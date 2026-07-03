@@ -1,9 +1,11 @@
 name: Web Build & Deploy
 
-# Exports the Godot project for the web and publishes it to GitHub Pages,
+# Exports the Godot project for the web and publishes it to the gh-pages
+# branch, which GitHub serves automatically at
+#   https://brookskemory-ops.github.io/game/
 # giving a play-in-browser test link on every push to the dev branch.
-# The web export uses thread_support=false so it runs on Pages without
-# cross-origin-isolation headers.
+# The web export uses thread_support=false so it runs on Pages and mobile
+# browsers without cross-origin-isolation headers.
 
 on:
   push:
@@ -12,9 +14,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
@@ -85,25 +85,12 @@ jobs:
         run: |
           mkdir -p build/web
           godot --headless --export-release "Web" build/web/index.html
+          touch build/web/.nojekyll
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: build/web
-
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
+          force_orphan: true
+          commit_message: "Deploy web build"
