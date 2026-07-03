@@ -215,13 +215,19 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	panel.add_child(column)
 	_center(_vignette_overlay, panel)
-	_vignette_overlay.gui_input.connect(func(event: InputEvent) -> void:
-		if _is_press(event):
+	# Tap ANYWHERE closes — including on the panel itself, which otherwise
+	# swallows the tap (PanelContainer defaults to MOUSE_FILTER_STOP; on a
+	# phone the panel is most of the screen, so the game read as frozen).
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	var close := func(event: InputEvent) -> void:
+		if _is_press(event) and _vignette_overlay != null:
 			Sfx.play("ui")
 			_vignette_overlay.queue_free()
 			_vignette_overlay = null
 			_show_next_unlock_vignette()
-	)
+	_vignette_overlay.gui_input.connect(close)
+	panel.gui_input.connect(close)
 
 # --- The ending (Block B): the Hollow King's last bargain ---
 
@@ -282,13 +288,16 @@ func _show_ending_epilogue(ending_id: String) -> void:
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	panel.add_child(column)
 	_center(_ending_overlay, panel)
-	_ending_overlay.gui_input.connect(func(event: InputEvent) -> void:
-		if _is_press(event):
+	# Same tap-anywhere rule as vignettes (the panel must not eat the tap).
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	var close := func(event: InputEvent) -> void:
+		if _is_press(event) and _ending_overlay != null:
 			Sfx.play("ui")
 			_ending_overlay.queue_free()
 			_ending_overlay = null
 			_show_next_unlock_vignette()
-	)
+	_ending_overlay.gui_input.connect(close)
+	panel.gui_input.connect(close)
 
 # --- The WARES shop ---
 
