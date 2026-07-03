@@ -92,7 +92,7 @@ func _make_hero_column(hero_id: String) -> VBoxContainer:
 	inner.add_theme_constant_override("separation", 4)
 	_place(inner, 0.0, 0.0, 1.0, 1.0, Rect2(6, 6, -12, -12))
 	var portrait := TextureRect.new()
-	portrait.texture = PixelSprites.get_tex(String(def.get("sprite", "wren")))
+	portrait.texture = _portrait_texture(hero_id, String(def.get("sprite", "wren")))
 	portrait.custom_minimum_size = Vector2(0, 54)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -131,6 +131,14 @@ func _make_hero_column(hero_id: String) -> VBoxContainer:
 
 # --- Story vignettes ---
 
+## Pixel Lab portrait if one exists (docs/ASSET_PIPELINE.md), else the
+## procedural sprite.
+func _portrait_texture(hero_id: String, sprite_id: String) -> Texture2D:
+	var path := "res://assets/portraits/%s.png" % hero_id
+	if ResourceLoader.exists(path):
+		return load(path)
+	return PixelSprites.get_tex(sprite_id)
+
 func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 	if not _vignettes.has(hero_id) or _vignette_overlay != null:
 		return
@@ -141,6 +149,12 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 	column.custom_minimum_size = Vector2(460, 0)
 	if from_unlock:
 		column.add_child(UITheme.make_label("A NEW FACE AT THE FIRE", 13, Palette.ASH))
+	var face := TextureRect.new()
+	face.texture = _portrait_texture(hero_id, hero_id)
+	face.custom_minimum_size = Vector2(0, 84)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	column.add_child(face)
 	column.add_child(UITheme.make_label(String(vignette.get("title", "")), 28, Palette.TORCH, true))
 	for line in vignette.get("lines", []):
 		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
