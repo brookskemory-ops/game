@@ -25,7 +25,7 @@ var _boss_summoned := false
 var _trickle_acc := 0.0
 
 func _ready() -> void:
-	var data: Variant = Game.load_json("res://data/waves/stage1.json")
+	var data: Variant = Game.load_json(Game.stage_path())
 	if data is Dictionary:
 		stage = data
 	_wave_acc.resize(waves().size())

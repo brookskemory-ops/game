@@ -165,6 +165,16 @@ func write_save() -> void:
 	file.store_string(JSON.stringify(save_data))
 	file.close()
 
+## Which stage the arena loads. On web builds a `?stage=qa` URL parameter
+## swaps in the 45-second QA stage so automated tests can play full runs
+## (docs/NIGHT_SHIFT.md WP2). Ignored everywhere else.
+func stage_path() -> String:
+	if OS.has_feature("web"):
+		var search := String(JavaScriptBridge.eval("window.location.search", true))
+		if search.contains("stage=qa"):
+			return "res://data/waves/qa.json"
+	return "res://data/waves/stage1.json"
+
 ## Loads a JSON data file (all game content is data — see data/README.md).
 func load_json(path: String) -> Variant:
 	var text := FileAccess.get_file_as_string(path)
