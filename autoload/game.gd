@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.13.4 — the fire answers"
+const VERSION := "0.14.0 — rites of the vigil, part i"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).

@@ -52,10 +52,15 @@ func roll() -> Array:
 				"tag": "new weapon",
 			})
 	# Take a passive.
+	# 3+3 rule: once three distinct keepsakes are held, only those three may
+	# deepen — no new ones appear (docs/ABILITIES.md).
+	var at_passive_cap: bool = player.passive_stacks.size() >= Player.MAX_PASSIVES
 	for passive_id in passives:
 		var def: Dictionary = passives[passive_id]
 		var stacks := int(player.passive_stacks.get(passive_id, 0))
 		if stacks >= int(def.get("max_stacks", 5)):
+			continue
+		if at_passive_cap and stacks == 0:
 			continue
 		var tag := "keepsake"
 		if stacks > 0:

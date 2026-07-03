@@ -11,6 +11,7 @@ signal hurt(amount: float)
 signal died
 
 const MAX_WEAPONS := 3
+const MAX_PASSIVES := 3  # distinct keepsakes; stacks within each stay allowed
 const LIGHTFOOT_RADIUS := 70.0
 const LIGHTFOOT_BONUS := 1.15
 const HURT_PULSE_THRESHOLD := 4.0
@@ -183,6 +184,10 @@ func damage_multiplier() -> float:
 	return multiplier
 
 func apply_passive(id: String, def: Dictionary) -> void:
+	# 3+3 build rule (docs/ABILITIES.md): three keepsakes, no more. The draft
+	# never offers a fourth; this guard is the belt to that suspender.
+	if not passive_stacks.has(id) and passive_stacks.size() >= MAX_PASSIVES:
+		return
 	passive_stacks[id] = int(passive_stacks.get(id, 0)) + 1
 	var effects: Dictionary = def.get("effects", {})
 	for key in effects:

@@ -7,6 +7,9 @@ extends Control
 const HP_BAR := Rect2(14, 12, 150, 10)
 const XP_BAR_HEIGHT := 5.0
 const RESULTS_INPUT_DELAY_MS := 600
+const TRAY_POS := Vector2(14, 46)  # 3+3 build tray under the gold count
+const TRAY_SLOT := 16.0
+const TRAY_GAP := 4.0
 
 var _arena  # untyped: arena exposes time_elapsed / run_length()
 var _player: Player
@@ -134,6 +137,7 @@ func _draw() -> void:
 	# --- Gold coin icon (under the HP bar) ---
 	if _coin_tex != null:
 		draw_texture(_coin_tex, Vector2(15.0, 30.0))
+	_draw_build_tray()
 	# --- Boss HP bar (bottom center, above the XP bar) ---
 	if _enemies != null and _enemies.boss_active():
 		var bar_w := minf(w * 0.5, 280.0)
@@ -165,6 +169,63 @@ func _draw() -> void:
 			draw_rect(Rect2(0, h - t, w, t), c)
 			draw_rect(Rect2(0, 0, t, h), c)
 			draw_rect(Rect2(w - t, 0, t, h), c)
+
+## The 3+3 build tray: a row of weapon slots over a row of keepsake slots.
+## Icons from assets/icons/{weapons,passives}/<id>.png when present; a plain
+## initial letter otherwise (procedural-fallback doctrine).
+func _draw_build_tray() -> void:
+	if _player == null:
+		return
+	var font := UITheme.body_font()
+	for i in Player.MAX_WEAPONS:
+		var slot := Rect2(TRAY_POS + Vector2(float(i) * (TRAY_SLOT + TRAY_GAP), 0.0),
+			Vector2(TRAY_SLOT, TRAY_SLOT))
+		_draw_tray_slot(slot, i < _player.weapons.size())
+		if i < _player.weapons.size():
+			var weapon: Weapon = _player.weapons[i]
+			_draw_tray_content(slot, "weapons", weapon.weapon_id(),
+				weapon.display_name(), font)
+			if font != null:  # level, small, bottom-right corner
+				draw_string(font, slot.position + Vector2(TRAY_SLOT - 5.0, TRAY_SLOT - 1.0),
+					str(weapon.level), HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Palette.TORCH)
+	var passive_ids := _player.passive_stacks.keys()
+	for i in Player.MAX_PASSIVES:
+		var slot := Rect2(TRAY_POS + Vector2(float(i) * (TRAY_SLOT + TRAY_GAP), TRAY_SLOT + TRAY_GAP),
+			Vector2(TRAY_SLOT, TRAY_SLOT))
+		_draw_tray_slot(slot, i < passive_ids.size())
+		if i < passive_ids.size():
+			var pid := String(passive_ids[i])
+			_draw_tray_content(slot, "passives", pid, pid, font)
+			if font != null:
+				draw_string(font, slot.position + Vector2(TRAY_SLOT - 5.0, TRAY_SLOT - 1.0),
+					str(int(_player.passive_stacks[pid])), HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Palette.BONE)
+
+func _draw_tray_slot(slot: Rect2, filled: bool) -> void:
+	draw_rect(Rect2(slot.position - Vector2.ONE, slot.size + Vector2.ONE * 2.0),
+		Color(Palette.IRON.r, Palette.IRON.g, Palette.IRON.b, 0.8 if filled else 0.35))
+	draw_rect(slot, Color(Palette.INK.r, Palette.INK.g, Palette.INK.b, 0.85 if filled else 0.5))
+
+func _draw_tray_content(slot: Rect2, kind: String, id: String, display: String, font: Font) -> void:
+	var tex := _icon(kind, id)
+	if tex != null:
+		draw_texture_rect(tex, slot.grow(-1.0), false)
+	elif font != null and not display.is_empty():
+		draw_string(font, slot.position + Vector2(4.0, TRAY_SLOT - 4.0),
+			display.substr(0, 1).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Palette.PARCHMENT)
+
+var _icon_cache := {}
+
+## Lazy icon lookup; a missing file caches as null so we only probe once.
+func _icon(kind: String, id: String) -> Texture2D:
+	var key := kind + "/" + id
+	if _icon_cache.has(key):
+		return _icon_cache[key]
+	var path := "res://assets/icons/%s/%s.png" % [kind, id]
+	var tex: Texture2D = null
+	if ResourceLoader.exists(path):
+		tex = load(path)
+	_icon_cache[key] = tex
+	return tex
 
 # --- Signal handlers ---
 
@@ -257,6 +318,16 @@ func _make_draft_card(option: Dictionary, on_pick: Callable) -> Button:
 	_place(inner, 0.0, 0.0, 1.0, 1.0, Rect2(8, 8, -16, -16))
 	var tag := UITheme.make_label(String(option.get("tag", "")), 9, Palette.ASH)
 	inner.add_child(tag)
+	# Icon (when the asset exists): weapon or keepsake, drawn above the title.
+	var icon_tex := _draft_icon(option)
+	if icon_tex != null:
+		var icon := TextureRect.new()
+		icon.texture = icon_tex
+		icon.custom_minimum_size = Vector2(0, 28)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		inner.add_child(icon)
 	var title := UITheme.make_label(String(option.get("title", "")), 14, Palette.TORCH)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	inner.add_child(title)
@@ -273,6 +344,18 @@ func _make_draft_card(option: Dictionary, on_pick: Callable) -> Button:
 			toast(String(message))
 	)
 	return card
+
+func _draft_icon(option: Dictionary) -> Texture2D:
+	match String(option.get("type", "")):
+		"weapon_up":
+			var weapon: Weapon = option.get("weapon")
+			if weapon != null:
+				return _icon("weapons", weapon.weapon_id())
+		"weapon_new":
+			return _icon("weapons", String(option.get("id", "")))
+		"passive":
+			return _icon("passives", String(option.get("id", "")))
+	return null
 
 func close_draft() -> void:
 	if _draft_panel != null:

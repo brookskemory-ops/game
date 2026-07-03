@@ -82,3 +82,10 @@ percentage reduction vs Oaken Shield's flat tick armor — different niche).
 - Passives are pure stat modifiers in data (Phase 2) — never bespoke logic per passive.
 - When Phase 2's upgrade draft is built, the pool must never offer two weapons from the same
   Delivery family in one draft of three (small quality rule that keeps choices interesting).
+
+## 6. The 3+3 rule (v0.14)
+
+A build is **3 weapons + 3 keepsakes, no more** (`Player.MAX_WEAPONS` /
+`Player.MAX_PASSIVES`). Once three distinct keepsakes are held, drafts only offer
+deepening those three. Evolutions remain reachable by design: a weapon and its catalyst
+fit inside 3+3. The HUD build tray (under the HP bar) shows all six slots.

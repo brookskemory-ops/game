@@ -2,7 +2,7 @@
 	"id": "stage3",
 	"name": "Castle Vane",
 	"theme": "castle",
-	"run_length": 360,
+	"run_length": 600,
 	"boss": "chapel_thing",
 	"boss_banner": "the chapel door stands open",
 	"boss_trickle": "courtier",
@@ -10,25 +10,25 @@
 	"victory_unlock": "hollow_king",
 	"events": [
 		{
-			"t": 90,
+			"t": 180,
 			"spawn": "risen_knight",
 			"count": 4,
 			"announce": "The honor guard answers an older oath..."
 		},
 		{
-			"t": 170,
+			"t": 300,
 			"spawn": "chorister",
 			"count": 1,
 			"announce": "A hymn drifts from the sealed chapel..."
 		},
 		{
-			"t": 260,
+			"t": 420,
 			"spawn": "crypt_archer",
-			"count": 7,
+			"count": 8,
 			"announce": "Arrows from the battlements!"
 		},
 		{
-			"t": 310,
+			"t": 520,
 			"spawn": "chorister",
 			"count": 2,
 			"announce": "The choir swells..."
@@ -37,59 +37,80 @@
 	"waves": [
 		{
 			"from": 0,
-			"to": 70,
+			"to": 90,
 			"type": "courtier",
 			"interval": 1.4,
 			"count": 2
 		},
 		{
-			"from": 35,
-			"to": 140,
+			"from": 45,
+			"to": 180,
 			"type": "crypt_archer",
 			"interval": 3.4,
 			"count": 1
 		},
 		{
-			"from": 60,
-			"to": 220,
+			"from": 75,
+			"to": 260,
 			"type": "risen_knight",
 			"interval": 4.0,
 			"count": 1
 		},
 		{
 			"from": 90,
-			"to": 260,
+			"to": 300,
 			"type": "courtier",
 			"interval": 0.9,
 			"count": 3
 		},
 		{
-			"from": 140,
-			"to": 320,
+			"from": 180,
+			"to": 420,
 			"type": "crypt_archer",
-			"interval": 2.2,
-			"count": 2
-		},
-		{
-			"from": 200,
-			"to": 360,
-			"type": "risen_knight",
-			"interval": 2.0,
+			"interval": 2.4,
 			"count": 2
 		},
 		{
 			"from": 260,
-			"to": 360,
-			"type": "courtier",
-			"interval": 0.45,
-			"count": 4
+			"to": 480,
+			"type": "risen_knight",
+			"interval": 2.2,
+			"count": 2
 		},
 		{
 			"from": 300,
-			"to": 360,
-			"type": "gnawer",
-			"interval": 1.2,
+			"to": 520,
+			"type": "courtier",
+			"interval": 0.7,
 			"count": 3
+		},
+		{
+			"from": 350,
+			"to": 550,
+			"type": "gnawer",
+			"interval": 1.4,
+			"count": 3
+		},
+		{
+			"from": 420,
+			"to": 600,
+			"type": "crypt_archer",
+			"interval": 1.8,
+			"count": 2
+		},
+		{
+			"from": 480,
+			"to": 600,
+			"type": "risen_knight",
+			"interval": 1.6,
+			"count": 3
+		},
+		{
+			"from": 520,
+			"to": 600,
+			"type": "courtier",
+			"interval": 0.5,
+			"count": 4
 		}
 	],
 	"ground": {

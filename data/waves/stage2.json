@@ -2,18 +2,12 @@
 	"id": "stage2",
 	"name": "The Wailing Forest",
 	"theme": "forest",
-	"run_length": 330,
+	"run_length": 600,
 	"boss": "briar_queen",
 	"boss_trickle": "bone_stag",
 	"boss_trickle_interval": 2.2,
 	"victory_unlock": "roland",
 	"events": [
-		{
-			"t": 75,
-			"spawn": "wight",
-			"count": 3,
-			"announce": "The barrows breathe open..."
-		},
 		{
 			"t": 150,
 			"spawn": "tolling_man",
@@ -21,70 +15,104 @@
 			"announce": "A bell tolls between the trees..."
 		},
 		{
-			"t": 230,
+			"t": 300,
+			"spawn": "wight",
+			"count": 4,
+			"announce": "The barrows breathe open..."
+		},
+		{
+			"t": 450,
+			"spawn": "tolling_man",
+			"count": 2,
+			"announce": "Two bells now. Run."
+		},
+		{
+			"t": 540,
 			"spawn": "bone_stag",
-			"count": 6,
+			"count": 8,
 			"announce": "Hoofbeats. Too many hoofbeats."
 		}
 	],
 	"waves": [
 		{
 			"from": 0,
-			"to": 60,
+			"to": 70,
 			"type": "shambler",
-			"interval": 1.1,
+			"interval": 1.2,
 			"count": 2
 		},
 		{
-			"from": 20,
-			"to": 120,
+			"from": 30,
+			"to": 160,
 			"type": "hanged_man",
-			"interval": 2.4,
+			"interval": 2.6,
 			"count": 1,
 			"distance": 170
 		},
 		{
-			"from": 50,
-			"to": 200,
+			"from": 60,
+			"to": 240,
 			"type": "wight",
 			"interval": 3.2,
 			"count": 1
 		},
 		{
-			"from": 80,
-			"to": 240,
+			"from": 100,
+			"to": 280,
 			"type": "bone_stag",
 			"interval": 2.8,
 			"count": 2
 		},
 		{
-			"from": 120,
-			"to": 330,
+			"from": 160,
+			"to": 380,
 			"type": "hanged_man",
-			"interval": 1.4,
+			"interval": 1.6,
 			"count": 2,
 			"distance": 170
 		},
 		{
-			"from": 180,
-			"to": 330,
+			"from": 240,
+			"to": 460,
 			"type": "wight",
-			"interval": 1.8,
+			"interval": 2.0,
 			"count": 2
 		},
 		{
-			"from": 240,
-			"to": 330,
+			"from": 280,
+			"to": 500,
 			"type": "bone_stag",
-			"interval": 1.1,
+			"interval": 1.6,
+			"count": 2
+		},
+		{
+			"from": 300,
+			"to": 450,
+			"type": "shambler",
+			"interval": 0.8,
 			"count": 3
 		},
 		{
-			"from": 270,
-			"to": 330,
-			"type": "shambler",
-			"interval": 0.5,
-			"count": 4
+			"from": 380,
+			"to": 600,
+			"type": "hanged_man",
+			"interval": 1.2,
+			"count": 3,
+			"distance": 170
+		},
+		{
+			"from": 460,
+			"to": 600,
+			"type": "wight",
+			"interval": 1.4,
+			"count": 2
+		},
+		{
+			"from": 500,
+			"to": 600,
+			"type": "bone_stag",
+			"interval": 1.0,
+			"count": 3
 		}
 	],
 	"ground": {
