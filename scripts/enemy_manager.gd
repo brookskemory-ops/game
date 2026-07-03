@@ -35,6 +35,7 @@ var _flash := PackedFloat32Array()
 var _wobble := PackedVector2Array()  # fixed per-enemy offset so the horde doesn't stack into one point
 var _phase := PackedFloat32Array()   # per-enemy animation phase
 var _facing := PackedFloat32Array()
+var _push := PackedVector2Array()    # knockback impulse, decays fast
 var _free := PackedInt32Array()
 var _alive_count := 0
 
@@ -54,6 +55,7 @@ func setup(player: Node2D, p_player_radius: float, gems: GemManager) -> void:
 	_wobble.resize(MAX_ENEMIES)
 	_phase.resize(MAX_ENEMIES)
 	_facing.resize(MAX_ENEMIES)
+	_push.resize(MAX_ENEMIES)
 	_free.resize(MAX_ENEMIES)
 	for i in MAX_ENEMIES:
 		_alive[i] = 0
@@ -101,6 +103,7 @@ func spawn(type_name: String, at: Vector2) -> void:
 	_wobble[slot] = Vector2.from_angle(randf() * TAU) * randf_range(2.0, 26.0)
 	_phase[slot] = randf() * TAU
 	_facing[slot] = 1.0
+	_push[slot] = Vector2.ZERO
 	_alive_count += 1
 
 func _physics_process(delta: float) -> void:
@@ -125,6 +128,12 @@ func _physics_process(delta: float) -> void:
 			_pos[i] += dir * float(def.get("speed", 40)) * delta
 			if absf(dir.x) > 0.1:
 				_facing[i] = -1.0 if dir.x < 0.0 else 1.0
+		# Knockback impulse (from shovel swings etc.), decays fast.
+		if _push[i] != Vector2.ZERO:
+			_pos[i] += _push[i] * delta
+			_push[i] *= maxf(0.0, 1.0 - 7.0 * delta)
+			if _push[i].length_squared() < 4.0:
+				_push[i] = Vector2.ZERO
 		# Spatial hash insert.
 		var cell := Vector2i(int(floorf(_pos[i].x / CELL_SIZE)), int(floorf(_pos[i].y / CELL_SIZE)))
 		if _grid.has(cell):
@@ -144,8 +153,8 @@ func _physics_process(delta: float) -> void:
 		var xform := Transform2D(bob, Vector2(_facing[i], 1.0), 0.0, _pos[i])
 		_type_mm[_type[i]].set_instance_transform_2d(i, xform)
 
-	if contact_dps > 0.0 and _player.has_method("take_contact_damage"):
-		_player.take_contact_damage(contact_dps * delta)
+	if contact_dps > 0.0 and _player.has_method("take_contact_dps"):
+		_player.take_contact_dps(contact_dps, delta)
 
 	if not _puffs.is_empty():
 		for p in _puffs:
@@ -224,6 +233,11 @@ func nearest_enemy(from: Vector2, max_range: float) -> int:
 					best_dist = d
 					best = slot
 	return best
+
+func push_slot(slot: int, impulse: Vector2) -> void:
+	if slot < 0 or slot >= MAX_ENEMIES or _alive[slot] == 0:
+		return
+	_push[slot] = (_push[slot] + impulse).limit_length(280.0)
 
 func enemy_pos(slot: int) -> Vector2:
 	return _pos[slot]

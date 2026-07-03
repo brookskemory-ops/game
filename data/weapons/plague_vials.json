@@ -1,0 +1,14 @@
+{
+	"id": "plague_vials",
+	"name": "Plague Vials",
+	"niche": "lobbed zone at densest cluster, lingering DoT pools (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/vials.gd",
+	"draft_desc": "Hurled sickness that pools where the dead crowd thickest",
+	"up_desc": "Fouler brew, longer linger",
+	"cooldown": 2.2,
+	"damage": 10,
+	"range": 210,
+	"pool_radius": 34,
+	"duration": 3.2,
+	"max_level": 8
+}

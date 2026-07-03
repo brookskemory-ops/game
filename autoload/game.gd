@@ -6,7 +6,7 @@ extends Node
 signal run_started
 signal run_ended(victory: bool)
 
-const VERSION := "0.2.0 — phase 1 preview"
+const VERSION := "0.3.0 — the night provides"
 
 ## Player-facing settings (persisted in a later phase).
 var settings := {

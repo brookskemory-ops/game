@@ -1,14 +1,16 @@
 class_name Player
 extends CharacterBody2D
-## The hero. Stats and weapon come from data (data/characters/*.json) —
+## The hero. Stats and starting weapon come from data (data/characters/*.json) —
 ## adding a hero must never require touching this script (design pillar #2).
+## Leveling produces pending draft picks; the arena runs the upgrade drafts.
 
 signal hp_changed(current: float, max_value: float)
 signal xp_changed(xp: int, needed: int, level: int)
-signal leveled_up(level: int, message: String)
+signal leveled_up(level: int)
 signal hurt(amount: float)
 signal died
 
+const MAX_WEAPONS := 3
 const LIGHTFOOT_RADIUS := 70.0
 const LIGHTFOOT_BONUS := 1.15
 const HURT_PULSE_THRESHOLD := 4.0
@@ -16,6 +18,17 @@ const HURT_PULSE_THRESHOLD := 4.0
 var stats := {}
 var level := 1
 var xp := 0
+var pending_levels := 0  # unclaimed draft picks; consumed by the arena
+
+# Base stats (from character data) and passive modifiers.
+# mods: damage/cooldown/speed/pickup are multipliers (start 1.0);
+#       armor is flat DPS blocked; max_hp is a flat bonus.
+var mods := {"damage": 1.0, "cooldown": 1.0, "speed": 1.0, "pickup": 1.0, "armor": 0.0, "max_hp": 0.0}
+var passive_stacks := {}  # passive id -> stacks taken
+var base_max_hp := 80.0
+var base_move_speed := 130.0
+var base_pickup_radius := 48.0
+
 var max_hp := 80.0
 var hp := 80.0
 var move_speed := 130.0
@@ -23,40 +36,80 @@ var pickup_radius := 48.0
 var body_radius := 6.0
 var dead := false
 var lightfoot_active := false
+var facing := Vector2.RIGHT
 
+var weapons: Array = []  # of Weapon
+
+var _ctx := {}  # enemies / projectiles / hazards, shared with weapons
 var _enemies: EnemyManager
-var _projectiles: ProjectileManager
 var _joystick: VirtualJoystick
 var _sprite: Sprite2D
-var _weapon: Weapon
 var _camera: GameCamera
 var _lightfoot_timer := 0.0
-var _hurt_accum := 0.0  # aggregates contact DPS into discrete hurt pulses for feedback
+var _hurt_accum := 0.0  # aggregates contact DPS into discrete hurt pulses
 
-func setup(enemies: EnemyManager, projectiles: ProjectileManager) -> void:
-	_enemies = enemies
-	_projectiles = projectiles
+func setup(ctx: Dictionary) -> void:
+	_ctx = ctx
+	_enemies = ctx.get("enemies")
 	var data: Variant = Game.load_json("res://data/characters/wren.json")
 	if data is Dictionary:
 		stats = data
-	max_hp = float(stats.get("max_hp", 80))
-	hp = max_hp
-	move_speed = float(stats.get("move_speed", 130))
-	pickup_radius = float(stats.get("pickup_radius", 48))
+	base_max_hp = float(stats.get("max_hp", 80))
+	base_move_speed = float(stats.get("move_speed", 130))
+	base_pickup_radius = float(stats.get("pickup_radius", 48))
 	body_radius = float(stats.get("radius", 6))
+	max_hp = base_max_hp
+	hp = max_hp
+	move_speed = base_move_speed
+	pickup_radius = base_pickup_radius
 	_sprite = Sprite2D.new()
 	_sprite.texture = PixelSprites.get_tex(String(stats.get("sprite", "wren")))
 	add_child(_sprite)
-	_equip(String(stats.get("weapon", "hunting_bow")))
+	equip(String(stats.get("weapon", "hunting_bow")))
 
-func _equip(weapon_id: String) -> void:
+## Add a weapon by id. Returns the Weapon node, or null if slots are full / data missing.
+func equip(weapon_id: String) -> Weapon:
+	if weapons.size() >= MAX_WEAPONS:
+		return null
 	var def: Variant = Game.load_json("res://data/weapons/%s.json" % weapon_id)
 	if not (def is Dictionary):
+		return null
+	var weapon_script: Variant = load(String(def.get("script", "")))
+	if weapon_script == null:
+		return null
+	var weapon: Weapon = weapon_script.new()
+	weapon.init(def, self, _ctx)
+	add_child(weapon)
+	weapons.append(weapon)
+	return weapon
+
+func has_weapon(weapon_id: String) -> bool:
+	for weapon in weapons:
+		if weapon.weapon_id() == weapon_id:
+			return true
+	return false
+
+func apply_passive(id: String, def: Dictionary) -> void:
+	passive_stacks[id] = int(passive_stacks.get(id, 0)) + 1
+	var effects: Dictionary = def.get("effects", {})
+	for key in effects:
+		mods[key] = float(mods.get(key, 0.0)) + float(effects[key])
+	_recompute()
+
+func _recompute() -> void:
+	move_speed = base_move_speed * float(mods["speed"])
+	pickup_radius = base_pickup_radius * float(mods["pickup"])
+	var new_max := base_max_hp + float(mods["max_hp"])
+	if new_max > max_hp:
+		hp += new_max - max_hp  # raising the cap also heals the difference
+	max_hp = new_max
+	hp_changed.emit(hp, max_hp)
+
+func heal(amount: float) -> void:
+	if dead:
 		return
-	var weapon_script: Variant = load(String(def.get("script", "res://scripts/weapons/bow.gd")))
-	_weapon = weapon_script.new()
-	_weapon.init(def, self, _enemies, _projectiles)
-	add_child(_weapon)
+	hp = minf(max_hp, hp + amount)
+	hp_changed.emit(hp, max_hp)
 
 func _ready() -> void:
 	_joystick = get_tree().get_first_node_in_group("virtual_joystick") as VirtualJoystick
@@ -77,6 +130,8 @@ func _physics_process(delta: float) -> void:
 	var speed := move_speed * (LIGHTFOOT_BONUS if lightfoot_active else 1.0)
 	velocity = dir.limit_length(1.0) * speed
 	move_and_slide()
+	if velocity.length_squared() > 1.0:
+		facing = velocity.normalized()
 	if _sprite != null:
 		if absf(velocity.x) > 1.0:
 			_sprite.flip_h = velocity.x < 0.0
@@ -84,8 +139,12 @@ func _physics_process(delta: float) -> void:
 	if _hurt_accum > 0.0:
 		_hurt_accum = maxf(0.0, _hurt_accum - delta * 6.0)
 
-func take_contact_damage(amount: float) -> void:
+## Contact damage as DPS while touched, minus flat armor (Oaken Shield).
+func take_contact_dps(dps: float, delta: float) -> void:
 	if dead:
+		return
+	var amount := maxf(0.0, dps - float(mods["armor"])) * delta
+	if amount <= 0.0:
 		return
 	hp -= amount
 	hp_changed.emit(hp, max_hp)
@@ -109,17 +168,15 @@ func gain_xp(amount: int) -> void:
 	while xp >= needed:
 		xp -= needed
 		level += 1
-		var message := ""
-		if _weapon != null:
-			message = _weapon.on_level(level)
-		leveled_up.emit(level, message)
+		pending_levels += 1
+		leveled_up.emit(level)
 		if _camera != null:
 			_camera.add_trauma(0.12)
 		needed = xp_needed(level)
 	xp_changed.emit(xp, needed, level)
 
 func xp_needed(for_level: int) -> int:
-	return 4 + for_level * 3
+	return 5 + for_level * 4
 
 func _die() -> void:
 	dead = true

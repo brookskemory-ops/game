@@ -1,0 +1,14 @@
+{
+	"id": "iron_shovel",
+	"name": "Iron Shovel",
+	"niche": "facing-direction melee arc + knockback (docs/ABILITIES.md #2)",
+	"script": "res://scripts/weapons/shovel.gd",
+	"draft_desc": "A gravedigger's answer: a wide swing that batters the dead back",
+	"up_desc": "Heavier blade, wider swing",
+	"cooldown": 1.1,
+	"damage": 24,
+	"range": 52,
+	"arc_deg": 130,
+	"knockback": 160,
+	"max_level": 8
+}

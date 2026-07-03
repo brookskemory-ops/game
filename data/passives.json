@@ -1,0 +1,38 @@
+{
+	"whetstone": {
+		"name": "Whetstone",
+		"desc": "+15% damage",
+		"effects": { "damage": 0.15 },
+		"max_stacks": 5
+	},
+	"fleet_boots": {
+		"name": "Fleet Boots",
+		"desc": "+10% move speed",
+		"effects": { "speed": 0.10 },
+		"max_stacks": 5
+	},
+	"oaken_shield": {
+		"name": "Oaken Shield",
+		"desc": "Blocks 3 damage per second of contact",
+		"effects": { "armor": 3.0 },
+		"max_stacks": 5
+	},
+	"iron_rations": {
+		"name": "Iron Rations",
+		"desc": "+20 max HP, restored on pickup",
+		"effects": { "max_hp": 20.0 },
+		"max_stacks": 5
+	},
+	"lodestone": {
+		"name": "Lodestone",
+		"desc": "+30% gem pickup range",
+		"effects": { "pickup": 0.30 },
+		"max_stacks": 5
+	},
+	"hourglass": {
+		"name": "Hourglass",
+		"desc": "-10% weapon cooldowns",
+		"effects": { "cooldown": -0.10 },
+		"max_stacks": 5
+	}
+}

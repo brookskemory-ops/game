@@ -11,24 +11,52 @@ const SCATTER_RANGE := 1700.0
 @onready var enemies: EnemyManager = $EnemyManager
 @onready var projectiles: ProjectileManager = $ProjectileManager
 @onready var gems: GemManager = $GemManager
+@onready var hazards: HazardManager = $HazardManager
 @onready var hud: HUD = $UILayer/HUD
 
 var stage := {}
 var time_elapsed := 0.0
 var run_over := false
+var upgrades: UpgradeSystem
 var _wave_acc := PackedFloat32Array()
+var _draft_open := false
 
 func _ready() -> void:
 	var data: Variant = Game.load_json("res://data/waves/stage1.json")
 	if data is Dictionary:
 		stage = data
 	_wave_acc.resize(waves().size())
-	player.setup(enemies, projectiles)
+	player.setup({"enemies": enemies, "projectiles": projectiles, "hazards": hazards})
 	enemies.setup(player, player.body_radius, gems)
 	projectiles.setup(enemies)
+	hazards.setup(enemies)
 	gems.setup(player, player.pickup_radius)
 	hud.setup(self, player, enemies)
+	upgrades = UpgradeSystem.new(player)
 	player.died.connect(_on_player_died)
+	player.leveled_up.connect(_on_player_leveled)
+
+# --- Upgrade draft flow (queues if several levels land at once) ---
+
+func _on_player_leveled(_level: int) -> void:
+	if not _draft_open and not run_over:
+		_open_draft()
+
+func _open_draft() -> void:
+	if player.pending_levels <= 0 or run_over:
+		return
+	player.pending_levels -= 1
+	_draft_open = true
+	hud.show_draft(upgrades.roll(), _on_draft_pick)
+
+func _on_draft_pick(option: Dictionary) -> String:
+	var message := upgrades.apply(option)
+	_draft_open = false
+	if player.pending_levels > 0 and not run_over:
+		_open_draft()
+	elif not run_over:
+		get_tree().paused = false
+	return message
 
 func waves() -> Array:
 	return stage.get("waves", [])

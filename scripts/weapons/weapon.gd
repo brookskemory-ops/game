@@ -9,32 +9,61 @@ var def := {}
 var wielder: Player
 var enemies: EnemyManager
 var projectiles: ProjectileManager
+var hazards: HazardManager
 
+var level := 1
 var damage_mul := 1.0
 var extra_projectiles := 0
 
 var _cooldown_left := 0.0
 
-func init(p_def: Dictionary, p_wielder: Player, p_enemies: EnemyManager, p_projectiles: ProjectileManager) -> void:
+func init(p_def: Dictionary, p_wielder: Player, ctx: Dictionary) -> void:
 	def = p_def
 	wielder = p_wielder
-	enemies = p_enemies
-	projectiles = p_projectiles
+	enemies = ctx.get("enemies")
+	projectiles = ctx.get("projectiles")
+	hazards = ctx.get("hazards")
 
 func _physics_process(delta: float) -> void:
 	if wielder == null or wielder.dead:
 		return
 	_cooldown_left -= delta
 	if _cooldown_left <= 0.0 and _try_fire():
-		_cooldown_left = float(def.get("cooldown", 1.0))
+		_cooldown_left = cooldown()
 
 ## Override per weapon. Return true only if the weapon actually fired
 ## (so weapons hold their shot when no target is in range).
 func _try_fire() -> bool:
 	return false
 
-## Phase 1 auto-growth on level up (Phase 2 replaces this with upgrade choices).
-## Returns a flavor message for the HUD toast.
-func on_level(_level: int) -> String:
-	damage_mul *= 1.08
-	return "Resolve hardens  (+8% damage)"
+# --- Stats (always routed through the wielder's passive modifiers) ---
+
+func display_name() -> String:
+	return String(def.get("name", "Weapon"))
+
+func weapon_id() -> String:
+	return String(def.get("id", ""))
+
+func damage() -> float:
+	return float(def.get("damage", 10)) * damage_mul * wielder.mods["damage"]
+
+func cooldown() -> float:
+	return float(def.get("cooldown", 1.0)) * clampf(wielder.mods["cooldown"], 0.5, 2.0)
+
+func max_level() -> int:
+	return int(def.get("max_level", 8))
+
+# --- Leveling (chosen in the upgrade draft) ---
+
+func upgrade() -> String:
+	level += 1
+	return _on_upgrade(level)
+
+## Override for weapon-specific growth. Returns the toast message.
+func _on_upgrade(_new_level: int) -> String:
+	damage_mul *= 1.12
+	return "%s: +12%% damage" % display_name()
+
+## Short line shown on the draft card for an upgrade of this weapon.
+func upgrade_preview() -> String:
+	return String(def.get("up_desc", "Grows stronger"))

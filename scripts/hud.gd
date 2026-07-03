@@ -25,6 +25,7 @@ var _vignette := 0.0
 var _xp_flash := 0.0
 var _hp_frac := 1.0        # smoothed toward _hp_target for a draining bar
 var _hp_target := 1.0
+var _draft_panel: Control
 var _results_shown := false
 var _results_victory := false
 var _results_stats := {}
@@ -142,12 +143,10 @@ func _on_hp_changed(current: float, max_value: float) -> void:
 func _on_hurt(_amount: float) -> void:
 	_vignette = 1.0
 
-func _on_leveled_up(_level: int, message: String) -> void:
+func _on_leveled_up(_level: int) -> void:
 	_xp_flash = 1.0
-	if not message.is_empty():
-		_toast(message)
 
-func _toast(text: String) -> void:
+func toast(text: String) -> void:
 	var label := UITheme.make_label(text, 12, Palette.TORCH)
 	_toast_box.add_child(label)
 	while _toast_box.get_child_count() > 3:
@@ -159,10 +158,68 @@ func _toast(text: String) -> void:
 	tween.tween_property(label, "modulate:a", 0.0, 0.5)
 	tween.tween_callback(label.queue_free)
 
+# --- Upgrade draft (pick 1 of 3 on level up) ---
+
+## Shows the draft and pauses the night. `on_pick` receives the chosen option
+## and must return the toast message. Unpausing is the caller's decision
+## (it may chain straight into the next queued draft).
+func show_draft(options: Array, on_pick: Callable) -> void:
+	if _results_shown:
+		return
+	get_tree().paused = true
+	_pause_button.visible = false
+	_draft_panel = _build_overlay_base()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 12)
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_child(UITheme.make_label("THE NIGHT PROVIDES", 26, Palette.PARCHMENT, true))
+	column.add_child(UITheme.make_label("choose one", 11, Palette.ASH))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	for option in options:
+		row.add_child(_make_draft_card(option, on_pick))
+	column.add_child(row)
+	_center_in_overlay(_draft_panel, column)
+
+func _make_draft_card(option: Dictionary, on_pick: Callable) -> Button:
+	var card := UITheme.make_button("", 12)
+	card.custom_minimum_size = Vector2(150, 132)
+	var inner := VBoxContainer.new()
+	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_theme_constant_override("separation", 6)
+	_place(inner, 0.0, 0.0, 1.0, 1.0, Rect2(8, 8, -16, -16))
+	var tag := UITheme.make_label(String(option.get("tag", "")), 9, Palette.ASH)
+	inner.add_child(tag)
+	var title := UITheme.make_label(String(option.get("title", "")), 14, Palette.TORCH)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	inner.add_child(title)
+	var desc := UITheme.make_label(String(option.get("desc", "")), 11, Palette.PARCHMENT)
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	inner.add_child(desc)
+	card.add_child(inner)
+	card.pressed.connect(func() -> void:
+		close_draft()
+		var message: Variant = on_pick.call(option)
+		if message is String and not String(message).is_empty():
+			toast(String(message))
+	)
+	return card
+
+func close_draft() -> void:
+	if _draft_panel != null:
+		_draft_panel.queue_free()
+		_draft_panel = null
+	_pause_button.visible = not _results_shown
+
+func draft_open() -> bool:
+	return _draft_panel != null
+
 # --- Pause ---
 
 func toggle_pause() -> void:
-	if _results_shown:
+	if _results_shown or draft_open():
 		return
 	var tree := get_tree()
 	tree.paused = not tree.paused
@@ -196,6 +253,7 @@ func _abandon_run() -> void:
 func show_results(victory: bool, stats: Dictionary) -> void:
 	if _results_shown:
 		return
+	close_draft()
 	_results_shown = true
 	_results_victory = victory
 	_results_stats = stats

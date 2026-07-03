@@ -1,7 +1,7 @@
 class_name HuntingBow
 extends Weapon
 ## Wren's Hunting Bow — niche: nearest-target piercing projectile
-## (see docs/ABILITIES.md, weapon #1).
+## (docs/ABILITIES.md weapon #1).
 
 func _try_fire() -> bool:
 	var target := enemies.nearest_enemy(wielder.global_position, float(def.get("range", 220)))
@@ -17,16 +17,16 @@ func _try_fire() -> bool:
 		projectiles.fire(
 			wielder.global_position,
 			dir.rotated(angle_off),
-			float(def.get("damage", 10)) * damage_mul,
+			damage(),
 			float(def.get("proj_speed", 420)),
 			float(def.get("proj_ttl", 0.9)),
 			int(def.get("pierce", 1))
 		)
 	return true
 
-func on_level(level: int) -> String:
-	if level % 3 == 0:
+func _on_upgrade(new_level: int) -> String:
+	if new_level % 3 == 0:
 		extra_projectiles += 1
-		return "Another arrow nocked  (+1 arrow)"
-	damage_mul *= 1.08
-	return "The bow grows keener  (+8% damage)"
+		return "Hunting Bow: another arrow nocked (+1 arrow)"
+	damage_mul *= 1.10
+	return "Hunting Bow: the string sings keener (+10% damage)"

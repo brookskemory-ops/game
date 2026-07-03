@@ -61,6 +61,10 @@ func _physics_process(delta: float) -> void:
 		return
 	_time += delta
 	var ppos: Vector2 = _player.global_position
+	# Read live so pickup-range passives (Lodestone) take effect immediately.
+	var live_radius: Variant = _player.get("pickup_radius")
+	if live_radius != null:
+		_pickup_radius = float(live_radius)
 	for i in CAP:
 		if _alive[i] == 0:
 			continue
