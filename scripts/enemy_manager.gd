@@ -42,6 +42,7 @@ var _wobble := PackedVector2Array()  # fixed per-enemy offset so the horde doesn
 var _phase := PackedFloat32Array()   # per-enemy animation phase
 var _facing := PackedFloat32Array()
 var _push := PackedVector2Array()    # knockback impulse, decays fast
+var _slow := PackedFloat32Array()    # remaining slow time (0.6x speed while > 0)
 var _free := PackedInt32Array()
 var _alive_count := 0
 
@@ -63,6 +64,7 @@ func setup(player: Node2D, p_player_radius: float, gems: GemManager) -> void:
 	_phase.resize(MAX_ENEMIES)
 	_facing.resize(MAX_ENEMIES)
 	_push.resize(MAX_ENEMIES)
+	_slow.resize(MAX_ENEMIES)
 	_free.resize(MAX_ENEMIES)
 	for i in MAX_ENEMIES:
 		_alive[i] = 0
@@ -121,6 +123,7 @@ func spawn(type_name: String, at: Vector2) -> void:
 	_phase[slot] = randf() * TAU
 	_facing[slot] = 1.0
 	_push[slot] = Vector2.ZERO
+	_slow[slot] = 0.0
 	_alive_count += 1
 	if bool(_type_defs[type_id].get("boss", false)):
 		_boss_slot = slot
@@ -146,7 +149,11 @@ func _physics_process(delta: float) -> void:
 		var dist := to_target.length()
 		if dist > 2.0:
 			var dir := to_target / dist
-			_pos[i] += dir * float(def.get("speed", 40)) * delta
+			var speed_mul := 1.0
+			if _slow[i] > 0.0:
+				_slow[i] -= delta
+				speed_mul = 0.6
+			_pos[i] += dir * float(def.get("speed", 40)) * speed_mul * delta
 			if absf(dir.x) > 0.1:
 				_facing[i] = -1.0 if dir.x < 0.0 else 1.0
 		# Knockback impulse (from shovel swings etc.), decays fast.
@@ -321,6 +328,16 @@ func push_slot(slot: int, impulse: Vector2) -> void:
 	if slot < 0 or slot >= MAX_ENEMIES or _alive[slot] == 0:
 		return
 	_push[slot] = (_push[slot] + impulse).limit_length(280.0)
+
+func slow_slot(slot: int, duration: float) -> void:
+	if slot < 0 or slot >= MAX_ENEMIES or _alive[slot] == 0:
+		return
+	_slow[slot] = maxf(_slow[slot], duration)
+
+func slot_def(slot: int) -> Dictionary:
+	if slot < 0 or slot >= MAX_ENEMIES or _alive[slot] == 0:
+		return {}
+	return _type_defs[_type[slot]]
 
 func enemy_pos(slot: int) -> Vector2:
 	return _pos[slot]

@@ -14,5 +14,6 @@
 	"orbit_speed": 2.6,
 	"orb_radius": 9,
 	"hit_interval": 0.5,
-	"max_level": 8
+	"max_level": 8,
+	"family": "orbit"
 }

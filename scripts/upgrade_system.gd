@@ -46,6 +46,7 @@ func roll() -> Array:
 			candidates.append({
 				"type": "weapon_new",
 				"id": weapon_id,
+				"family": String(def.get("family", "")),
 				"title": String(def.get("name", weapon_id)),
 				"desc": String(def.get("draft_desc", "A new weapon")),
 				"tag": "new weapon",
@@ -67,7 +68,19 @@ func roll() -> Array:
 			"tag": tag,
 		})
 	candidates.shuffle()
-	var options := candidates.slice(0, DRAFT_SIZE)
+	# Quality rule (docs/ABILITIES.md §5): a draft never offers two new weapons
+	# from the same delivery family.
+	var options: Array = []
+	var families := {}
+	for candidate in candidates:
+		if options.size() >= DRAFT_SIZE:
+			break
+		if String(candidate.get("type", "")) == "weapon_new":
+			var family := String(candidate.get("family", ""))
+			if not family.is_empty() and families.has(family):
+				continue
+			families[family] = true
+		options.append(candidate)
 	if options.is_empty():
 		options.append({
 			"type": "heal",

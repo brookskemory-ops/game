@@ -2,49 +2,81 @@
 	"whetstone": {
 		"name": "Whetstone",
 		"desc": "+15% damage",
-		"effects": { "damage": 0.15 },
+		"effects": {
+			"damage": 0.15
+		},
 		"max_stacks": 5
 	},
 	"fleet_boots": {
 		"name": "Fleet Boots",
 		"desc": "+10% move speed",
-		"effects": { "speed": 0.10 },
+		"effects": {
+			"speed": 0.1
+		},
 		"max_stacks": 5
 	},
 	"oaken_shield": {
 		"name": "Oaken Shield",
 		"desc": "Blocks 3 damage per second of contact",
-		"effects": { "armor": 3.0 },
+		"effects": {
+			"armor": 3.0
+		},
 		"max_stacks": 5
 	},
 	"iron_rations": {
 		"name": "Iron Rations",
 		"desc": "+20 max HP, restored on pickup",
-		"effects": { "max_hp": 20.0 },
+		"effects": {
+			"max_hp": 20.0
+		},
 		"max_stacks": 5
 	},
 	"lodestone": {
 		"name": "Lodestone",
 		"desc": "+30% gem pickup range",
-		"effects": { "pickup": 0.30 },
+		"effects": {
+			"pickup": 0.3
+		},
 		"max_stacks": 5
 	},
 	"hourglass": {
 		"name": "Hourglass",
 		"desc": "-10% weapon cooldowns",
-		"effects": { "cooldown": -0.10 },
+		"effects": {
+			"cooldown": -0.1
+		},
 		"max_stacks": 5
 	},
 	"hawk_eye": {
 		"name": "Hawk's Eye",
 		"desc": "+20% weapon range",
-		"effects": { "range": 0.20 },
+		"effects": {
+			"range": 0.2
+		},
 		"max_stacks": 3
 	},
 	"penitence": {
 		"name": "Penitence",
 		"desc": "+20% aura and orbit size",
-		"effects": { "area": 0.20 },
+		"effects": {
+			"area": 0.2
+		},
+		"max_stacks": 3
+	},
+	"gravedust": {
+		"name": "Gravedust",
+		"desc": "+25% gold",
+		"effects": {
+			"gold": 0.25
+		},
+		"max_stacks": 3
+	},
+	"bad_humours": {
+		"name": "Bad Humours",
+		"desc": "+30% effect duration",
+		"effects": {
+			"duration": 0.3
+		},
 		"max_stacks": 3
 	}
 }

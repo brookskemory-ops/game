@@ -23,6 +23,9 @@ func _try_fire() -> bool:
 		enemies.damage_slot(slot, damage())
 		enemies.push_slot(slot, to_enemy.normalized() * knockback)
 	_swing_time = 0.16
+	# Sexton's Spade: every swing digs a grave — a slowing patch of turned earth.
+	if bool(def.get("tombstones", false)) and hazards != null:
+		hazards.spawn(center, 20.0, damage() * 0.15, 2.5, true)
 	Sfx.play("swing", 0.8)
 	queue_redraw()
 	return true

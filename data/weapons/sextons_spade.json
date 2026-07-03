@@ -1,0 +1,17 @@
+{
+	"id": "sextons_spade",
+	"name": "Sexton's Spade",
+	"family": "melee",
+	"niche": "evolution of the Iron Shovel (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/shovel.gd",
+	"evolved": true,
+	"draft_desc": "Every swing digs a grave",
+	"up_desc": "Deeper graves",
+	"cooldown": 1.0,
+	"damage": 34,
+	"range": 58,
+	"arc_deg": 170,
+	"knockback": 190,
+	"tombstones": true,
+	"max_level": 8
+}

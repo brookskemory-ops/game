@@ -1,0 +1,14 @@
+{
+	"id": "saint_reliquary",
+	"name": "Reliquary of the Unquiet Saint",
+	"family": "aura",
+	"niche": "steady sanctified field, low ticks + slow (docs/ABILITIES.md #12)",
+	"script": "res://scripts/weapons/saint_aura.gd",
+	"draft_desc": "Carry the saint's bones; the dead wither in their presence",
+	"up_desc": "The sanctity spreads",
+	"cooldown": 999,
+	"damage": 3,
+	"field_radius": 55,
+	"tick_interval": 0.4,
+	"max_level": 8
+}

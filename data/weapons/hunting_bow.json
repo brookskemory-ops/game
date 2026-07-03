@@ -12,5 +12,6 @@
 	"spread_deg": 7,
 	"pierce": 2,
 	"proj_speed": 430,
-	"proj_ttl": 0.9
+	"proj_ttl": 0.9,
+	"family": "projectile"
 }

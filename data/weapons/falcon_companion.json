@@ -1,0 +1,15 @@
+{
+	"id": "falcon_companion",
+	"name": "Falcon Companion",
+	"family": "seeker",
+	"niche": "autonomous hunter preferring elites (docs/ABILITIES.md #10)",
+	"script": "res://scripts/weapons/falcon.gd",
+	"draft_desc": "Wren's old hunting bird — she picks her own prey, and picks well",
+	"up_desc": "Sharper talons, faster strikes",
+	"cooldown": 999,
+	"damage": 14,
+	"speed": 260,
+	"hunt_range": 340,
+	"hit_interval": 0.5,
+	"max_level": 8
+}

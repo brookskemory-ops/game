@@ -1,0 +1,13 @@
+{
+	"id": "pilgrims_chain",
+	"name": "Pilgrim's Chain",
+	"family": "lash",
+	"niche": "fast thin lash alternating left/right (docs/ABILITIES.md #11)",
+	"script": "res://scripts/weapons/chain.gd",
+	"draft_desc": "A penitent's chain, lashing left and right in ceaseless rhythm",
+	"up_desc": "Longer links, heavier penance",
+	"cooldown": 0.55,
+	"damage": 10,
+	"reach": 95,
+	"max_level": 8
+}

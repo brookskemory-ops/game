@@ -1,0 +1,17 @@
+{
+	"id": "the_miasma",
+	"name": "The Miasma",
+	"family": "zone",
+	"niche": "evolution of the Plague Vials (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/vials.gd",
+	"evolved": true,
+	"draft_desc": "The pools have merged, and now it follows the fight",
+	"up_desc": "The cloud thickens",
+	"cooldown": 999,
+	"damage": 14,
+	"range": 240,
+	"pool_radius": 44,
+	"duration": 3.2,
+	"roaming": true,
+	"max_level": 8
+}

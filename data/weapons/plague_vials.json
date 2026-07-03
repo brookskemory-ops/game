@@ -10,5 +10,8 @@
 	"range": 210,
 	"pool_radius": 28,
 	"duration": 3.2,
-	"max_level": 8
+	"max_level": 8,
+	"family": "zone",
+	"catalyst": "bad_humours",
+	"evolution": "the_miasma"
 }

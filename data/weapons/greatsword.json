@@ -13,5 +13,6 @@
 	"arc_deg": 200,
 	"knockback": 260,
 	"windup": 0.25,
-	"max_level": 8
+	"max_level": 8,
+	"family": "cleave"
 }

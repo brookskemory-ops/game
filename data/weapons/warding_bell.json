@@ -1,0 +1,14 @@
+{
+	"id": "warding_bell",
+	"name": "Warding Bell",
+	"family": "nova",
+	"niche": "radial push nova, crowd control (docs/ABILITIES.md #9)",
+	"script": "res://scripts/weapons/bell.gd",
+	"draft_desc": "A hand-bell blessed against the risen — its toll shoves them back",
+	"up_desc": "A wider, deeper toll",
+	"cooldown": 3.0,
+	"damage": 8,
+	"nova_radius": 90,
+	"knockback": 320,
+	"max_level": 8
+}

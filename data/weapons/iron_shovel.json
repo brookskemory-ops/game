@@ -10,5 +10,8 @@
 	"range": 52,
 	"arc_deg": 130,
 	"knockback": 160,
-	"max_level": 8
+	"max_level": 8,
+	"family": "melee",
+	"catalyst": "gravedust",
+	"evolution": "sextons_spade"
 }

@@ -16,6 +16,7 @@ var _radius := PackedFloat32Array()
 var _dps := PackedFloat32Array()
 var _ttl := PackedFloat32Array()
 var _tick_acc := PackedFloat32Array()
+var _slows := PackedByteArray()
 var _free := PackedInt32Array()
 
 func setup(enemies: EnemyManager) -> void:
@@ -26,12 +27,13 @@ func setup(enemies: EnemyManager) -> void:
 	_dps.resize(CAP)
 	_ttl.resize(CAP)
 	_tick_acc.resize(CAP)
+	_slows.resize(CAP)
 	_free.resize(CAP)
 	for i in CAP:
 		_alive[i] = 0
 		_free[i] = CAP - 1 - i
 
-func spawn(at: Vector2, radius: float, dps: float, duration: float) -> void:
+func spawn(at: Vector2, radius: float, dps: float, duration: float, slows := false) -> void:
 	if _free.is_empty():
 		return
 	var slot := _free[_free.size() - 1]
@@ -42,6 +44,7 @@ func spawn(at: Vector2, radius: float, dps: float, duration: float) -> void:
 	_dps[slot] = dps
 	_ttl[slot] = duration
 	_tick_acc[slot] = 0.0
+	_slows[slot] = 1 if slows else 0
 	queue_redraw()
 
 func _physics_process(delta: float) -> void:
@@ -63,6 +66,8 @@ func _physics_process(delta: float) -> void:
 			_tick_acc[i] -= TICK
 			for slot in _enemies.query_circle(_pos[i], _radius[i]):
 				_enemies.damage_slot(slot, _dps[i] * TICK)
+				if _slows[i] == 1:
+					_enemies.slow_slot(slot, 0.5)
 	if any_active:
 		queue_redraw()
 

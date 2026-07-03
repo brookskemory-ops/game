@@ -176,6 +176,9 @@ func apply_passive(id: String, def: Dictionary) -> void:
 	passive_stacks[id] = int(passive_stacks.get(id, 0)) + 1
 	var effects: Dictionary = def.get("effects", {})
 	for key in effects:
+		if String(key) == "gold":
+			gold_mul += float(effects[key])  # Gravedust routes to the coin pipeline
+			continue
 		mods[key] = float(mods.get(key, 0.0)) + float(effects[key])
 	_recompute()
 

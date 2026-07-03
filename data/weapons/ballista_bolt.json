@@ -1,0 +1,14 @@
+{
+	"id": "ballista_bolt",
+	"name": "Ballista Bolt",
+	"family": "line",
+	"niche": "slow-charging infinite-pierce lane shot (docs/ABILITIES.md #8)",
+	"script": "res://scripts/weapons/ballista.gd",
+	"draft_desc": "A siege engine's answer: one lane, nothing left standing in it",
+	"up_desc": "Heavier bolts, faster crank",
+	"cooldown": 2.6,
+	"damage": 60,
+	"range": 420,
+	"windup": 0.5,
+	"max_level": 8
+}

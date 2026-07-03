@@ -59,6 +59,9 @@ func attack_range() -> float:
 func area_mul() -> float:
 	return float(wielder.mods["area"])
 
+func range_mul() -> float:
+	return float(wielder.mods["range"])
+
 ## The reliquary transforms this weapon (docs/ABILITIES.md §3). The evolved
 ## def replaces the base def; earned damage/projectile multipliers carry over.
 func evolve(evolved_def: Dictionary) -> void:
