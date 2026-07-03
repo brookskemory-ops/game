@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.7.0 — the wailing forest"
+const VERSION := "0.9.0 — faces of the dead"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -187,10 +187,9 @@ func stage_cleared(id: String) -> bool:
 func stage_path() -> String:
 	if OS.has_feature("web"):
 		var search := String(JavaScriptBridge.eval("window.location.search", true))
-		if search.contains("stage=qa"):
-			return "res://data/waves/qa.json"
-		if search.contains("stage=stress"):
-			return "res://data/waves/stress.json"  # perf-ceiling measurement
+		for stage_id in ["qa", "stress", "stage1", "stage2"]:
+			if search.contains("stage=" + stage_id):
+				return "res://data/waves/%s.json" % stage_id
 	return "res://data/waves/%s.json" % selected_stage
 
 ## Loads a JSON data file (all game content is data — see data/README.md).

@@ -90,7 +90,16 @@ func setup(ctx: Dictionary) -> void:
 	move_speed = base_move_speed
 	pickup_radius = base_pickup_radius
 	_sprite = Sprite2D.new()
-	_sprite.texture = PixelSprites.get_tex(String(stats.get("sprite", "wren")))
+	# Pixel Lab full-body art (same image as the camp portrait) scaled to
+	# world size; procedural sprite as fallback.
+	var portrait_path := "res://assets/portraits/%s.png" % String(stats.get("id", "wren"))
+	if ResourceLoader.exists(portrait_path):
+		_sprite.texture = load(portrait_path)
+		var target_height := float(stats.get("world_height", 19.0))
+		var sprite_scale := target_height / float(_sprite.texture.get_height())
+		_sprite.scale = Vector2(sprite_scale, sprite_scale)
+	else:
+		_sprite.texture = PixelSprites.get_tex(String(stats.get("sprite", "wren")))
 	add_child(_sprite)
 	equip(String(stats.get("weapon", "hunting_bow")))
 

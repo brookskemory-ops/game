@@ -73,9 +73,18 @@ func setup(player: Node2D, p_player_radius: float, gems: GemManager) -> void:
 			_register_type(String(type_name), defs[type_name])
 
 func _register_type(type_name: String, def: Dictionary) -> void:
-	var tex := PixelSprites.get_tex(String(def.get("sprite", type_name)))
+	# Pixel Lab art when it exists (64x64 canvases, scaled down to world size
+	# by gen_scale); procedural ASCII sprites as the fallback.
+	var sprite_id := String(def.get("sprite", type_name))
+	var tex: Texture2D
 	var quad := QuadMesh.new()
-	quad.size = Vector2(tex.get_width(), tex.get_height())
+	var gen_path := "res://assets/sprites/generated/%s.png" % sprite_id
+	if ResourceLoader.exists(gen_path):
+		tex = load(gen_path)
+		quad.size = Vector2(tex.get_width(), tex.get_height()) * float(def.get("gen_scale", 0.3))
+	else:
+		tex = PixelSprites.get_tex(sprite_id)
+		quad.size = Vector2(tex.get_width(), tex.get_height())
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_2D
 	mm.use_colors = true

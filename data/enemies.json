@@ -7,7 +7,8 @@
 		"damage": 8,
 		"radius": 7,
 		"xp": 1,
-		"gold_chance": 0.03
+		"gold_chance": 0.03,
+		"gen_scale": 0.27
 	},
 	"gnawer": {
 		"name": "Gnawer",
@@ -17,7 +18,8 @@
 		"damage": 5,
 		"radius": 5,
 		"xp": 1,
-		"gold_chance": 0.03
+		"gold_chance": 0.03,
+		"gen_scale": 0.26
 	},
 	"wight": {
 		"name": "Wight",
@@ -27,7 +29,8 @@
 		"damage": 13,
 		"radius": 8,
 		"xp": 3,
-		"gold_chance": 0.06
+		"gold_chance": 0.06,
+		"gen_scale": 0.3
 	},
 	"hanged_man": {
 		"name": "Hanged Man",
@@ -37,7 +40,8 @@
 		"damage": 9,
 		"radius": 7,
 		"xp": 2,
-		"gold_chance": 0.04
+		"gold_chance": 0.04,
+		"gen_scale": 0.28
 	},
 	"bone_stag": {
 		"name": "Bone Stag",
@@ -47,7 +51,8 @@
 		"damage": 11,
 		"radius": 8,
 		"xp": 2,
-		"gold_chance": 0.04
+		"gold_chance": 0.04,
+		"gen_scale": 0.3
 	},
 	"briar_queen": {
 		"name": "The Briar Queen",
@@ -58,7 +63,8 @@
 		"radius": 13,
 		"xp": 60,
 		"gold": 60,
-		"boss": true
+		"boss": true,
+		"gen_scale": 0.46
 	},
 	"tolling_man": {
 		"name": "Tolling Man",
@@ -70,7 +76,8 @@
 		"xp": 10,
 		"gold": 12,
 		"elite": true,
-		"drops_scroll": true
+		"drops_scroll": true,
+		"gen_scale": 0.38
 	},
 	"sexton": {
 		"name": "The Sexton",
@@ -81,6 +88,7 @@
 		"radius": 13,
 		"xp": 40,
 		"gold": 40,
-		"boss": true
+		"boss": true,
+		"gen_scale": 0.46
 	}
 }
