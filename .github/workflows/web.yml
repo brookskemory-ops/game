@@ -66,8 +66,15 @@ jobs:
         if: steps.cache-templates.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          curl -sSL -o /tmp/templates.tpz \
-            https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          url="https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+          if command -v wget >/dev/null 2>&1; then
+            wget -q -O /tmp/templates.tpz "$url"
+          elif command -v curl >/dev/null 2>&1; then
+            curl -sSL -o /tmp/templates.tpz "$url"
+          else
+            apt-get update -qq && apt-get install -y -qq wget
+            wget -q -O /tmp/templates.tpz "$url"
+          fi
           cd /tmp
           unzip -o templates.tpz "templates/web_nothreads_*"
           mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
