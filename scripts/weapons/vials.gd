@@ -9,7 +9,7 @@ const ARC_HEIGHT := 26.0
 var _flights: Array = []  # [from: Vector2, to: Vector2, t: float]
 
 func _try_fire() -> bool:
-	var throw_range := float(def.get("range", 210))
+	var throw_range := attack_range()
 	var target := _densest_target(throw_range)
 	if target == Vector2.INF:
 		return false
@@ -40,7 +40,7 @@ func _physics_process(delta: float) -> void:
 		flight[2] += delta / FLIGHT_TIME
 	for flight in _flights:
 		if flight[2] >= 1.0 and hazards != null:
-			hazards.spawn(flight[1], float(def.get("pool_radius", 34)),
+			hazards.spawn(flight[1], float(def.get("pool_radius", 34)) * area_mul(),
 				damage(), float(def.get("duration", 3.2)))
 	_flights = _flights.filter(func(f): return f[2] < 1.0)
 	queue_redraw()

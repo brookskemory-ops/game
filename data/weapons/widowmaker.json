@@ -1,0 +1,18 @@
+{
+	"id": "widowmaker",
+	"name": "Widowmaker",
+	"niche": "evolution of the Hunting Bow (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/bow.gd",
+	"evolved": true,
+	"draft_desc": "The bow that ends bloodlines",
+	"up_desc": "Keener still",
+	"cooldown": 0.7,
+	"damage": 17,
+	"range": 270,
+	"projectiles": 2,
+	"spread_deg": 9,
+	"pierce": 99,
+	"proj_speed": 480,
+	"proj_ttl": 1.1,
+	"max_level": 8
+}

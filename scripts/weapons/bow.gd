@@ -4,7 +4,7 @@ extends Weapon
 ## (docs/ABILITIES.md weapon #1).
 
 func _try_fire() -> bool:
-	var target := enemies.nearest_enemy(wielder.global_position, float(def.get("range", 220)))
+	var target := enemies.nearest_enemy(wielder.global_position, attack_range())
 	if target < 0:
 		return false
 	var dir := (enemies.enemy_pos(target) - wielder.global_position).normalized()

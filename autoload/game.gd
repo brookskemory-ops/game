@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.5.0 — the survivors gather"
+const VERSION := "0.6.0 — old oaths"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).

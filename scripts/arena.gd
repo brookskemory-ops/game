@@ -22,6 +22,7 @@ var _wave_acc := PackedFloat32Array()
 var _events_fired := PackedByteArray()
 var _draft_open := false
 var _boss_summoned := false
+var _awaiting_chest := false
 var _trickle_acc := 0.0
 
 func _ready() -> void:
@@ -41,6 +42,8 @@ func _ready() -> void:
 	player.leveled_up.connect(_on_player_leveled)
 	enemies.boss_spawned.connect(_on_boss_spawned)
 	enemies.boss_died.connect(_on_boss_died)
+	# Level-up juice: vacuum every gem on the ground.
+	player.leveled_up.connect(func(_level: int) -> void: gems.vacuum_all())
 
 # --- Upgrade draft flow (queues if several levels land at once) ---
 
@@ -80,7 +83,7 @@ func _physics_process(delta: float) -> void:
 	# The timer running out doesn't end the night — it summons what rings the bell.
 	if not _boss_summoned and time_elapsed >= run_length():
 		_summon_boss()
-	if _boss_summoned:
+	if _boss_summoned and not _awaiting_chest:
 		_trickle_acc += delta
 		var interval := float(stage.get("boss_trickle_interval", 2.0))
 		if _trickle_acc >= interval:
@@ -127,12 +130,54 @@ func _on_boss_spawned(display_name: String) -> void:
 	hud.set_boss_name(display_name)
 	hud.banner("THE BELL TOLLS", "%s rises from the churchyard" % display_name)
 	Sfx.play("bell")
+	player.get_node("Camera2D").add_trauma(0.45)
 
-func _on_boss_died() -> void:
+## The boss drops the reliquary; the run ends after it is claimed.
+func _on_boss_died(at: Vector2) -> void:
 	Sfx.play("boss_death")
+	_awaiting_chest = true
+	var chest := Reliquary.new()
+	chest.global_position = at
+	chest.setup(player)
+	chest.opened.connect(_on_chest_opened)
+	add_child(chest)
+
+func _on_chest_opened() -> void:
+	var evolved := _try_evolve()
+	if evolved.is_empty():
+		# Consolation: gold and mercy within.
+		for c in 8:
+			gems.spawn(player.global_position, 4, GemManager.KIND_COIN)
+		player.heal(player.max_hp)
+		hud.banner("THE RELIQUARY", "gold and mercy within")
+	else:
+		hud.banner("OLD OATHS ANSWERED", "%s takes new form" % evolved)
+		Sfx.play("level")
+	player.get_node("Camera2D").add_trauma(0.3)
+	_finish_after_fanfare()
+
+## First maxed weapon whose catalyst passive is held evolves (VS rule).
+func _try_evolve() -> String:
+	for weapon in player.weapons:
+		if weapon.level < weapon.max_level():
+			continue
+		var evo_id := String(weapon.def.get("evolution", ""))
+		var catalyst := String(weapon.def.get("catalyst", ""))
+		if evo_id.is_empty() or catalyst.is_empty():
+			continue
+		if int(player.passive_stacks.get(catalyst, 0)) <= 0:
+			continue
+		var evo_def: Variant = Game.load_json("res://data/weapons/%s.json" % evo_id)
+		if evo_def is Dictionary:
+			weapon.evolve(evo_def)
+			return String(evo_def.get("name", "?"))
+	return ""
+
+func _finish_after_fanfare() -> void:
 	var unlock_id := String(stage.get("victory_unlock", ""))
 	if not unlock_id.is_empty():
 		Game.unlock(unlock_id)
+	await get_tree().create_timer(1.8).timeout
 	_finish(true)
 
 func _on_player_died() -> void:

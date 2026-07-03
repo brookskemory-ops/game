@@ -54,6 +54,12 @@ func setup(player: Node2D, pickup_radius: float) -> void:
 		add_child(mmi)
 		_mm.append(mm)
 
+## Level-up juice: every gem on the ground flies to the hero.
+func vacuum_all() -> void:
+	for i in CAP:
+		if _alive[i] == 1 and _kind[i] == KIND_GEM:
+			_attract[i] = 1
+
 func spawn(at: Vector2, value: int, kind := KIND_GEM) -> void:
 	if _free.is_empty():
 		return  # cap reached; the ground is already paved with souls

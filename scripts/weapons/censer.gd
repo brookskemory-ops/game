@@ -11,8 +11,8 @@ func _physics_process(delta: float) -> void:
 		return
 	_angle = fmod(_angle + float(def.get("orbit_speed", 2.6)) * delta, TAU)
 	var orb_count := int(def.get("orbs", 2)) + extra_projectiles
-	var orbit_radius := float(def.get("orbit_radius", 36))
-	var orb_radius := float(def.get("orb_radius", 9))
+	var orbit_radius := float(def.get("orbit_radius", 36)) * area_mul()
+	var orb_radius := float(def.get("orb_radius", 9)) * area_mul()
 	var hit_interval := float(def.get("hit_interval", 0.5))
 	var now := float(Time.get_ticks_msec()) / 1000.0
 	for k in orb_count:
@@ -23,11 +23,22 @@ func _physics_process(delta: float) -> void:
 				continue
 			_last_hit[slot] = now
 			enemies.damage_slot(slot, damage())
+	# Halo of Cinders: a second, counter-rotating ring.
+	if bool(def.get("second_ring", false)):
+		var halo_radius := orbit_radius + 15.0
+		for k in orb_count:
+			var orb_pos: Vector2 = wielder.global_position \
+				+ Vector2.from_angle(-_angle * 1.2 + TAU * float(k) / float(orb_count)) * halo_radius
+			for slot in enemies.query_circle(orb_pos, orb_radius):
+				if now - float(_last_hit.get(slot, -9.9)) < hit_interval:
+					continue
+				_last_hit[slot] = now
+				enemies.damage_slot(slot, damage())
 	queue_redraw()
 
 func _draw() -> void:
 	var orb_count := int(def.get("orbs", 2)) + extra_projectiles
-	var orbit_radius := float(def.get("orbit_radius", 36))
+	var orbit_radius := float(def.get("orbit_radius", 36)) * area_mul()
 	# Faint orbit ring.
 	draw_arc(Vector2.ZERO, orbit_radius, 0.0, TAU, 28,
 		Color(Palette.EMBER.r, Palette.EMBER.g, Palette.EMBER.b, 0.10), 1.0)
@@ -35,9 +46,21 @@ func _draw() -> void:
 		var local := Vector2.from_angle(_angle + TAU * float(k) / float(orb_count)) * orbit_radius
 		# Chain from the wielder, then the burning orb with a glow.
 		draw_line(Vector2.ZERO, local, Color(Palette.IRON.r, Palette.IRON.g, Palette.IRON.b, 0.35), 1.0)
-		draw_circle(local, 6.0, Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, 0.18))
-		draw_circle(local, 3.5, Palette.TORCH)
-		draw_circle(local, 1.5, Color(1.0, 0.95, 0.8))
+		_draw_orb(local, _angle)
+	if bool(def.get("second_ring", false)):
+		var halo_radius := orbit_radius + 15.0
+		for k in orb_count:
+			var halo_angle := -_angle * 1.2 + TAU * float(k) / float(orb_count)
+			var local := Vector2.from_angle(halo_angle) * halo_radius
+			# Ember trail behind each halo coal.
+			draw_arc(Vector2.ZERO, halo_radius, halo_angle + 0.5, halo_angle + 0.06, 8,
+				Color(Palette.EMBER.r, Palette.EMBER.g, Palette.EMBER.b, 0.28), 2.0)
+			_draw_orb(local, halo_angle)
+
+func _draw_orb(local: Vector2, _orb_angle: float) -> void:
+	draw_circle(local, 6.0, Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, 0.18))
+	draw_circle(local, 3.5, Palette.TORCH)
+	draw_circle(local, 1.5, Color(1.0, 0.95, 0.8))
 
 func _on_upgrade(new_level: int) -> String:
 	if new_level % 2 == 0:

@@ -23,7 +23,10 @@ var pending_levels := 0  # unclaimed draft picks; consumed by the arena
 # Base stats (from character data) and passive modifiers.
 # mods: damage/cooldown/speed/pickup are multipliers (start 1.0);
 #       armor is flat DPS blocked; max_hp is a flat bonus.
-var mods := {"damage": 1.0, "cooldown": 1.0, "speed": 1.0, "pickup": 1.0, "armor": 0.0, "max_hp": 0.0}
+var mods := {
+	"damage": 1.0, "cooldown": 1.0, "speed": 1.0, "pickup": 1.0,
+	"range": 1.0, "area": 1.0, "armor": 0.0, "max_hp": 0.0,
+}
 var passive_stacks := {}  # passive id -> stacks taken
 var base_max_hp := 80.0
 var base_move_speed := 130.0

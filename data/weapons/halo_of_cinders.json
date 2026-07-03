@@ -1,0 +1,18 @@
+{
+	"id": "halo_of_cinders",
+	"name": "Halo of Cinders",
+	"niche": "evolution of the Burning Censer (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/censer.gd",
+	"evolved": true,
+	"draft_desc": "A saint's crown, still burning",
+	"up_desc": "Hotter, wider",
+	"cooldown": 999,
+	"damage": 9,
+	"orbs": 3,
+	"orbit_radius": 38,
+	"orbit_speed": 3.1,
+	"orb_radius": 10,
+	"hit_interval": 0.45,
+	"second_ring": true,
+	"max_level": 8
+}

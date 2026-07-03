@@ -16,7 +16,7 @@ const PUFF_TIME := 0.35
 const HIDDEN := Transform2D(Vector2.ZERO, Vector2.ZERO, Vector2.ZERO)
 
 signal boss_spawned(display_name: String)
-signal boss_died
+signal boss_died(at: Vector2)
 signal enemy_killed
 
 var kills := 0
@@ -201,7 +201,7 @@ func _kill(slot: int) -> void:
 	queue_redraw()
 	if slot == _boss_slot:
 		_boss_slot = -1
-		boss_died.emit()
+		boss_died.emit(_pos[slot])
 
 ## XP gems always; gold from elites/bosses (and a rare trickle from normals).
 func _drop_pickups(slot: int, def: Dictionary) -> void:

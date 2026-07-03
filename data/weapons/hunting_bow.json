@@ -3,6 +3,8 @@
 	"name": "Hunting Bow",
 	"niche": "nearest-target piercing projectile (docs/ABILITIES.md #1)",
 	"script": "res://scripts/weapons/bow.gd",
+	"catalyst": "hawk_eye",
+	"evolution": "widowmaker",
 	"cooldown": 0.85,
 	"damage": 12,
 	"range": 230,

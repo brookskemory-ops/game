@@ -53,6 +53,18 @@ func cooldown() -> float:
 func max_level() -> int:
 	return int(def.get("max_level", 8))
 
+func attack_range() -> float:
+	return float(def.get("range", 220)) * float(wielder.mods["range"])
+
+func area_mul() -> float:
+	return float(wielder.mods["area"])
+
+## The reliquary transforms this weapon (docs/ABILITIES.md §3). The evolved
+## def replaces the base def; earned damage/projectile multipliers carry over.
+func evolve(evolved_def: Dictionary) -> void:
+	def = evolved_def
+	queue_redraw()
+
 # --- Leveling (chosen in the upgrade draft) ---
 
 func upgrade() -> String:

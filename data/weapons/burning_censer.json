@@ -3,6 +3,8 @@
 	"name": "Burning Censer",
 	"niche": "orbiting bodies, constant contact ticks (docs/ABILITIES.md #4)",
 	"script": "res://scripts/weapons/censer.gd",
+	"catalyst": "penitence",
+	"evolution": "halo_of_cinders",
 	"draft_desc": "Holy coals on a chain, circling ever around you",
 	"up_desc": "More coals, hotter embers",
 	"cooldown": 999,

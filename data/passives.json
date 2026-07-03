@@ -34,5 +34,17 @@
 		"desc": "-10% weapon cooldowns",
 		"effects": { "cooldown": -0.10 },
 		"max_stacks": 5
+	},
+	"hawk_eye": {
+		"name": "Hawk's Eye",
+		"desc": "+20% weapon range",
+		"effects": { "range": 0.20 },
+		"max_stacks": 3
+	},
+	"penitence": {
+		"name": "Penitence",
+		"desc": "+20% aura and orbit size",
+		"effects": { "area": 0.20 },
+		"max_stacks": 3
 	}
 }

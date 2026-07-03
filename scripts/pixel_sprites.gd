@@ -117,6 +117,27 @@ const SPRITES := {
 			".b.b.b.",
 		],
 	},
+	# The reliquary chest, 13x10
+	"chest": {
+		"colors": {
+			"w": "4a3826", "W": "5c4832", # dark wood
+			"g": "d9a441", "G": "f0cd7a", # gold banding
+			"k": "16131c",                # keyhole / shadow
+			"e": "e08840",                # inner glow
+		},
+		"rows": [
+			"..wwwwwwwww..",
+			".wWWWWWWWWWw.",
+			"wWWgWWWWWgWWw",
+			"wggggggggggGw",
+			"wWWgWeeWWgWWw",
+			"wWWgWekWWgWWw",
+			"wggggggggggGw",
+			"wWWgWWWWWgWWw",
+			".wwwwwwwwwww.",
+			"..kkkkkkkkk..",
+		],
+	},
 	# Gold coin, 5x5
 	"coin": {
 		"colors": {
