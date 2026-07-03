@@ -61,6 +61,13 @@ Get the workshop set up so nothing ever blocks you mid-flow.
 
 ---
 
+> **STATUS (updated during the night shift):** Phases 0–1 ✅ complete. Phase 2 largely
+> complete ahead of schedule: upgrade draft ✅, 4 weapons ✅, 4 heroes ✅, run structure
+> with mini-boss + stage boss ✅, meta-progression (gold, shop, unlocks, save) ✅, and two
+> weapon evolutions ✅ (early Phase 3 pull-in). Narrative vignettes started (Phase 4
+> pull-in). QA harness + perf ceiling measured (see docs/NIGHT_LOG.md). Remaining in
+> Phase 2/3: more weapons/passives, stage 2, draft rerolls, elite drops, boss variety.
+
 ### **PHASE 1 — The Naked Loop (find the fun)** *(~3–4 weeks)* ⭐ most important phase
 
 One hero, one weapon, one enemy, one empty field. No menus, no story, no upgrades. The question this phase answers: **is walking around while auto-attacking a horde fun on a touchscreen?**
