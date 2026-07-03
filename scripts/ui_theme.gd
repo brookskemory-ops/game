@@ -16,7 +16,12 @@ static func title_font() -> Font:
 
 static func body_font() -> Font:
 	if _body_font == null and ResourceLoader.exists(BODY_FONT_PATH):
-		_body_font = load(BODY_FONT_PATH)
+		# Pixelify Sans has a broken 'fi' ligature glyph ("fire" renders as
+		# "Are") — wrap it in a FontVariation with ligatures disabled.
+		var variation := FontVariation.new()
+		variation.base_font = load(BODY_FONT_PATH)
+		variation.opentype_features = {TextServer.name_to_tag("liga"): 0}
+		_body_font = variation
 	return _body_font
 
 ## A Label with our styling. `display=true` uses the medieval display font.
@@ -51,6 +56,9 @@ static func panel_style(bg := Palette.INK, border := Palette.IRON) -> StyleBoxFl
 static func make_button(text: String, size := 15) -> Button:
 	var button := Button.new()
 	button.text = text
+	# Touch game: no keyboard nav, and focus rings misleadingly highlight
+	# disabled cards (found by the QA sweep).
+	button.focus_mode = Control.FOCUS_NONE
 	var font := body_font()
 	if font != null:
 		button.add_theme_font_override("font", font)

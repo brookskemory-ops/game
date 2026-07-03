@@ -1,16 +1,16 @@
 {
 	"id": "qa",
-	"name": "QA Night (45s)",
-	"run_length": 45,
+	"name": "QA Night (30s)",
+	"run_length": 30,
 	"boss": "sexton",
 	"boss_trickle": "shambler",
-	"boss_trickle_interval": 1.5,
+	"boss_trickle_interval": 2.5,
 	"victory_unlock": "maud",
 	"events": [
-		{ "t": 20, "spawn": "tolling_man", "count": 1, "announce": "A bell tolls in the fog..." }
+		{ "t": 15, "spawn": "tolling_man", "count": 1, "announce": "A bell tolls in the fog..." }
 	],
 	"waves": [
-		{ "from": 0,  "to": 45, "type": "shambler", "interval": 0.5, "count": 3 },
-		{ "from": 10, "to": 45, "type": "gnawer",   "interval": 1.0, "count": 2 }
+		{ "from": 0,  "to": 30, "type": "shambler", "interval": 1.6, "count": 1 },
+		{ "from": 12, "to": 30, "type": "gnawer",   "interval": 3.0, "count": 1 }
 	]
 }

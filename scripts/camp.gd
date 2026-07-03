@@ -239,10 +239,8 @@ func _find_shop_rows(node: Node) -> Array:
 	return found
 
 func _pips(rank: int, max_rank: int) -> String:
-	var pips := ""
-	for i in max_rank:
-		pips += "●" if i < rank else "○"
-	return pips
+	# Plain digits: the pixel font lacks the ●/○ glyphs (QA sweep finding).
+	return "%d/%d" % [rank, max_rank]
 
 # --- Overlay plumbing ---
 
