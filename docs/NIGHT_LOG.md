@@ -190,3 +190,31 @@ and verified in-game.
 Verified: CI green on all four pushes; full qa_suite zero script errors; 6-card camp
 layout fits 640px; castle ground/decals/props reviewed in-game; hollow-king and boss
 probes clean.
+
+---
+
+## The Replayability Push (v0.13.4 → v0.15.0)
+
+Shipped in one arc, per the user's direction: tight builds, hidden unlocks with a codex,
+story-tied objectives, more maps, and an endless mode.
+
+- **v0.13.4**: the "their tale"/post-victory freeze — the vignette PanelContainer was
+  eating the closing tap (MOUSE_FILTER_STOP). Panels now PASS and carry the close handler.
+- **v0.14.0 "Rites of the Vigil"**: ten-minute nights (all three stages retuned, elite
+  events ~3:00/6:00/8:30) · the 3+3 build rule with a HUD build tray · 36 generated item
+  icons (draft cards, tray, Ledger) · hidden weapons behind deeds + THE LEDGER codex
+  (silhouettes + unlock hints, "the ledger grows" notices) · RITES (three data-driven
+  archetypes: light_candles / slay_elite / stand_ground) rewarding RELICS (8, one carried
+  per night, one hook each, docs/ABILITIES.md §7).
+- **v0.15.0 "Many Nights"**: night modifier engine (hp/speed/gold/xp/spawn multipliers +
+  fog) · CHOOSE THE NIGHT picker driven by _nights.json (a new map = one json + one index
+  line) · four variant nights each carrying a rite + relic (Blood Toll, The Deep Mist,
+  The Cold Court, The Bell's Echo) · THE LONG NIGHT endless mode (looping waves, the dark
+  deepens every 3:00, elite storms every 5:00, deepest-count record in the picker).
+- **QA infra note**: post-container-restart, headless screenshots intermittently wedge
+  SwiftShader (probes now carry --disable-dev-shm-usage --disable-gpu-compositing and
+  screenshot-timeout catches). NEVER `pkill -f chromium/pw-browsers` — it matches the
+  harness's own process; anchor to `^/opt/pw-browsers/chromium`.
+- **Verified**: CI green on all six pushes; full qa_suite zero errors on the final build;
+  reviewed in-game: build tray + icons, Test-Light rite candle lit, night picker with
+  lock hints, Deep Mist fog + shrine, Long Night count-up at 1:48 with 113 kills.
