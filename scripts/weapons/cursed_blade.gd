@@ -10,6 +10,7 @@ const SEEK_RANGE := 260.0
 const THRALL_SPEED := 95.0
 const HIT_COOLDOWN := 0.5
 const CONTACT_PAD := 5.0
+const SLASH_REACH := 38.0
 
 var bonus_thralls := 0
 var bonus_duration := 0.0
@@ -17,6 +18,7 @@ var bonus_duration := 0.0
 var _thralls: Array = []          # {pos, ttl, hp, hit_cd, face}
 var _pending: Array = []          # kill positions waiting for a raise (gated by cooldown)
 var _thralls_bursts: Array = []   # [position, age] Crownsorrow detonation rings
+var _slashes: Array = []          # [from, to, age] direct blade strikes
 var _tex: Texture2D
 var _tex_scale := 1.0
 
@@ -45,19 +47,29 @@ func service_time() -> float:
 		* (1.0 + float(wielder.mods.get("duration", 0.0)))
 
 func _try_fire() -> bool:
-	# The base cooldown gates how fast the dead can be pressed into service.
-	if _pending.is_empty() or _thralls.size() >= max_thralls():
-		_pending.clear()
+	# The base cooldown gates the blade's rhythm: raising a thrall takes the
+	# tick when a kill is waiting and the court has room; otherwise the blade
+	# itself lashes out — a weak strike, but it's what starts the killing.
+	if not _pending.is_empty() and _thralls.size() < max_thralls():
+		var at: Vector2 = _pending.pop_front()
+		_thralls.append({
+			"pos": at,
+			"ttl": service_time(),
+			"hp": float(def.get("thrall_hp", 30.0)),
+			"hit_cd": 0.0,
+			"face": 1.0,
+		})
+		Sfx.play("bell", 0.35)
+		return true
+	_pending.clear()
+	var target := enemies.nearest_enemy(wielder.global_position, SLASH_REACH * range_mul())
+	if target < 0:
 		return false
-	var at: Vector2 = _pending.pop_front()
-	_thralls.append({
-		"pos": at,
-		"ttl": service_time(),
-		"hp": float(def.get("thrall_hp", 30.0)),
-		"hit_cd": 0.0,
-		"face": 1.0,
-	})
-	Sfx.play("bell", 0.35)
+	var target_pos := enemies.enemy_pos(target)
+	enemies.damage_slot(target, damage())
+	enemies.push_slot(target, (target_pos - wielder.global_position).normalized() * 60.0)
+	_slashes.append([wielder.global_position, target_pos, 0.0])
+	Sfx.play("swing", 0.6)
 	return true
 
 func _physics_process(delta: float) -> void:
@@ -119,6 +131,11 @@ func _process(delta: float) -> void:
 			b[1] += delta
 		_thralls_bursts = _thralls_bursts.filter(func(b): return b[1] < 0.4)
 		queue_redraw()
+	if not _slashes.is_empty():
+		for s in _slashes:
+			s[2] += delta
+		_slashes = _slashes.filter(func(s): return s[2] < 0.18)
+		queue_redraw()
 
 func _draw() -> void:
 	if _tex == null:
@@ -137,6 +154,10 @@ func _draw() -> void:
 		var frac: float = b[1] / 0.4
 		draw_arc(b[0], 8.0 + frac * 40.0, 0.0, TAU, 20,
 			Color(0.55, 0.85, 1.3, (1.0 - frac) * 0.6), 2.0)
+	# The blade's own lash: a pale streak that dies fast.
+	for s in _slashes:
+		var slash_frac: float = s[2] / 0.18
+		draw_line(s[0], s[1], Color(0.85, 0.9, 1.0, (1.0 - slash_frac) * 0.8), 2.0)
 
 func _on_upgrade(new_level: int) -> String:
 	match new_level:

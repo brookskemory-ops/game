@@ -16,7 +16,7 @@ Niche = Delivery method × Targeting rule × Damage profile. No two weapons shar
 | 3 | **Plague Vials** | Corvus (start) | Lobbed zone (pool) | Densest cluster | Low DoT over area, lingers | Bigger pools, longer linger | Slow kill; no burst, no knockback |
 | 4 | **Burning Censer** | Ansel (start) | Orbiting bodies | Self (orbit) | Constant contact ticks | More orbs, wider orbit | Can't aim it at all |
 | 5 | **Greatsword** | Roland (start) | Heavy frontal cleave | Facing, slow wind-up | Very high burst + heavy knockback | Bigger cleave, armor-shred | Long cooldown gaps between swings |
-| 6 | **Cursed Blade** | Hollow King (start) | Summon (thrall) | On-kill trigger | Converts slain foes to 6s allies | More thralls, longer service | Useless until the killing starts |
+| 6 | **Cursed Blade** | Hollow King (start) | Summon (thrall) | On-kill trigger (a weak point-blank lash starts the killing) | Converts slain foes to 6s allies | More thralls, longer service | Feeble until the court assembles |
 | 7 | **Throwing Axes** | — | Tumbling arc projectile | Random directions | High single-hit, falls short/long | More axes, bigger tumble | Unreliable — rewards repositioning |
 | 8 | **Ballista Bolt** | — | Line shot, infinite pierce | Facing, long charge | Huge damage down one lane | Faster charge, wider bolt | A single narrow line |
 | 9 | **Warding Bell** | — | Nova pulse (ring) | Self, radial | Low damage, strong push-back | Bigger ring, harder push | Crowd control, not a killer |
