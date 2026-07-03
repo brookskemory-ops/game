@@ -30,7 +30,7 @@ func _ready() -> void:
 
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 10)
+	row.add_theme_constant_override("separation", 8)
 	var roster: Variant = Game.load_json("res://data/characters/_roster.json")
 	if roster is Array:
 		for hero_id in roster:
@@ -114,8 +114,9 @@ func _make_hero_column(hero_id: String) -> VBoxContainer:
 	var data: Variant = Game.load_json("res://data/characters/%s.json" % hero_id)
 	var def: Dictionary = data if data is Dictionary else {}
 	var unlocked := Game.is_unlocked(hero_id)
+	# 5 columns × 118 + 4 × 8 = 622: fits the 640-wide minimum viewport.
 	var card := UITheme.make_button("", 11)
-	card.custom_minimum_size = Vector2(134, 158)
+	card.custom_minimum_size = Vector2(118, 150)
 	card.disabled = not unlocked
 	var inner := VBoxContainer.new()
 	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
