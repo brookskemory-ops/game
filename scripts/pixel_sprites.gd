@@ -231,6 +231,140 @@ const SPRITES := {
 			"..tt..rr..",
 		],
 	},
+	# Wight — tall gaunt barrow-dweller, 11x16
+	"wight": {
+		"colors": {
+			"p": "8b8496", "P": "9a94a6", # pallid flesh
+			"e": "6f9fd8",                # cold blue eyes
+			"r": "2b2733", "R": "3a3542", # barrow rags
+			"g": "6a7a52",                # grave mold
+		},
+		"rows": [
+			"...ppppp...",
+			"..pPPPPPp..",
+			"..PePPPeP..",
+			"..PPPPPPP..",
+			"...PPPPP...",
+			"..rRRRRRr..",
+			".rrRRRRRrr.",
+			".r.RRRRR.r.",
+			".p.RRRRR.p.",
+			"...RRgRR...",
+			"...RRRRR...",
+			"...RRRRR...",
+			"...RRgRR...",
+			"...RR.RR...",
+			"...RR.RR...",
+			"...gg.gg...",
+		],
+	},
+	# Hanged Man — ambusher trailing his rope, 10x14
+	"hanged_man": {
+		"colors": {
+			"f": "7a8468", "F": "8a9478", # bloated flesh
+			"e": "16131c",                # sunken eyes
+			"n": "8a6d3b",                # noose rope
+			"c": "2e2a38", "C": "3a3542", # burial suit
+		},
+		"rows": [
+			"....nn....",
+			"....nn....",
+			"...ffff...",
+			"..fFFFFf..",
+			"..FeFFeF..",
+			"..FFFFFF..",
+			"...ffff...",
+			"..cCCCCc..",
+			".ccCCCCcc.",
+			".c.CCCC.c.",
+			"...CCCC...",
+			"...CCCC...",
+			"...c..c...",
+			"...c..c...",
+		],
+	},
+	# Bone Stag — antlered skeletal charger, 14x12
+	"bone_stag": {
+		"colors": {
+			"b": "cfc9b8", "B": "b8b2a0", # bone
+			"a": "9a8f78",                # antlers
+			"e": "e08840",                # ember eye
+			"d": "8b8496",                # shadowed bone
+		},
+		"rows": [
+			"a..a......a...",
+			".aa.a....a....",
+			"..aaa...ab....",
+			"...abbbbbBe...",
+			"...dBBBBBbb...",
+			"..bBBBBBBb....",
+			".bBBBBBBBb....",
+			".bBdBBBBdb....",
+			".b.BBBBB.b....",
+			".b.d..d..b....",
+			".d.b..b..d....",
+			"...d..d.......",
+		],
+	},
+	# The Briar Queen — stage 2 boss: thorn wraith crowned in briars, 16x20
+	"briar_queen": {
+		"colors": {
+			"t": "3d4a2e", "T": "4d5c3a", # briar thorns
+			"e": "b8542f",                # ember-rose eyes
+			"v": "2b332b", "V": "364036", # mossy veil/gown
+			"w": "8b8496",                # pale wraith face
+			"r": "6a3a4a",                # dead roses
+		},
+		"rows": [
+			".t..tttttt..t...",
+			"t.tttTTTTttt.t..",
+			".tttTTTTTTttt...",
+			"..tTTrTTrTTt....",
+			"...wwwwwwww.....",
+			"...wewwwwew.....",
+			"...wwwwwwww.....",
+			"..vVVVVVVVVv....",
+			".vvVVVVVVVVvv...",
+			".v.VVVVVVVV.v...",
+			"tv.VVrVVVVV.vt..",
+			".t.VVVVVVVV.t...",
+			"...VVVVrVVV.....",
+			"...VVVVVVVV.....",
+			"..vVVVVVVVVv....",
+			"..vVVVVVVVVv....",
+			"...VVV..VVV.....",
+			"...VVV..VVV.....",
+			"...ttt..ttt.....",
+			"..t.t....t.t....",
+		],
+	},
+	# Ser Roland — armored knight, 10x14
+	"roland": {
+		"colors": {
+			"s": "8b8496", "S": "9a94a6", # steel plate
+			"k": "5a5464",                # dark steel
+			"f": "d8c2a0",                # face
+			"e": "16131c",                # visor slit / eyes
+			"c": "8c2f2f",                # tabard (faded crimson)
+			"g": "6b5236",                # sword grip
+		},
+		"rows": [
+			"...ssss...",
+			"..sSSSSs..",
+			"..Seffes..",
+			"..sffffs..",
+			"...ssss..g",
+			"..sSSSSs.g",
+			".ssScCsssg",
+			".s.ScCS.sg",
+			".k.ScCS.k.",
+			"...ScCS...",
+			"..sSSSSs..",
+			"..kk..kk..",
+			"..kk..kk..",
+			"..ss..ss..",
+		],
+	},
 	# Tolling Man — elite with a bronze bell for a head, 11x14
 	"tolling_man": {
 		"colors": {

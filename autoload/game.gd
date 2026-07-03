@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.6.0 — old oaths"
+const VERSION := "0.7.0 — the wailing forest"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -16,8 +16,9 @@ var settings := {
 	"haptics": true,
 }
 
-## Which hero the next run uses (picked at the camp).
+## Which hero and stage the next run uses (picked at the camp).
 var selected_character := "wren"
+var selected_stage := "stage1"
 
 ## Hero ids unlocked this session, awaiting their campfire vignette.
 var newly_unlocked: Array = []
@@ -29,6 +30,7 @@ var save_data := {
 	"best_run": {},
 	"shop": {},
 	"stats": {"deaths": 0, "total_kills": 0, "nights_survived": 0},
+	"stages": {},
 	"settings": {},
 }
 
@@ -65,6 +67,9 @@ func end_run(victory: bool, stats := {}) -> void:
 	lifetime["total_kills"] = int(lifetime.get("total_kills", 0)) + int(stats.get("kills", 0))
 	if victory:
 		lifetime["nights_survived"] = int(lifetime.get("nights_survived", 0)) + 1
+		var stage_id := String(stats.get("stage", ""))
+		if not stage_id.is_empty():
+			save_data["stages"][stage_id] = true
 	else:
 		lifetime["deaths"] = int(lifetime.get("deaths", 0)) + 1
 	var best: Dictionary = save_data.get("best_run", {})
@@ -168,6 +173,9 @@ func write_save() -> void:
 ## Which stage the arena loads. On web builds a `?stage=qa` URL parameter
 ## swaps in the 45-second QA stage so automated tests can play full runs
 ## (docs/NIGHT_SHIFT.md WP2). Ignored everywhere else.
+func stage_cleared(id: String) -> bool:
+	return bool(save_data.get("stages", {}).get(id, false))
+
 func stage_path() -> String:
 	if OS.has_feature("web"):
 		var search := String(JavaScriptBridge.eval("window.location.search", true))
@@ -175,7 +183,7 @@ func stage_path() -> String:
 			return "res://data/waves/qa.json"
 		if search.contains("stage=stress"):
 			return "res://data/waves/stress.json"  # perf-ceiling measurement
-	return "res://data/waves/stage1.json"
+	return "res://data/waves/%s.json" % selected_stage
 
 ## Loads a JSON data file (all game content is data — see data/README.md).
 func load_json(path: String) -> Variant:

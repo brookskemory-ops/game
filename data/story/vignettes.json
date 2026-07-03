@@ -26,6 +26,15 @@
 			"He keeps mixing his vials. Whatever answered the invitation dislikes them immensely."
 		]
 	},
+	"roland": {
+		"title": "The Disgraced Knight",
+		"lines": [
+			"They say Ser Roland fled Castle Vane the night it fell. They spit when they say it.",
+			"He lets them spit. Armor takes worse than spit.",
+			"But ask him what he saw in the chapel that night — what the king was DOING — and the wall of steel goes quiet.",
+			"\"I didn't run from the dead,\" he says at last, hand on the great blade. \"I ran to warn the living. No one listened.\""
+		]
+	},
 	"ansel": {
 		"title": "The Heretic Monk",
 		"lines": [

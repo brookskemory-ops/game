@@ -29,6 +29,9 @@ func _ready() -> void:
 	var data: Variant = Game.load_json(Game.stage_path())
 	if data is Dictionary:
 		stage = data
+	# Stage theme drives the ground dressing and background tint.
+	if String(stage.get("theme", "graveyard")) == "forest":
+		$BackgroundLayer/Background.color = Color(0.055, 0.075, 0.06)
 	_wave_acc.resize(waves().size())
 	_events_fired.resize(events().size())
 	player.setup({"enemies": enemies, "projectiles": projectiles, "hazards": hazards})
@@ -112,11 +115,13 @@ func _physics_process(delta: float) -> void:
 		while _wave_acc[w] >= interval:
 			_wave_acc[w] -= interval
 			for c in int(wave.get("count", 1)):
-				enemies.spawn(String(wave.get("type", "shambler")), _spawn_point())
+				enemies.spawn(String(wave.get("type", "shambler")),
+					_spawn_point(float(wave.get("distance", SPAWN_DISTANCE))))
 
-func _spawn_point() -> Vector2:
-	# Just past the edge of a landscape phone view, in a random direction.
-	return player.global_position + Vector2.from_angle(randf() * TAU) * SPAWN_DISTANCE
+func _spawn_point(distance := SPAWN_DISTANCE) -> Vector2:
+	# Just past the edge of a landscape phone view, in a random direction
+	# (ambushers like the Hanged Man pass a shorter distance).
+	return player.global_position + Vector2.from_angle(randf() * TAU) * distance
 
 func _summon_boss() -> void:
 	_boss_summoned = true
@@ -191,6 +196,7 @@ func _finish(victory: bool) -> void:
 		"time": time_elapsed,
 		"kills": enemies.kills,
 		"level": player.level,
+		"stage": String(stage.get("id", "stage1")),
 	}
 	hud.show_results(victory, stats)
 	# Freeze the night behind the overlay (HUD runs in PROCESS_MODE_ALWAYS).
@@ -199,6 +205,7 @@ func _finish(victory: bool) -> void:
 func _draw() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1349
+	var forest := String(stage.get("theme", "graveyard")) == "forest"
 	for i in SCATTER_COUNT:
 		var pos := Vector2(
 			rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE),
@@ -206,16 +213,35 @@ func _draw() -> void:
 		)
 		var roll := rng.randf()
 		var shade := rng.randf_range(0.10, 0.16)
-		if roll < 0.18:
-			# A tombstone with a base.
-			var stone := Color(shade + 0.07, shade + 0.06, shade + 0.10)
-			draw_rect(Rect2(pos, Vector2(8.0, 10.0)), stone)
-			draw_rect(Rect2(pos + Vector2(-1.0, 8.0), Vector2(10.0, 2.0)), stone.darkened(0.25))
-		elif roll < 0.26:
-			# A grave cross.
-			var cross := Color(shade + 0.05, shade + 0.05, shade + 0.07)
-			draw_rect(Rect2(pos + Vector2(3.0, 0.0), Vector2(2.0, 12.0)), cross)
-			draw_rect(Rect2(pos + Vector2(0.0, 3.0), Vector2(8.0, 2.0)), cross)
+		if forest:
+			if roll < 0.14:
+				# A black tree: trunk + canopy blob.
+				var wood := Color(shade * 0.8, shade * 0.75, shade * 0.7)
+				draw_rect(Rect2(pos + Vector2(4.0, 8.0), Vector2(3.0, 12.0)), wood)
+				draw_circle(pos + Vector2(5.5, 4.0), 8.0, Color(shade * 0.7, shade + 0.02, shade * 0.75))
+				draw_circle(pos + Vector2(1.0, 8.0), 5.0, Color(shade * 0.65, shade, shade * 0.7))
+			elif roll < 0.24:
+				# Roots / fallen branches.
+				var root := Color(shade * 0.9, shade * 0.8, shade * 0.7)
+				draw_rect(Rect2(pos, Vector2(9.0, 1.5)), root)
+				draw_rect(Rect2(pos + Vector2(3.0, -2.0), Vector2(1.5, 5.0)), root)
+			elif roll < 0.30:
+				# A mossy stone.
+				draw_rect(Rect2(pos, Vector2(5.0, 4.0)), Color(shade + 0.03, shade + 0.05, shade + 0.03))
+			else:
+				# Undergrowth specks.
+				draw_rect(Rect2(pos, Vector2(2.5, 2.0)), Color(shade * 0.8, shade + 0.03, shade * 0.85))
 		else:
-			# Rubble / dead grass.
-			draw_rect(Rect2(pos, Vector2(3.0, 2.0)), Color(shade, shade + 0.02, shade))
+			if roll < 0.18:
+				# A tombstone with a base.
+				var stone := Color(shade + 0.07, shade + 0.06, shade + 0.10)
+				draw_rect(Rect2(pos, Vector2(8.0, 10.0)), stone)
+				draw_rect(Rect2(pos + Vector2(-1.0, 8.0), Vector2(10.0, 2.0)), stone.darkened(0.25))
+			elif roll < 0.26:
+				# A grave cross.
+				var cross := Color(shade + 0.05, shade + 0.05, shade + 0.07)
+				draw_rect(Rect2(pos + Vector2(3.0, 0.0), Vector2(2.0, 12.0)), cross)
+				draw_rect(Rect2(pos + Vector2(0.0, 3.0), Vector2(8.0, 2.0)), cross)
+			else:
+				# Rubble / dead grass.
+				draw_rect(Rect2(pos, Vector2(3.0, 2.0)), Color(shade, shade + 0.02, shade))

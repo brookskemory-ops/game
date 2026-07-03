@@ -1,0 +1,14 @@
+{
+	"id": "roland",
+	"name": "Ser Roland, the Disgraced Knight",
+	"sprite": "roland",
+	"max_hp": 110,
+	"move_speed": 112,
+	"radius": 6,
+	"pickup_radius": 48,
+	"weapon": "greatsword",
+	"signature": "bulwark",
+	"signature_desc": "Bulwark — a wall of steel: 25% less contact damage",
+	"unlock_hint": "Cleanse the Wailing Forest",
+	"story_arc": "roland_arc"
+}

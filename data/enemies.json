@@ -19,6 +19,47 @@
 		"xp": 1,
 		"gold_chance": 0.03
 	},
+	"wight": {
+		"name": "Wight",
+		"sprite": "wight",
+		"hp": 48,
+		"speed": 30,
+		"damage": 13,
+		"radius": 8,
+		"xp": 3,
+		"gold_chance": 0.06
+	},
+	"hanged_man": {
+		"name": "Hanged Man",
+		"sprite": "hanged_man",
+		"hp": 24,
+		"speed": 55,
+		"damage": 9,
+		"radius": 7,
+		"xp": 2,
+		"gold_chance": 0.04
+	},
+	"bone_stag": {
+		"name": "Bone Stag",
+		"sprite": "bone_stag",
+		"hp": 26,
+		"speed": 118,
+		"damage": 11,
+		"radius": 8,
+		"xp": 2,
+		"gold_chance": 0.04
+	},
+	"briar_queen": {
+		"name": "The Briar Queen",
+		"sprite": "briar_queen",
+		"hp": 1500,
+		"speed": 34,
+		"damage": 22,
+		"radius": 13,
+		"xp": 60,
+		"gold": 60,
+		"boss": true
+	},
 	"tolling_man": {
 		"name": "Tolling Man",
 		"sprite": "tolling_man",

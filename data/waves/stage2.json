@@ -1,0 +1,25 @@
+{
+	"id": "stage2",
+	"name": "The Wailing Forest",
+	"theme": "forest",
+	"run_length": 330,
+	"boss": "briar_queen",
+	"boss_trickle": "bone_stag",
+	"boss_trickle_interval": 2.2,
+	"victory_unlock": "roland",
+	"events": [
+		{ "t": 75,  "spawn": "wight", "count": 3, "announce": "The barrows breathe open..." },
+		{ "t": 150, "spawn": "tolling_man", "count": 1, "announce": "A bell tolls between the trees..." },
+		{ "t": 230, "spawn": "bone_stag", "count": 6, "announce": "Hoofbeats. Too many hoofbeats." }
+	],
+	"waves": [
+		{ "from": 0,   "to": 60,  "type": "shambler",   "interval": 1.1, "count": 2 },
+		{ "from": 20,  "to": 120, "type": "hanged_man", "interval": 2.4, "count": 1, "distance": 170 },
+		{ "from": 50,  "to": 200, "type": "wight",      "interval": 3.2, "count": 1 },
+		{ "from": 80,  "to": 240, "type": "bone_stag",  "interval": 2.8, "count": 2 },
+		{ "from": 120, "to": 330, "type": "hanged_man", "interval": 1.4, "count": 2, "distance": 170 },
+		{ "from": 180, "to": 330, "type": "wight",      "interval": 1.8, "count": 2 },
+		{ "from": 240, "to": 330, "type": "bone_stag",  "interval": 1.1, "count": 3 },
+		{ "from": 270, "to": 330, "type": "shambler",   "interval": 0.5, "count": 4 }
+	]
+}

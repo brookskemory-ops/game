@@ -49,6 +49,8 @@ func _ready() -> void:
 	)
 	add_child(wares)
 
+	_build_stage_row()
+
 	_treasury = UITheme.make_label(str(Game.gold()), 12, Color("f0cd7a"))
 	_treasury.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_place(_treasury, 0.0, 1.0, 0.0, 1.0, Rect2(26, -24, 100, 16))
@@ -75,6 +77,34 @@ func _show_next_unlock_vignette() -> void:
 		return
 	var hero_id := String(Game.newly_unlocked.pop_front())
 	_show_vignette(hero_id, true)
+
+# --- Stage select (the forest opens once the village is survived) ---
+
+func _build_stage_row() -> void:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 8)
+	_place(row, 0.5, 1.0, 0.5, 1.0, Rect2(-220, -72, 440, 26))
+	var stages := [
+		["stage1", "Hollowmere Village", true],
+		["stage2", "The Wailing Forest", Game.stage_cleared("stage1")],
+	]
+	for entry in stages:
+		var stage_id: String = entry[0]
+		var open: bool = entry[2]
+		var text: String = entry[1] if open else "the path is dark yet"
+		if Game.selected_stage == stage_id:
+			text = "> %s <" % text
+		var button := UITheme.make_button(text, 9)
+		button.disabled = not open
+		button.pressed.connect(func() -> void:
+			Sfx.play("ui")
+			Game.selected_stage = stage_id
+			row.queue_free()
+			_build_stage_row()
+		)
+		row.add_child(button)
+	add_child(row)
 
 # --- Hero cards ---
 

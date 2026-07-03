@@ -45,6 +45,7 @@ var facing := Vector2.RIGHT
 var _sig_light_foot := false
 var _sig_malpractice := false
 var _sig_mortification := false
+var _sig_bulwark := false
 var _invuln := 0.0
 var _last_kill_at := -10.0
 
@@ -77,6 +78,8 @@ func setup(ctx: Dictionary) -> void:
 				_enemies.enemy_killed.connect(_on_enemy_killed)
 		"mortification":
 			_sig_mortification = true
+		"bulwark":
+			_sig_bulwark = true
 	_apply_camp_shop()
 	base_max_hp = float(stats.get("max_hp", 80))
 	base_move_speed = float(stats.get("move_speed", 130))
@@ -208,6 +211,8 @@ func _physics_process(delta: float) -> void:
 func take_contact_dps(dps: float, delta: float) -> void:
 	if dead or _invuln > 0.0:
 		return
+	if _sig_bulwark:
+		dps *= 0.75  # Ser Roland's wall of steel
 	var amount := maxf(0.0, dps - float(mods["armor"])) * delta
 	if amount <= 0.0:
 		return

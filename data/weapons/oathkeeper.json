@@ -1,0 +1,17 @@
+{
+	"id": "oathkeeper",
+	"name": "Oathkeeper",
+	"niche": "evolution of the Greatsword (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/greatsword.gd",
+	"evolved": true,
+	"draft_desc": "The oath that circles back",
+	"up_desc": "The circle widens",
+	"cooldown": 1.5,
+	"damage": 70,
+	"range": 72,
+	"arc_deg": 360,
+	"knockback": 300,
+	"windup": 0.2,
+	"shockwave": true,
+	"max_level": 8
+}

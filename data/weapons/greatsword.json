@@ -1,0 +1,17 @@
+{
+	"id": "greatsword",
+	"name": "Greatsword",
+	"niche": "heavy frontal cleave, slow wind-up, huge burst + heavy knockback (docs/ABILITIES.md #5)",
+	"script": "res://scripts/weapons/greatsword.gd",
+	"catalyst": "whetstone",
+	"evolution": "oathkeeper",
+	"draft_desc": "A knight's answer: slow, vast, and final",
+	"up_desc": "Heavier oaths, wider arcs",
+	"cooldown": 1.7,
+	"damage": 55,
+	"range": 62,
+	"arc_deg": 200,
+	"knockback": 260,
+	"windup": 0.25,
+	"max_level": 8
+}
