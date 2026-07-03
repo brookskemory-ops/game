@@ -173,6 +173,8 @@ func stage_path() -> String:
 		var search := String(JavaScriptBridge.eval("window.location.search", true))
 		if search.contains("stage=qa"):
 			return "res://data/waves/qa.json"
+		if search.contains("stage=stress"):
+			return "res://data/waves/stress.json"  # perf-ceiling measurement
 	return "res://data/waves/stage1.json"
 
 ## Loads a JSON data file (all game content is data — see data/README.md).
