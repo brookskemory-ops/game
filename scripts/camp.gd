@@ -7,8 +7,10 @@ var _coin_tex: Texture2D
 var _treasury: Label
 var _shop_overlay: Control
 var _vignette_overlay: Control
+var _ending_overlay: Control
 var _vignettes := {}
 var _shop_defs := {}
+var _endings := {}
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -19,18 +21,25 @@ func _ready() -> void:
 	var shop_data: Variant = Game.load_json("res://data/shop.json")
 	if shop_data is Dictionary:
 		_shop_defs = shop_data
+	var endings_data: Variant = Game.load_json("res://data/story/endings.json")
+	if endings_data is Dictionary:
+		_endings = endings_data
 
 	var title := UITheme.make_label("THE CAMP", 32, Palette.PARCHMENT, true)
 	_place(title, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 10, 500, 40))
 	add_child(title)
 
-	var subtitle := UITheme.make_label("who keeps the vigil tonight?", 11, Palette.ASH)
+	# Once the ending is chosen, its epitaph replaces the nightly question.
+	var subtitle_text := "who keeps the vigil tonight?"
+	if not Game.ending().is_empty():
+		subtitle_text = String(_endings.get(Game.ending(), {}).get("epitaph", subtitle_text))
+	var subtitle := UITheme.make_label(subtitle_text, 11, Palette.ASH)
 	_place(subtitle, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 48, 500, 16))
 	add_child(subtitle)
 
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", 6)
 	var roster: Variant = Game.load_json("res://data/characters/_roster.json")
 	if roster is Array:
 		for hero_id in roster:
@@ -69,8 +78,12 @@ func _ready() -> void:
 		_place(last_run, 1.0, 1.0, 1.0, 1.0, Rect2(-340, -24, 332, 16))
 		add_child(last_run)
 
-	# Newly unlocked survivors tell their tale as they join the fire.
-	_show_next_unlock_vignette()
+	# The Hollow King's victory poses the final choice; otherwise, newly
+	# unlocked survivors tell their tale as they join the fire.
+	if Game.ending_pending():
+		_show_ending_choice()
+	else:
+		_show_next_unlock_vignette()
 
 func _show_next_unlock_vignette() -> void:
 	if Game.newly_unlocked.is_empty():
@@ -84,10 +97,11 @@ func _build_stage_row() -> void:
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 8)
-	_place(row, 0.5, 1.0, 0.5, 1.0, Rect2(-220, -72, 440, 26))
+	_place(row, 0.5, 1.0, 0.5, 1.0, Rect2(-280, -72, 560, 26))
 	var stages := [
 		["stage1", "Hollowmere Village", true],
 		["stage2", "The Wailing Forest", Game.stage_cleared("stage1")],
+		["stage3", "Castle Vane", Game.stage_cleared("stage2")],
 	]
 	for entry in stages:
 		var stage_id: String = entry[0]
@@ -114,9 +128,9 @@ func _make_hero_column(hero_id: String) -> VBoxContainer:
 	var data: Variant = Game.load_json("res://data/characters/%s.json" % hero_id)
 	var def: Dictionary = data if data is Dictionary else {}
 	var unlocked := Game.is_unlocked(hero_id)
-	# 5 columns × 118 + 4 × 8 = 622: fits the 640-wide minimum viewport.
+	# 6 columns × 98 + 5 × 6 = 618: fits the 640-wide minimum viewport.
 	var card := UITheme.make_button("", 11)
-	card.custom_minimum_size = Vector2(118, 150)
+	card.custom_minimum_size = Vector2(98, 150)
 	card.disabled = not unlocked
 	var inner := VBoxContainer.new()
 	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -206,6 +220,73 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 			Sfx.play("ui")
 			_vignette_overlay.queue_free()
 			_vignette_overlay = null
+			_show_next_unlock_vignette()
+	)
+
+# --- The ending (Block B): the Hollow King's last bargain ---
+
+func _show_ending_choice() -> void:
+	if _ending_overlay != null or not _endings.has("prompt"):
+		return
+	var prompt: Dictionary = _endings["prompt"]
+	_ending_overlay = _overlay()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 10)
+	column.custom_minimum_size = Vector2(470, 0)
+	column.add_child(UITheme.make_label(String(prompt.get("title", "")), 28, Palette.TORCH, true))
+	for line in prompt.get("lines", []):
+		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		text.custom_minimum_size = Vector2(450, 0)
+		column.add_child(text)
+	for choice in prompt.get("choices", []):
+		var choice_id := String(choice.get("id", ""))
+		var button := UITheme.make_button(String(choice.get("label", "")), 13)
+		button.pressed.connect(func() -> void:
+			Sfx.play("bell")
+			Game.set_ending(choice_id)
+			_ending_overlay.queue_free()
+			_ending_overlay = null
+			_show_ending_epilogue(choice_id)
+		)
+		column.add_child(button)
+		var hint := UITheme.make_label(String(choice.get("hint", "")), 9, Palette.ASH)
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint.custom_minimum_size = Vector2(450, 0)
+		column.add_child(hint)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_ending_overlay, panel)
+
+func _show_ending_epilogue(ending_id: String) -> void:
+	if _ending_overlay != null or not _endings.has(ending_id):
+		return
+	var epilogue: Dictionary = _endings[ending_id]
+	_ending_overlay = _overlay()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	column.custom_minimum_size = Vector2(470, 0)
+	column.add_child(UITheme.make_label(String(epilogue.get("title", "")), 28, Palette.TORCH, true))
+	for line in epilogue.get("lines", []):
+		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		text.custom_minimum_size = Vector2(450, 0)
+		column.add_child(text)
+	var prompt := UITheme.make_label("tap to return to the fire", 10, Palette.BONE)
+	column.add_child(prompt)
+	var tween := create_tween().set_loops()
+	tween.tween_property(prompt, "modulate:a", 0.35, 0.7)
+	tween.tween_property(prompt, "modulate:a", 1.0, 0.7)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_ending_overlay, panel)
+	_ending_overlay.gui_input.connect(func(event: InputEvent) -> void:
+		if _is_press(event):
+			Sfx.play("ui")
+			_ending_overlay.queue_free()
+			_ending_overlay = null
 			_show_next_unlock_vignette()
 	)
 
@@ -368,7 +449,8 @@ func _draw() -> void:
 		draw_rect(Rect2(spark_pos, Vector2(1.5, 1.5)),
 			Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, (1.0 - phase) * 0.7))
 	# Survivors' silhouettes by the fire (one per unlocked hero).
-	var seats := [Vector2(-34.0, -3.0), Vector2(32.0, -2.0), Vector2(-52.0, 4.0), Vector2(50.0, 5.0)]
+	var seats := [Vector2(-34.0, -3.0), Vector2(32.0, -2.0), Vector2(-52.0, 4.0),
+		Vector2(50.0, 5.0), Vector2(-18.0, 7.0), Vector2(16.0, 8.0)]
 	var roster: Variant = Game.load_json("res://data/characters/_roster.json")
 	var seat := 0
 	if roster is Array:

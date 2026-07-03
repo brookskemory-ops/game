@@ -46,6 +46,7 @@ var _sig_light_foot := false
 var _sig_malpractice := false
 var _sig_mortification := false
 var _sig_bulwark := false
+var _sig_deathless := false
 var _invuln := 0.0
 var _last_kill_at := -10.0
 
@@ -84,6 +85,10 @@ func setup(ctx: Dictionary) -> void:
 			_sig_mortification = true
 		"bulwark":
 			_sig_bulwark = true
+		"deathless":
+			_sig_deathless = true
+			if _enemies != null:
+				_enemies.enemy_killed.connect(_on_enemy_killed)
 	_apply_camp_shop()
 	base_max_hp = float(stats.get("max_hp", 80))
 	base_move_speed = float(stats.get("move_speed", 130))
@@ -159,7 +164,12 @@ func _apply_camp_shop() -> void:
 	_recompute()
 
 ## Malpractice (Corvus): kills within a 3s streak each restore 1 HP.
-func _on_enemy_killed() -> void:
+## Deathless (the Hollow King): EVERY kill leeches life — his only healing.
+func _on_enemy_killed(_at: Vector2) -> void:
+	if _sig_deathless:
+		hp = minf(max_hp, hp + 1.0)
+		hp_changed.emit(hp, max_hp)
+		return
 	var now := float(Time.get_ticks_msec()) / 1000.0
 	if now - _last_kill_at <= 3.0:
 		heal(1.0)
@@ -194,6 +204,8 @@ func _recompute() -> void:
 func heal(amount: float) -> void:
 	if dead:
 		return
+	if _sig_deathless:
+		return  # no salve nor prayer works on him; only the leech (docs/ABILITIES.md §4)
 	hp = minf(max_hp, hp + amount)
 	hp_changed.emit(hp, max_hp)
 
@@ -267,6 +279,29 @@ func take_contact_dps(dps: float, delta: float) -> void:
 		Sfx.play("hurt")
 		if _camera != null:
 			_camera.add_trauma(0.3)
+	if hp <= 0.0:
+		if revives > 0:
+			_revive()
+		else:
+			_die()
+
+## Discrete hits (crypt archer bolts). Armor blocks its flat value once per hit.
+func take_hit(amount: float) -> void:
+	if dead or _invuln > 0.0:
+		return
+	if _sig_bulwark:
+		amount *= 0.75
+	amount = maxf(0.0, amount - float(mods["armor"]))
+	if amount <= 0.0:
+		return
+	hp -= amount
+	hp_changed.emit(hp, max_hp)
+	if _sprite != null:
+		_sprite.modulate = Color(1.0, 0.35, 0.35)
+	hurt.emit(amount)
+	Sfx.play("hurt")
+	if _camera != null:
+		_camera.add_trauma(0.25)
 	if hp <= 0.0:
 		if revives > 0:
 			_revive()

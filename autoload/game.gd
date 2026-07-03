@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.12.1 — the ground beneath"
+const VERSION := "0.13.0 — the court of the hollow king"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -33,6 +33,7 @@ var save_data := {
 	"stats": {"deaths": 0, "total_kills": 0, "nights_survived": 0},
 	"stages": {},
 	"settings": {},
+	"ending": "",
 }
 
 ## Stats from the most recent run, for camp/results screens.
@@ -41,6 +42,8 @@ var last_run := {
 	"time": 0.0,
 	"kills": 0,
 	"level": 1,
+	"stage": "",
+	"character": "",
 }
 
 func _ready() -> void:
@@ -63,6 +66,8 @@ func end_run(victory: bool, stats := {}) -> void:
 		"time": stats.get("time", 0.0),
 		"kills": stats.get("kills", 0),
 		"level": stats.get("level", 1),
+		"stage": String(stats.get("stage", "")),
+		"character": selected_character,
 	}
 	var lifetime: Dictionary = save_data["stats"]
 	lifetime["total_kills"] = int(lifetime.get("total_kills", 0)) + int(stats.get("kills", 0))
@@ -184,10 +189,27 @@ func write_save() -> void:
 func stage_cleared(id: String) -> bool:
 	return bool(save_data.get("stages", {}).get(id, false))
 
+# --- The ending (Block B): chosen once, at the camp, by the Hollow King ---
+
+func ending() -> String:
+	return String(save_data.get("ending", ""))
+
+func set_ending(id: String) -> void:
+	save_data["ending"] = id
+	write_save()
+
+## The final choice is offered when the Hollow King himself has just
+## put down the Thing in the Chapel — and no ending is chosen yet.
+func ending_pending() -> bool:
+	return ending().is_empty() \
+		and bool(last_run.get("victory", false)) \
+		and String(last_run.get("stage", "")) == "stage3" \
+		and String(last_run.get("character", "")) == "hollow_king"
+
 func stage_path() -> String:
 	if OS.has_feature("web"):
 		var search := String(JavaScriptBridge.eval("window.location.search", true))
-		for stage_id in ["qa", "stress", "stage1", "stage2"]:
+		for stage_id in ["qa", "stress", "stage1", "stage2", "stage3"]:
 			if search.contains("stage=" + stage_id):
 				return "res://data/waves/%s.json" % stage_id
 	return "res://data/waves/%s.json" % selected_stage

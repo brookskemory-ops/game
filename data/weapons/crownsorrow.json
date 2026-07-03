@@ -1,0 +1,18 @@
+{
+	"id": "crownsorrow",
+	"name": "Crownsorrow",
+	"niche": "evolution of the Cursed Blade (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/cursed_blade.gd",
+	"evolved": true,
+	"draft_desc": "The court is sworn until death — and death keeps no one",
+	"up_desc": "A larger, harder-striking court",
+	"cooldown": 1.0,
+	"damage": 18,
+	"duration": 6.0,
+	"max_thralls": 4,
+	"thrall_hp": 46,
+	"persist": true,
+	"detonate": true,
+	"max_level": 8,
+	"family": "summon"
+}

@@ -33,8 +33,11 @@ func _ready() -> void:
 	if data is Dictionary:
 		stage = data
 	# Stage theme drives the ground dressing and background tint.
-	if String(stage.get("theme", "graveyard")) == "forest":
-		$BackgroundLayer/Background.color = Color(0.055, 0.075, 0.06)
+	match String(stage.get("theme", "graveyard")):
+		"forest":
+			$BackgroundLayer/Background.color = Color(0.055, 0.075, 0.06)
+		"castle":
+			$BackgroundLayer/Background.color = Color(0.075, 0.065, 0.085)
 	_load_theme_props()
 	ground.setup(stage, $Player)
 	_wave_acc.resize(waves().size())
@@ -154,7 +157,10 @@ func _summon_boss() -> void:
 
 func _on_boss_spawned(display_name: String) -> void:
 	hud.set_boss_name(display_name)
-	hud.banner("THE BELL TOLLS", "%s rises from the churchyard" % display_name)
+	var sub := String(stage.get("boss_banner", ""))
+	if sub.is_empty():
+		sub = "%s rises from the churchyard" % display_name
+	hud.banner("THE BELL TOLLS", sub)
 	Sfx.play("bell")
 	player.get_node("Camera2D").add_trauma(0.45)
 
@@ -236,6 +242,11 @@ const THEME_PROPS := {
 		["res://assets/sprites/generated/props/prop_stump.png", 0.7],
 		["res://assets/sprites/generated/props/prop_boulder.png", 0.8],
 	],
+	"castle": [
+		["res://assets/sprites/generated/props/prop_pillar.png", 0.8],
+		["res://assets/sprites/generated/props/prop_rubble.png", 0.8],
+		["res://assets/sprites/generated/props/prop_candelabra.png", 0.7],
+	],
 }
 
 var _prop_textures: Array = []  # [Texture2D, scale] pairs for the active theme
@@ -249,7 +260,9 @@ func _load_theme_props() -> void:
 func _draw() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1349
-	var forest := String(stage.get("theme", "graveyard")) == "forest"
+	var theme_name := String(stage.get("theme", "graveyard"))
+	var forest := theme_name == "forest"
+	var castle := theme_name == "castle"
 	# Generated props scattered sparsely (big, so fewer), specks fill between.
 	if not _prop_textures.is_empty():
 		for i in 240:
@@ -279,7 +292,24 @@ func _draw() -> void:
 		)
 		var roll := rng.randf()
 		var shade := rng.randf_range(0.10, 0.16)
-		if forest:
+		if castle:
+			if roll < 0.10:
+				# A toppled pillar drum.
+				var stone := Color(shade + 0.08, shade + 0.07, shade + 0.11)
+				draw_rect(Rect2(pos, Vector2(12.0, 6.0)), stone)
+				draw_rect(Rect2(pos + Vector2(1.0, 6.0), Vector2(10.0, 2.0)), stone.darkened(0.3))
+			elif roll < 0.22:
+				# Rubble heap.
+				var rubble := Color(shade + 0.05, shade + 0.04, shade + 0.08)
+				draw_rect(Rect2(pos, Vector2(5.0, 4.0)), rubble)
+				draw_rect(Rect2(pos + Vector2(4.0, 2.0), Vector2(4.0, 3.0)), rubble.darkened(0.2))
+			elif roll < 0.28:
+				# A scrap of fallen banner (faded royal crimson).
+				draw_rect(Rect2(pos, Vector2(4.0, 7.0)), Color(0.22, 0.09, 0.11))
+			else:
+				# Cracked flagstone edges.
+				draw_rect(Rect2(pos, Vector2(3.0, 1.5)), Color(shade + 0.03, shade + 0.02, shade + 0.05))
+		elif forest:
 			if roll < 0.14:
 				# A black tree: trunk + canopy blob.
 				var wood := Color(shade * 0.8, shade * 0.75, shade * 0.7)

@@ -1,0 +1,17 @@
+{
+	"id": "cursed_blade",
+	"name": "Cursed Blade",
+	"niche": "summon, on-kill trigger: slain foes rise as temporary allies (docs/ABILITIES.md #6)",
+	"script": "res://scripts/weapons/cursed_blade.gd",
+	"catalyst": "hourglass",
+	"evolution": "crownsorrow",
+	"draft_desc": "What it slays, it keeps. For a while.",
+	"up_desc": "A larger, longer-serving court",
+	"cooldown": 1.2,
+	"damage": 14,
+	"duration": 6.0,
+	"max_thralls": 3,
+	"thrall_hp": 30,
+	"max_level": 8,
+	"family": "summon"
+}

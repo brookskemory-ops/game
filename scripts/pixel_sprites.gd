@@ -442,6 +442,195 @@ const SPRITES := {
 			"..ggg...ggg.....",
 		],
 	},
+	# The Hollow King — hero 6: gaunt king in a tarnished crown, 10x14
+	"hollow_king": {
+		"colors": {
+			"g": "8a6d3b", "G": "a8894f", # tarnished gold crown
+			"f": "9a94a6",                # hollowed grey face
+			"e": "6f9fd8",                # cold blue eyes
+			"r": "2e2233", "R": "3a2c42", # funeral-purple robes
+			"c": "8c2f2f",                # dead royal crimson sash
+			"s": "b8b2a0",                # the cursed blade, pale steel
+		},
+		"rows": [
+			".g.gGGg.g.",
+			"..gGGGGg..",
+			"..ffffff..",
+			"..fefefe..",
+			"...ffff..s",
+			"..rRRRRr.s",
+			".rrRcRRrrs",
+			".r.RcRRR.s",
+			".r.RcRRR.s",
+			"...RRRRR..",
+			"...RRRRR..",
+			"..rRRRRRr.",
+			"..RR..RR..",
+			"..RR..RR..",
+		],
+	},
+	# Thrall — a slain foe risen in the King's service, 10x12 spectral wisp
+	"thrall": {
+		"colors": {
+			"w": "9dc1ec", "W": "c5ddf5", # grave-light body
+			"e": "e8f4ff",                # burning pale eyes
+			"d": "6f9fd8",                # deep spectral folds
+		},
+		"rows": [
+			"...wwww...",
+			"..wWWWWw..",
+			"..WeWWeW..",
+			"..WWWWWW..",
+			"...WWWW...",
+			"..wWWWWw..",
+			".wwWWWWww.",
+			".w.WWWW.w.",
+			"...WWWW...",
+			"...dWWd...",
+			"....dd....",
+			"....d.....",
+		],
+	},
+	# Risen Courtier — court fodder in rotted finery, 10x14
+	"courtier": {
+		"colors": {
+			"f": "8a8474",                # grey-green dead flesh
+			"e": "e08840",                # ember eyes
+			"v": "3a2c42", "V": "473652", # moth-eaten velvet
+			"c": "8a6d3b",                # torn gilt trim
+			"b": "8b8496",                # bone
+		},
+		"rows": [
+			"...ffff...",
+			"..ffffff..",
+			"..fefefe..",
+			"...ffff...",
+			"..vVVVVv..",
+			".vvVcVVvv.",
+			".v.VcVVV.v",
+			".b.VVVVV.b",
+			"...VVVVV..",
+			"...VcVVV..",
+			"..vVVVVVv.",
+			"..VV..VV..",
+			"..VV..VV..",
+			"..bb..bb..",
+		],
+	},
+	# Risen Knight — shielded tank in grave-plate, 11x15
+	"risen_knight": {
+		"colors": {
+			"s": "5a5464", "S": "6a6474", # tarnished plate
+			"k": "3a3542",                # dark steel joints
+			"e": "e08840",                # ember visor glow
+			"c": "8c2f2f",                # rotted tabard
+			"h": "8b8496",                # shield face
+			"H": "9a94a6",                # shield boss
+		},
+		"rows": [
+			"....ssss...",
+			"...sSSSSs..",
+			"...Se..eS..",
+			"...sSSSSs..",
+			"hh..ssss...",
+			"hHh.sSSs...",
+			"hHhssScCss.",
+			"hHhs.ScCs..",
+			"hHhk.ScCk..",
+			"hh...ScC...",
+			".....SSS...",
+			"...sSSSSs..",
+			"...kk.kk...",
+			"...kk.kk...",
+			"...ss.ss...",
+		],
+	},
+	# Crypt Archer — skeletal bowman who holds his distance, 11x14
+	"crypt_archer": {
+		"colors": {
+			"b": "cfc9b8", "B": "b8b2a0", # bone
+			"e": "6f9fd8",                # cold eye sockets
+			"h": "2b2733", "H": "3a3542", # crypt-shroud hood
+			"w": "6b5236",                # yew bow
+			"s": "8a6d3b",                # bowstring / quiver
+		},
+		"rows": [
+			"...hhhh....",
+			"..hHHHHh...",
+			"..HbBBbH..w",
+			"..HeBBeH..w",
+			"...BBBB..sw",
+			"..hHHHHh.sw",
+			".hhHHHHhhsw",
+			".h.HHHH.ssw",
+			".b.HHHH..sw",
+			"...HHHH...w",
+			"...HHHH...w",
+			"...HH.HH..w",
+			"...HH.HH...",
+			"...bb.bb...",
+		],
+	},
+	# Chapel Chorister — elite: robed singer whose hymn mends the dead, 12x16
+	"chorister": {
+		"colors": {
+			"r": "3d3830", "R": "4a4438", # cassock
+			"w": "cfc9b8", "W": "e0dac8", # surplice (once white)
+			"f": "8a8474",                # dead grey face
+			"e": "f0cd7a",                # gilt-lit hollow mouth/eyes
+			"g": "8a6d3b",                # gold hymnal
+		},
+		"rows": [
+			"....ffff....",
+			"...ffffff...",
+			"...fefefe...",
+			"...ffeeff...",
+			"....ffff....",
+			"...wWWWWw...",
+			"..wwWWWWww..",
+			".ww.WWWW.ww.",
+			".w..WWWW..w.",
+			"..g.WWWW.g..",
+			"..ggWWWWgg..",
+			"...rRRRRr...",
+			"...RRRRRR...",
+			"...RRRRRR...",
+			"...RRR.RRR..",
+			"...rrr.rrr..",
+		],
+	},
+	# The Thing in the Chapel — final boss: what answered the bell, 16x20
+	"chapel_thing": {
+		"colors": {
+			"v": "1c1526", "V": "2a1f38", # a shape of chapel-dark
+			"e": "f0cd7a",                # too many gilt eyes
+			"b": "8a6d3b", "B": "a8894f", # the bell it carries, half-melted
+			"w": "9a94a6",                # pale grasping hands
+			"r": "8c2f2f",                # vestment scraps
+		},
+		"rows": [
+			"....vvvvvvvv....",
+			"..vvVVVVVVVVvv..",
+			".vVVeVVeVVeVVv..",
+			".vVVVVVVVVVVVv..",
+			"vVVeVVVeVVVeVVv.",
+			"vVVVVVVVVVVVVVv.",
+			"vVVVVrVVVrVVVVv.",
+			"vVVVVVVVVVVVVVv.",
+			".vVVVVbbbVVVVv..",
+			".vVVVbBBBbVVVv..",
+			"wVVVVbBBBbVVVVw.",
+			"wwVVVbbbbbVVVww.",
+			"w.vVVVVVVVVv..w.",
+			"...vVVVVVVv.....",
+			"...vVVVVVVv.....",
+			"..vVVVVVVVVv....",
+			"..vVVv..vVVv....",
+			"..vVv....vVv....",
+			"...v......v.....",
+			"................",
+		],
+	},
 }
 
 static func get_tex(id: String) -> ImageTexture:

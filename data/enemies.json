@@ -91,5 +91,84 @@
 		"gold": 40,
 		"boss": true,
 		"gen_scale": 0.46
+	},
+	"courtier": {
+		"name": "Risen Courtier",
+		"sprite": "courtier",
+		"hp": 26,
+		"speed": 48,
+		"damage": 10,
+		"radius": 7,
+		"xp": 2,
+		"gold_chance": 0.04,
+		"gen_scale": 0.27
+	},
+	"risen_knight": {
+		"name": "Risen Knight",
+		"sprite": "risen_knight",
+		"hp": 95,
+		"speed": 26,
+		"damage": 16,
+		"radius": 9,
+		"xp": 4,
+		"armor": 4,
+		"gold_chance": 0.08,
+		"gen_scale": 0.3
+	},
+	"crypt_archer": {
+		"name": "Crypt Archer",
+		"sprite": "crypt_archer",
+		"hp": 30,
+		"speed": 46,
+		"damage": 8,
+		"radius": 7,
+		"xp": 3,
+		"gold_chance": 0.05,
+		"gen_scale": 0.28,
+		"ranged": {
+			"range": 165,
+			"cooldown": 2.4,
+			"proj_speed": 150,
+			"proj_damage": 9
+		}
+	},
+	"chorister": {
+		"name": "Chapel Chorister",
+		"sprite": "chorister",
+		"hp": 320,
+		"speed": 22,
+		"damage": 12,
+		"radius": 10,
+		"xp": 12,
+		"gold": 14,
+		"elite": true,
+		"drops_scroll": true,
+		"gen_scale": 0.38,
+		"heals_allies": {
+			"radius": 95,
+			"amount": 8,
+			"interval": 2.0
+		}
+	},
+	"chapel_thing": {
+		"name": "The Thing in the Chapel",
+		"sprite": "chapel_thing",
+		"hp": 2600,
+		"speed": 30,
+		"damage": 26,
+		"radius": 15,
+		"xp": 100,
+		"gold": 100,
+		"boss": true,
+		"gen_scale": 0.5,
+		"ranged": {
+			"range": 260,
+			"cooldown": 3.4,
+			"proj_speed": 115,
+			"proj_damage": 12,
+			"volley": 5,
+			"spread_deg": 55,
+			"hold_distance": false
+		}
 	}
 }

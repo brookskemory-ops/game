@@ -1,0 +1,112 @@
+{
+	"id": "stage3",
+	"name": "Castle Vane",
+	"theme": "castle",
+	"run_length": 360,
+	"boss": "chapel_thing",
+	"boss_banner": "the chapel door stands open",
+	"boss_trickle": "courtier",
+	"boss_trickle_interval": 1.6,
+	"victory_unlock": "hollow_king",
+	"events": [
+		{
+			"t": 90,
+			"spawn": "risen_knight",
+			"count": 4,
+			"announce": "The honor guard answers an older oath..."
+		},
+		{
+			"t": 170,
+			"spawn": "chorister",
+			"count": 1,
+			"announce": "A hymn drifts from the sealed chapel..."
+		},
+		{
+			"t": 260,
+			"spawn": "crypt_archer",
+			"count": 7,
+			"announce": "Arrows from the battlements!"
+		},
+		{
+			"t": 310,
+			"spawn": "chorister",
+			"count": 2,
+			"announce": "The choir swells..."
+		}
+	],
+	"waves": [
+		{
+			"from": 0,
+			"to": 70,
+			"type": "courtier",
+			"interval": 1.0,
+			"count": 2
+		},
+		{
+			"from": 35,
+			"to": 140,
+			"type": "crypt_archer",
+			"interval": 3.4,
+			"count": 1
+		},
+		{
+			"from": 60,
+			"to": 220,
+			"type": "risen_knight",
+			"interval": 4.0,
+			"count": 1
+		},
+		{
+			"from": 90,
+			"to": 260,
+			"type": "courtier",
+			"interval": 0.7,
+			"count": 3
+		},
+		{
+			"from": 140,
+			"to": 320,
+			"type": "crypt_archer",
+			"interval": 2.2,
+			"count": 2
+		},
+		{
+			"from": 200,
+			"to": 360,
+			"type": "risen_knight",
+			"interval": 2.0,
+			"count": 2
+		},
+		{
+			"from": 260,
+			"to": 360,
+			"type": "courtier",
+			"interval": 0.45,
+			"count": 4
+		},
+		{
+			"from": 300,
+			"to": 360,
+			"type": "gnawer",
+			"interval": 1.2,
+			"count": 3
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/castle_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_flagstone_crack.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_rubble.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_banner_scrap.png",
+				0.85
+			]
+		]
+	}
+}

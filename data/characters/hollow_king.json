@@ -1,0 +1,15 @@
+{
+	"id": "hollow_king",
+	"name": "Hollow King, Once of Vane",
+	"sprite": "hollow_king",
+	"max_hp": 100,
+	"move_speed": 120,
+	"radius": 6,
+	"pickup_radius": 48,
+	"weapon": "cursed_blade",
+	"signature": "deathless",
+	"signature_desc": "Deathless — no salve heals him; every kill returns a drop of life",
+	"unlock_hint": "Open the chapel at Castle Vane",
+	"world_height": 19,
+	"story_arc": "hollow_king_arc"
+}
