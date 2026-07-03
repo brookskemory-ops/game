@@ -40,3 +40,16 @@ style-matched later. Endpoint: `POST /v1/generate-image-pixflux`.
 3. "skeletal X" needs "bare bones only, no flesh no fur" + a negative prompt.
 4. The model likes adding a small floating moon/glow orb inside character canvases —
    harmless at portrait size; crop or negative-prompt it for world sprites.
+
+## v0.10.0 environment + directional set
+- Moon + 6 props (pixflux 64/32px): PASS after 1 retry round. **Prompting lesson: any
+  mention of "moonlight" in a prop prompt paints a literal moon into the canvas — add
+  "moon, sky, background scenery" to negatives and describe light as "dim cool night
+  lighting" instead.**
+- Side-profile stills, all 5 heroes: PASS (Ansel needed 1 retry with "we see only his
+  right side, one visible eye" phrasing).
+- animate-with-text walk cycles: **FAILED the QA gate 3/3 attempts** (front-facing copies,
+  a turnaround instead of a cycle, then hallucinated shapes). Verdict: text-driven frame
+  animation is not reliable enough to ship; revisit with /animate-with-skeleton (pose
+  keypoints) in a future block. Shipped instead: per-direction stills + procedural gait
+  (bob/sway/footfall squash) — genre-standard and deterministic.

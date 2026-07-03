@@ -56,6 +56,10 @@ var _enemies: EnemyManager
 var _joystick: VirtualJoystick
 var _sprite: Sprite2D
 var _camera: GameCamera
+var _front_tex: Texture2D
+var _side_tex: Texture2D
+var _gait_t := 0.0
+var _sprite_base_scale := 1.0
 var _lightfoot_timer := 0.0
 var _hurt_accum := 0.0  # aggregates contact DPS into discrete hurt pulses
 
@@ -92,7 +96,8 @@ func setup(ctx: Dictionary) -> void:
 	_sprite = Sprite2D.new()
 	# Pixel Lab full-body art (same image as the camp portrait) scaled to
 	# world size; procedural sprite as fallback.
-	var portrait_path := "res://assets/portraits/%s.png" % String(stats.get("id", "wren"))
+	var hero_id := String(stats.get("id", "wren"))
+	var portrait_path := "res://assets/portraits/%s.png" % hero_id
 	if ResourceLoader.exists(portrait_path):
 		_sprite.texture = load(portrait_path)
 		var target_height := float(stats.get("world_height", 19.0))
@@ -100,6 +105,12 @@ func setup(ctx: Dictionary) -> void:
 		_sprite.scale = Vector2(sprite_scale, sprite_scale)
 	else:
 		_sprite.texture = PixelSprites.get_tex(String(stats.get("sprite", "wren")))
+	_front_tex = _sprite.texture
+	# Directional art: strict side profile used while moving horizontally.
+	var side_path := "res://assets/sprites/generated/side/%s.png" % hero_id
+	if ResourceLoader.exists(side_path):
+		_side_tex = load(side_path)
+	_sprite_base_scale = _sprite.scale.x
 	add_child(_sprite)
 	equip(String(stats.get("weapon", "hunting_bow")))
 
@@ -203,12 +214,28 @@ func _physics_process(delta: float) -> void:
 	var speed := move_speed * (LIGHTFOOT_BONUS if lightfoot_active else 1.0)
 	velocity = dir.limit_length(1.0) * speed
 	move_and_slide()
-	if velocity.length_squared() > 1.0:
+	var moving := velocity.length_squared() > 1.0
+	if moving:
 		facing = velocity.normalized()
 	if _sprite != null:
 		if absf(velocity.x) > 1.0:
 			_sprite.flip_h = velocity.x < 0.0
 		_sprite.modulate = _sprite.modulate.lerp(Color.WHITE, delta * 8.0)
+		# Directional still: side profile when horizontal movement dominates.
+		if _side_tex != null:
+			_sprite.texture = _side_tex if (moving and absf(velocity.x) >= absf(velocity.y)) else _front_tex
+		# Procedural gait (genre-standard): footstep bob, sway, and a small
+		# squash on each footfall. Settles smoothly when standing.
+		if moving:
+			_gait_t += delta * move_speed * 0.085
+			var step := sin(_gait_t)
+			_sprite.rotation = step * 0.07
+			_sprite.position.y = -absf(step) * 1.4
+			_sprite.scale.y = _sprite_base_scale * (1.0 - 0.04 * absf(step))
+		else:
+			_sprite.rotation = lerpf(_sprite.rotation, 0.0, minf(1.0, delta * 10.0))
+			_sprite.position.y = lerpf(_sprite.position.y, 0.0, minf(1.0, delta * 10.0))
+			_sprite.scale.y = lerpf(_sprite.scale.y, _sprite_base_scale, minf(1.0, delta * 10.0))
 	if _hurt_accum > 0.0:
 		_hurt_accum = maxf(0.0, _hurt_accum - delta * 6.0)
 	if _invuln > 0.0:

@@ -34,6 +34,7 @@ func _ready() -> void:
 	# Stage theme drives the ground dressing and background tint.
 	if String(stage.get("theme", "graveyard")) == "forest":
 		$BackgroundLayer/Background.color = Color(0.055, 0.075, 0.06)
+	_load_theme_props()
 	_wave_acc.resize(waves().size())
 	_events_fired.resize(events().size())
 	player.setup({"enemies": enemies, "projectiles": projectiles, "hazards": hazards})
@@ -220,10 +221,55 @@ func _finish(victory: bool) -> void:
 	# Freeze the night behind the overlay (HUD runs in PROCESS_MODE_ALWAYS).
 	get_tree().paused = true
 
+# Generated prop art per theme: [texture path, draw scale, weight threshold].
+# Falls back to the procedural rectangles if a texture is missing.
+const THEME_PROPS := {
+	"graveyard": [
+		["res://assets/sprites/generated/props/prop_tombstone.png", 0.7],
+		["res://assets/sprites/generated/props/prop_cross.png", 0.7],
+		["res://assets/sprites/generated/props/prop_shrub.png", 0.8],
+	],
+	"forest": [
+		["res://assets/sprites/generated/props/prop_tree.png", 1.0],
+		["res://assets/sprites/generated/props/prop_stump.png", 0.7],
+		["res://assets/sprites/generated/props/prop_boulder.png", 0.8],
+	],
+}
+
+var _prop_textures: Array = []  # [Texture2D, scale] pairs for the active theme
+
+func _load_theme_props() -> void:
+	var theme_name := String(stage.get("theme", "graveyard"))
+	for entry in THEME_PROPS.get(theme_name, []):
+		if ResourceLoader.exists(String(entry[0])):
+			_prop_textures.append([load(String(entry[0])), float(entry[1])])
+
 func _draw() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1349
 	var forest := String(stage.get("theme", "graveyard")) == "forest"
+	# Generated props scattered sparsely (big, so fewer), specks fill between.
+	if not _prop_textures.is_empty():
+		for i in 90:
+			var prop_pos := Vector2(
+				rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE),
+				rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE)
+			)
+			var pick: Array = _prop_textures[rng.randi() % _prop_textures.size()]
+			var tex: Texture2D = pick[0]
+			var prop_size := Vector2(tex.get_width(), tex.get_height()) * float(pick[1])
+			draw_texture_rect(tex, Rect2(prop_pos - prop_size * 0.5, prop_size), false,
+				Color(0.72, 0.72, 0.8))  # dimmed into the night
+		# Small speck pass for ground texture between the props.
+		for i in 200:
+			var speck_pos := Vector2(
+				rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE),
+				rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE)
+			)
+			var speck_shade := rng.randf_range(0.10, 0.15)
+			draw_rect(Rect2(speck_pos, Vector2(2.5, 2.0)),
+				Color(speck_shade * 0.9, speck_shade + 0.02, speck_shade * 0.9))
+		return
 	for i in SCATTER_COUNT:
 		var pos := Vector2(
 			rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE),

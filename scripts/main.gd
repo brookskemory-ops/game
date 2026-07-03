@@ -6,9 +6,13 @@ extends Control
 var _started := false
 var _time := 0.0
 var _prompt: Label
+var _moon_tex: Texture2D
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	var moon_path := "res://assets/sprites/generated/props/moon.png"
+	if ResourceLoader.exists(moon_path):
+		_moon_tex = load(moon_path)
 
 	var title := UITheme.make_label("VIGIL", 78, Palette.PARCHMENT, true)
 	_place(title, 0.5, 0.5, 0.5, 0.5, Rect2(-300, -118, 600, 92))
@@ -77,14 +81,18 @@ func _draw() -> void:
 		draw_rect(Rect2(star, Vector2(1.5, 1.5)),
 			Color(Palette.MOON.r, Palette.MOON.g, Palette.MOON.b, 0.12 + 0.3 * twinkle))
 
-	# The moon, with a soft glow.
+	# The moon (generated art), with the code-drawn glow kept beneath it.
 	var moon := Vector2(w * 0.78, h * 0.2)
 	for glow in 3:
 		draw_circle(moon, 24.0 + float(glow) * 9.0,
 			Color(Palette.MOON.r, Palette.MOON.g, Palette.MOON.b, 0.05))
-	draw_circle(moon, 21.0, Palette.MOON)
-	draw_circle(moon + Vector2(-6, -4), 3.5, Palette.MOON.darkened(0.14))
-	draw_circle(moon + Vector2(4, 6), 2.5, Palette.MOON.darkened(0.1))
+	if _moon_tex != null:
+		var moon_size := Vector2(52, 52)
+		draw_texture_rect(_moon_tex, Rect2(moon - moon_size * 0.5, moon_size), false)
+	else:
+		draw_circle(moon, 21.0, Palette.MOON)
+		draw_circle(moon + Vector2(-6, -4), 3.5, Palette.MOON.darkened(0.14))
+		draw_circle(moon + Vector2(4, 6), 2.5, Palette.MOON.darkened(0.1))
 
 	# Castle Vane, far left: keep, wall, and the bell tower with one lit window.
 	var castle := Color(0.09, 0.08, 0.12)

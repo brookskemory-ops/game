@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.9.0 — faces of the dead"
+const VERSION := "0.10.0 — alive at night"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
