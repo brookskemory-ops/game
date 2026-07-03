@@ -1,15 +1,15 @@
 {
 	"id": "qa3",
-	"name": "QA Court (20s)",
+	"name": "QA Court (10s)",
 	"theme": "castle",
-	"run_length": 20,
+	"run_length": 10,
 	"boss": "chapel_thing",
 	"boss_banner": "the chapel door stands open",
 	"boss_trickle": "courtier",
-	"boss_trickle_interval": 3.0,
+	"boss_trickle_interval": 4.0,
 	"events": [
 		{
-			"t": 8,
+			"t": 6,
 			"spawn": "chorister",
 			"count": 1,
 			"announce": "A hymn drifts from the sealed chapel..."
@@ -18,23 +18,16 @@
 	"waves": [
 		{
 			"from": 0,
-			"to": 20,
+			"to": 10,
 			"type": "courtier",
-			"interval": 2.2,
+			"interval": 4.0,
 			"count": 1
 		},
 		{
-			"from": 4,
-			"to": 20,
+			"from": 2,
+			"to": 10,
 			"type": "crypt_archer",
-			"interval": 4.5,
-			"count": 1
-		},
-		{
-			"from": 8,
-			"to": 20,
-			"type": "risen_knight",
-			"interval": 8.0,
+			"interval": 6.0,
 			"count": 1
 		}
 	],
