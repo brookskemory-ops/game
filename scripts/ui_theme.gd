@@ -20,7 +20,8 @@ static func body_font() -> Font:
 		# "Are") — wrap it in a FontVariation with ligatures disabled.
 		var variation := FontVariation.new()
 		variation.base_font = load(BODY_FONT_PATH)
-		variation.opentype_features = {TextServer.name_to_tag("liga"): 0}
+		var liga_tag := TextServerManager.get_primary_interface().name_to_tag("liga")
+		variation.opentype_features = {liga_tag: 0}
 		_body_font = variation
 	return _body_font
 
