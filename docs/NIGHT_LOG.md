@@ -110,3 +110,22 @@ artifacts; a real-phone soak test remains owed. Layout sweep passed at 844×390,
 - Monster art staged in assets/sprites/generated/ — **decision for the morning:** approve
   the art direction and I'll integrate world sprites (needs sprite-scale + camera retune)
 - All parameters logged in docs/asset_log.md for style-consistent future batches
+
+---
+
+## Day session addendum (v0.10.x → v0.11.0)
+
+- **v0.10.0 "Alive at Night"**: generated moon + 6 scenery props (with the "moonlight
+  paints moons" prompting lesson), side-profile stills for all 5 heroes, procedural walk
+  gait. Frame-cycle animations failed the per-animation QA gate 3/3 — parked for the
+  skeleton endpoint.
+- **User-reported bug fixed**: all MultiMesh sprites rendered upside down (QuadMesh Y-up
+  UVs in the 2D canvas). Every MultiMesh texture now passes through
+  `PixelSprites.flipped_for_multimesh()`.
+- **v0.11.0 "An Armory of Last Resorts"**: weapon registry complete (12/12) — Throwing
+  Axes, Ballista Bolt, Warding Bell, Falcon Companion, Pilgrim's Chain, Saint's Reliquary;
+  enemy slow system; Sexton's Spade + The Miasma evolutions (5/6 live); Gravedust +
+  Bad Humours; draft family rule. QA bot picked the Reliquary live during verification —
+  zero script errors.
+- **Next**: Block B "The Court of the Hollow King" (stage 3, hero 6, Cursed Blade thralls,
+  the final boss + story resolution), then Block C polish/v1.0-rc.
