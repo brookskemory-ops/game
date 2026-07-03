@@ -51,6 +51,29 @@ jobs:
           done
           exit $fail
 
+      # The containerized job runs with HOME=/github/home, so the image's
+      # preinstalled templates are invisible — and we need the *nothreads*
+      # web templates (runs on Pages/mobile browsers without COOP/COEP
+      # headers), which the image doesn't ship. Fetch once, cache forever.
+      - name: Cache web export templates
+        id: cache-templates
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.local/share/godot/export_templates/4.4.1.stable
+          key: godot-4.4.1-web-nothreads-v1
+
+      - name: Install nothreads web templates
+        if: steps.cache-templates.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          curl -sSL -o /tmp/templates.tpz \
+            https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          cd /tmp
+          unzip -o templates.tpz "templates/web_nothreads_*"
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          cp templates/web_nothreads_* "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
+          ls -la "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
+
       - name: Export Web
         run: |
           mkdir -p build/web
