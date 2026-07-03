@@ -1,0 +1,16 @@
+# Godot 4
+.godot/
+*.translation
+
+# Export output
+exports/
+*.apk
+*.aab
+*.ipa
+
+# Android build template (installed locally, not committed)
+android/
+
+# OS junk
+.DS_Store
+Thumbs.db
