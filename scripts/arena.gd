@@ -250,7 +250,7 @@ func _draw() -> void:
 	var forest := String(stage.get("theme", "graveyard")) == "forest"
 	# Generated props scattered sparsely (big, so fewer), specks fill between.
 	if not _prop_textures.is_empty():
-		for i in 90:
+		for i in 240:
 			var prop_pos := Vector2(
 				rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE),
 				rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE)
@@ -261,7 +261,7 @@ func _draw() -> void:
 			draw_texture_rect(tex, Rect2(prop_pos - prop_size * 0.5, prop_size), false,
 				Color(0.72, 0.72, 0.8))  # dimmed into the night
 		# Small speck pass for ground texture between the props.
-		for i in 200:
+		for i in 420:
 			var speck_pos := Vector2(
 				rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE),
 				rng.randf_range(-SCATTER_RANGE, SCATTER_RANGE)
