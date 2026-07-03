@@ -22,6 +22,10 @@ var upgrades: UpgradeSystem
 var rites: RiteTracker
 var _time_scale := 1.0   # Hourless Glass relic
 var _wisp_acc := 0.0     # Wisp in a Jar relic
+var _spawn_mul := 1.0    # night modifier: spawn-rate multiplier
+var _endless := false    # The Long Night: no dawn, only deeper dark
+var _endless_tier := 0
+var _storm_count := 0
 var _wave_acc := PackedFloat32Array()
 var _events_fired := PackedByteArray()
 var _draft_open := false
@@ -47,6 +51,15 @@ func _ready() -> void:
 	_events_fired.resize(events().size())
 	player.setup({"enemies": enemies, "projectiles": projectiles, "hazards": hazards})
 	enemies.setup(player, player.body_radius, gems)
+	# Night modifiers (v0.15): tougher/faster/richer nights, mist, endlessness.
+	var mods: Dictionary = stage.get("mods", {})
+	enemies.set_mods(mods)
+	_spawn_mul = float(mods.get("spawn_mul", 1.0))
+	_endless = bool(stage.get("endless", false))
+	if bool(mods.get("fog", false)):
+		var fog := FogLayer.new()
+		add_child(fog)
+		fog.setup(player)
 	projectiles.setup(enemies)
 	hazards.setup(enemies)
 	gems.setup(player, player.pickup_radius)
@@ -119,6 +132,11 @@ func events() -> Array:
 func run_length() -> float:
 	return float(stage.get("run_length", 300))
 
+func is_endless() -> bool:
+	return _endless
+
+var _loop_count := 0
+
 func _physics_process(delta: float) -> void:
 	if run_over:
 		return
@@ -129,8 +147,31 @@ func _physics_process(delta: float) -> void:
 		if _wisp_acc >= 30.0:
 			_wisp_acc = 0.0
 			gems.vacuum_all()
+	# The Long Night: waves loop, the dark deepens, storms toll — no dawn.
+	var wave_time := time_elapsed
+	if _endless:
+		var loop := int(time_elapsed / run_length())
+		wave_time = time_elapsed - float(loop) * run_length()
+		if loop != _loop_count:
+			_loop_count = loop
+			for e in _events_fired.size():
+				_events_fired[e] = 0
+		var tier := int(time_elapsed / 180.0)
+		if tier != _endless_tier:
+			_endless_tier = tier
+			enemies.escalate(1.35)
+			_spawn_mul *= 1.1
+			hud.toast("the dark deepens...")
+			Sfx.play("bell", 0.6)
+		var storm := int(time_elapsed / 300.0)
+		if storm != _storm_count:
+			_storm_count = storm
+			hud.banner("THE BELL TOLLS AGAIN", "the night sends its elites")
+			for c in 3:
+				enemies.spawn("tolling_man", _spawn_point())
+			enemies.spawn("chorister", _spawn_point())
 	# The timer running out doesn't end the night — it summons what rings the bell.
-	if not _boss_summoned and time_elapsed >= run_length():
+	if not _endless and not _boss_summoned and time_elapsed >= run_length():
 		_summon_boss()
 	if _boss_summoned and not _awaiting_chest:
 		_trickle_acc += delta
@@ -138,13 +179,13 @@ func _physics_process(delta: float) -> void:
 		if _trickle_acc >= interval:
 			_trickle_acc -= interval
 			enemies.spawn(String(stage.get("boss_trickle", "shambler")), _spawn_point())
-	# Timed one-shot events (mini-bosses etc.).
+	# Timed one-shot events (mini-bosses etc.; re-armed per loop when endless).
 	var event_list := events()
 	for e in event_list.size():
 		if _events_fired[e] == 1:
 			continue
 		var event: Dictionary = event_list[e]
-		if time_elapsed >= float(event.get("t", 0)):
+		if wave_time >= float(event.get("t", 0)):
 			_events_fired[e] = 1
 			for c in int(event.get("count", 1)):
 				enemies.spawn(String(event.get("spawn", "shambler")), _spawn_point())
@@ -154,10 +195,10 @@ func _physics_process(delta: float) -> void:
 	var wave_list := waves()
 	for w in wave_list.size():
 		var wave: Dictionary = wave_list[w]
-		if time_elapsed < float(wave.get("from", 0)) or time_elapsed >= float(wave.get("to", 0)):
+		if wave_time < float(wave.get("from", 0)) or wave_time >= float(wave.get("to", 0)):
 			continue
 		_wave_acc[w] += delta
-		var interval := maxf(0.05, float(wave.get("interval", 1.0)))
+		var interval := maxf(0.05, float(wave.get("interval", 1.0)) / _spawn_mul)
 		while _wave_acc[w] >= interval:
 			_wave_acc[w] -= interval
 			for c in int(wave.get("count", 1)):

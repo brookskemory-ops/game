@@ -1,0 +1,128 @@
+{
+	"id": "bells_echo",
+	"name": "The Bell's Echo",
+	"theme": "graveyard",
+	"tagline": "every bell you ever rang answers at once",
+	"run_length": 480,
+	"boss": "chapel_thing",
+	"boss_banner": "the echo finds its voice",
+	"boss_trickle": "courtier",
+	"boss_trickle_interval": 1.4,
+	"mods": {
+		"xp_mul": 1.2,
+		"spawn_mul": 1.3
+	},
+	"events": [
+		{
+			"t": 90,
+			"spawn": "tolling_man",
+			"count": 2,
+			"announce": "The first echo."
+		},
+		{
+			"t": 200,
+			"spawn": "chorister",
+			"count": 1,
+			"announce": "A hymn joins the bells."
+		},
+		{
+			"t": 300,
+			"spawn": "bone_stag",
+			"count": 8,
+			"announce": "The forest answers too."
+		},
+		{
+			"t": 400,
+			"spawn": "risen_knight",
+			"count": 5,
+			"announce": "And last, the court."
+		}
+	],
+	"waves": [
+		{
+			"from": 0,
+			"to": 120,
+			"type": "shambler",
+			"interval": 1.0,
+			"count": 2
+		},
+		{
+			"from": 60,
+			"to": 200,
+			"type": "gnawer",
+			"interval": 1.3,
+			"count": 2
+		},
+		{
+			"from": 120,
+			"to": 280,
+			"type": "hanged_man",
+			"interval": 1.6,
+			"count": 2,
+			"distance": 160
+		},
+		{
+			"from": 180,
+			"to": 340,
+			"type": "wight",
+			"interval": 1.8,
+			"count": 2
+		},
+		{
+			"from": 240,
+			"to": 400,
+			"type": "courtier",
+			"interval": 1.0,
+			"count": 3
+		},
+		{
+			"from": 300,
+			"to": 440,
+			"type": "crypt_archer",
+			"interval": 2.2,
+			"count": 2
+		},
+		{
+			"from": 360,
+			"to": 480,
+			"type": "risen_knight",
+			"interval": 2.0,
+			"count": 2
+		},
+		{
+			"from": 400,
+			"to": 480,
+			"type": "shambler",
+			"interval": 0.4,
+			"count": 4
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/grave_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_cobbles.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_bones.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_gravedirt.png",
+				0.9
+			]
+		]
+	},
+	"rites": [
+		{
+			"id": "echo_lights",
+			"name": "Six for the Echo",
+			"type": "light_candles",
+			"count": 6,
+			"radius": 450,
+			"announce_t": 25,
+			"relic": "ledger_page"
+		}
+	]
+}

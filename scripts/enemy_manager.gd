@@ -33,6 +33,22 @@ var _boss_max_hp := 1.0
 var _player: Node2D
 var _gems: GemManager
 
+# Night modifiers (v0.15 variant nights): stage json "mods" block.
+var _hp_mul := 1.0
+var _speed_mul := 1.0
+var _gold_mul := 1.0
+var _xp_mul := 1.0
+
+func set_mods(mods: Dictionary) -> void:
+	_hp_mul = float(mods.get("hp_mul", 1.0))
+	_speed_mul = float(mods.get("speed_mul", 1.0))
+	_gold_mul = float(mods.get("gold_mul", 1.0))
+	_xp_mul = float(mods.get("xp_mul", 1.0))
+
+## Endless escalation: each tier deepens the night (The Long Night).
+func escalate(hp_factor: float) -> void:
+	_hp_mul *= hp_factor
+
 # Type registry, from data/enemies.json.
 var _type_defs: Array = []      # Dictionary per type id
 var _type_mm: Array = []        # MultiMesh per type id
@@ -145,7 +161,7 @@ func spawn(type_name: String, at: Vector2) -> void:
 	_alive[slot] = 1
 	_type[slot] = type_id
 	_pos[slot] = at
-	_hp[slot] = float(_type_defs[type_id].get("hp", 10))
+	_hp[slot] = float(_type_defs[type_id].get("hp", 10)) * _hp_mul
 	_flash[slot] = 0.0
 	_wobble[slot] = Vector2.from_angle(randf() * TAU) * randf_range(2.0, 26.0)
 	_phase[slot] = randf() * TAU
@@ -199,7 +215,7 @@ func _physics_process(delta: float) -> void:
 			if _slow[i] > 0.0:
 				_slow[i] -= delta
 				speed_mul = 0.6
-			_pos[i] += dir * float(def.get("speed", 40)) * speed_mul * move_sign * delta
+			_pos[i] += dir * float(def.get("speed", 40)) * speed_mul * _speed_mul * move_sign * delta
 			if absf(dir.x) > 0.1:
 				_facing[i] = -1.0 if dir.x < 0.0 else 1.0
 		# Per-type abilities on the shared per-slot timer.
@@ -369,13 +385,13 @@ func _kill(slot: int) -> void:
 func _drop_pickups(slot: int, def: Dictionary) -> void:
 	if _gems == null:
 		return
-	var xp := int(def.get("xp", 1))
+	var xp := maxi(1, int(round(float(def.get("xp", 1)) * _xp_mul)))
 	var gem_count := clampi(xp, 1, 8)
 	for g in gem_count:
 		var value := xp / gem_count + (1 if g < xp % gem_count else 0)
 		_gems.spawn(_scatter(_pos[slot], gem_count), value, GemManager.KIND_GEM)
-	var gold := int(def.get("gold", 0))
-	if gold == 0 and randf() < float(def.get("gold_chance", 0.0)):
+	var gold := int(round(float(def.get("gold", 0)) * _gold_mul))
+	if gold == 0 and randf() < float(def.get("gold_chance", 0.0)) * _gold_mul:
 		gold = 1
 	if gold > 0:
 		var coin_count := clampi(gold, 1, 8)

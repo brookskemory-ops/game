@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.14.0 — rites of the vigil"
+const VERSION := "0.15.0 — many nights"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -107,6 +107,14 @@ func end_run(victory: bool, stats := {}) -> void:
 	var best: Dictionary = save_data.get("best_run", {})
 	if float(stats.get("time", 0.0)) > float(best.get("time", 0.0)):
 		save_data["best_run"] = last_run.duplicate()
+	# The Long Night keeps its own tally: how deep did the count go?
+	if String(stats.get("stage", "")) == "long_night":
+		var record: Dictionary = save_data["stats"].get("long_night_best", {})
+		if float(stats.get("time", 0.0)) > float(record.get("time", 0.0)):
+			save_data["stats"]["long_night_best"] = {
+				"time": float(stats.get("time", 0.0)),
+				"kills": int(stats.get("kills", 0)),
+			}
 	_check_unlocks(stats)
 	_check_weapon_unlocks(stats, weapons_before)
 	write_save()
@@ -325,7 +333,8 @@ func stage_path() -> String:
 	if OS.has_feature("web"):
 		var search := String(JavaScriptBridge.eval("window.location.search", true))
 		# NOTE: "qa3" must precede "qa" — the match is a substring check.
-		for stage_id in ["qa3", "qa", "stress", "stage1", "stage2", "stage3"]:
+		for stage_id in ["qa3", "qa", "stress", "stage1", "stage2", "stage3",
+				"blood_toll", "deep_mist", "cold_court", "bells_echo", "long_night"]:
 			if search.contains("stage=" + stage_id):
 				return "res://data/waves/%s.json" % stage_id
 	return "res://data/waves/%s.json" % selected_stage

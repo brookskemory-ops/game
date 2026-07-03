@@ -22,21 +22,21 @@
 	"ledger_page": {
 		"name": "Sexton's Ledger-Page",
 		"desc": "The first reroll of every night is free.",
-		"hint": "A rite not yet asked — new nights will ask it"
+		"hint": "Light Six for the Echo (The Bell's Echo)"
 	},
 	"ferrymans_coin": {
 		"name": "Ferryman's Coin",
 		"desc": "If the night takes you, the ferryman pays your gold out double.",
-		"hint": "A rite not yet asked — new nights will ask it"
+		"hint": "Collect the Toll (Blood Toll)"
 	},
 	"pilgrims_flask": {
 		"name": "Pilgrim's Flask",
 		"desc": "One desperate swallow: rise once at a quarter of your life.",
-		"hint": "A rite not yet asked — new nights will ask it"
+		"hint": "Find the Lights in the Mist (The Deep Mist)"
 	},
 	"hourless_glass": {
 		"name": "Hourless Glass",
-		"desc": "The night passes a tenth faster. Dawn comes sooner — so does the bell.",
-		"hint": "A rite not yet asked — new nights will ask it"
+		"desc": "The night passes a tenth faster. Dawn comes sooner \u2014 so does the bell.",
+		"hint": "Hold the Cold Ground (The Cold Court)"
 	}
 }

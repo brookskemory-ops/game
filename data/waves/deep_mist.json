@@ -1,0 +1,113 @@
+{
+	"id": "deep_mist",
+	"name": "The Deep Mist",
+	"theme": "forest",
+	"tagline": "the mist hides the lights \u2014 and the dead",
+	"run_length": 480,
+	"boss": "briar_queen",
+	"boss_trickle": "hanged_man",
+	"boss_trickle_interval": 2.0,
+	"mods": {
+		"fog": true,
+		"spawn_mul": 1.15,
+		"speed_mul": 1.05
+	},
+	"events": [
+		{
+			"t": 140,
+			"spawn": "tolling_man",
+			"count": 1,
+			"announce": "A bell, somewhere in the white..."
+		},
+		{
+			"t": 280,
+			"spawn": "wight",
+			"count": 5,
+			"announce": "Shapes in the mist."
+		},
+		{
+			"t": 400,
+			"spawn": "bone_stag",
+			"count": 6,
+			"announce": "Hoofbeats you cannot see."
+		}
+	],
+	"waves": [
+		{
+			"from": 0,
+			"to": 120,
+			"type": "shambler",
+			"interval": 1.1,
+			"count": 2
+		},
+		{
+			"from": 30,
+			"to": 240,
+			"type": "hanged_man",
+			"interval": 1.8,
+			"count": 2,
+			"distance": 150
+		},
+		{
+			"from": 120,
+			"to": 360,
+			"type": "wight",
+			"interval": 2.4,
+			"count": 2
+		},
+		{
+			"from": 200,
+			"to": 480,
+			"type": "hanged_man",
+			"interval": 1.2,
+			"count": 3,
+			"distance": 150
+		},
+		{
+			"from": 300,
+			"to": 480,
+			"type": "bone_stag",
+			"interval": 1.4,
+			"count": 2
+		},
+		{
+			"from": 390,
+			"to": 480,
+			"type": "wight",
+			"interval": 1.2,
+			"count": 2
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/forest_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_roots.png",
+				1.0
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_moss.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_mushrooms.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_leaves.png",
+				0.85
+			]
+		]
+	},
+	"rites": [
+		{
+			"id": "mist_lights",
+			"name": "Lights in the Mist",
+			"type": "light_candles",
+			"count": 5,
+			"radius": 420,
+			"announce_t": 20,
+			"relic": "pilgrims_flask"
+		}
+	]
+}

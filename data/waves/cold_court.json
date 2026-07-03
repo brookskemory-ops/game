@@ -1,0 +1,111 @@
+{
+	"id": "cold_court",
+	"name": "The Cold Court",
+	"theme": "castle",
+	"tagline": "the court is patient, and the court is cold",
+	"run_length": 480,
+	"boss": "chapel_thing",
+	"boss_banner": "the chapel remembers you",
+	"boss_trickle": "risen_knight",
+	"boss_trickle_interval": 3.0,
+	"mods": {
+		"hp_mul": 1.3,
+		"spawn_mul": 1.1
+	},
+	"events": [
+		{
+			"t": 120,
+			"spawn": "risen_knight",
+			"count": 5,
+			"announce": "The honor guard, twice honored."
+		},
+		{
+			"t": 260,
+			"spawn": "chorister",
+			"count": 2,
+			"announce": "The hymn does not pause."
+		},
+		{
+			"t": 380,
+			"spawn": "crypt_archer",
+			"count": 10,
+			"announce": "A sky of bone-tipped rain."
+		}
+	],
+	"waves": [
+		{
+			"from": 0,
+			"to": 120,
+			"type": "courtier",
+			"interval": 1.4,
+			"count": 2
+		},
+		{
+			"from": 40,
+			"to": 240,
+			"type": "crypt_archer",
+			"interval": 2.8,
+			"count": 1
+		},
+		{
+			"from": 90,
+			"to": 300,
+			"type": "risen_knight",
+			"interval": 3.2,
+			"count": 1
+		},
+		{
+			"from": 180,
+			"to": 420,
+			"type": "crypt_archer",
+			"interval": 2.0,
+			"count": 2
+		},
+		{
+			"from": 240,
+			"to": 480,
+			"type": "risen_knight",
+			"interval": 1.8,
+			"count": 2
+		},
+		{
+			"from": 320,
+			"to": 480,
+			"type": "courtier",
+			"interval": 0.6,
+			"count": 3
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/castle_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_flagstone_crack.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_rubble.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_bones.png",
+				0.9
+			]
+		]
+	},
+	"rites": [
+		{
+			"id": "cold_ground",
+			"name": "Hold the Cold Ground",
+			"type": "stand_ground",
+			"t": 200,
+			"pos": [
+				240,
+				0
+			],
+			"radius": 80,
+			"seconds": 20,
+			"relic": "hourless_glass"
+		}
+	]
+}

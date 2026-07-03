@@ -1,0 +1,54 @@
+[
+	{
+		"id": "stage1"
+	},
+	{
+		"id": "stage2",
+		"requires": {
+			"type": "stage",
+			"id": "stage1"
+		}
+	},
+	{
+		"id": "stage3",
+		"requires": {
+			"type": "stage",
+			"id": "stage2"
+		}
+	},
+	{
+		"id": "blood_toll",
+		"requires": {
+			"type": "stage",
+			"id": "stage1"
+		}
+	},
+	{
+		"id": "deep_mist",
+		"requires": {
+			"type": "stage",
+			"id": "stage2"
+		}
+	},
+	{
+		"id": "cold_court",
+		"requires": {
+			"type": "stage",
+			"id": "stage3"
+		}
+	},
+	{
+		"id": "bells_echo",
+		"requires": {
+			"type": "relics",
+			"value": 3
+		}
+	},
+	{
+		"id": "long_night",
+		"requires": {
+			"type": "stage",
+			"id": "stage1"
+		}
+	}
+]

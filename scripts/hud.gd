@@ -102,8 +102,10 @@ func _process(delta: float) -> void:
 	if _results_shown or get_tree().paused:
 		return
 	if _arena != null:
-		var remaining: float = maxf(0.0, _arena.run_length() - _arena.time_elapsed)
-		_timer_label.text = "%d:%02d" % [int(remaining) / 60, int(remaining) % 60]
+		# Endless nights count up; every other night counts down to the bell.
+		var shown: float = _arena.time_elapsed if _arena.is_endless() \
+			else maxf(0.0, _arena.run_length() - _arena.time_elapsed)
+		_timer_label.text = "%d:%02d" % [int(shown) / 60, int(shown) % 60]
 	if _enemies != null:
 		_kills_label.text = str(_enemies.kills)
 		_boss_label.visible = _enemies.boss_active()

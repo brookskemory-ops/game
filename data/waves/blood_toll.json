@@ -1,0 +1,106 @@
+{
+	"id": "blood_toll",
+	"name": "Blood Toll",
+	"theme": "graveyard",
+	"tagline": "the dead pay double tonight",
+	"run_length": 480,
+	"boss": "sexton",
+	"boss_trickle": "gnawer",
+	"boss_trickle_interval": 1.6,
+	"mods": {
+		"gold_mul": 2.0,
+		"hp_mul": 1.15,
+		"spawn_mul": 1.25
+	},
+	"events": [
+		{
+			"t": 120,
+			"spawn": "tolling_man",
+			"count": 2,
+			"announce": "Two bells. Two purses."
+		},
+		{
+			"t": 240,
+			"spawn": "tolling_man",
+			"count": 2,
+			"announce": "The toll comes due..."
+		},
+		{
+			"t": 360,
+			"spawn": "tolling_man",
+			"count": 3,
+			"announce": "Every debt in the vale walks tonight."
+		}
+	],
+	"waves": [
+		{
+			"from": 0,
+			"to": 120,
+			"type": "shambler",
+			"interval": 1.2,
+			"count": 2
+		},
+		{
+			"from": 60,
+			"to": 240,
+			"type": "gnawer",
+			"interval": 1.6,
+			"count": 2
+		},
+		{
+			"from": 120,
+			"to": 360,
+			"type": "shambler",
+			"interval": 0.7,
+			"count": 3
+		},
+		{
+			"from": 240,
+			"to": 480,
+			"type": "gnawer",
+			"interval": 0.9,
+			"count": 3
+		},
+		{
+			"from": 300,
+			"to": 480,
+			"type": "wight",
+			"interval": 2.6,
+			"count": 1
+		},
+		{
+			"from": 390,
+			"to": 480,
+			"type": "shambler",
+			"interval": 0.45,
+			"count": 4
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/grave_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_cobbles.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_bones.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_gravedirt.png",
+				0.9
+			]
+		]
+	},
+	"rites": [
+		{
+			"id": "toll_rite",
+			"name": "Collect the Toll",
+			"type": "slay_elite",
+			"target": "tolling_man",
+			"within": 45,
+			"relic": "ferrymans_coin"
+		}
+	]
+}

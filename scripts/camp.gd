@@ -121,34 +121,133 @@ func _show_next_unlock_vignette() -> void:
 	var hero_id := String(Game.newly_unlocked.pop_front())
 	_show_vignette(hero_id, true)
 
-# --- Stage select (the forest opens once the village is survived) ---
+# --- Night select: one button showing tonight's pick, opening the full list ---
+
+var _night_overlay: Control
+var _stage_row: Control
 
 func _build_stage_row() -> void:
+	if _stage_row != null:
+		_stage_row.queue_free()
+	var selected: Variant = Game.load_json("res://data/waves/%s.json" % Game.selected_stage)
+	var night_name := Game.selected_stage
+	if selected is Dictionary:
+		night_name = String(selected.get("name", night_name))
+	var button := UITheme.make_button("night:  > %s <" % night_name, 10)
+	_place(button, 0.5, 1.0, 0.5, 1.0, Rect2(-160, -72, 320, 26))
+	button.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_open_night_picker()
+	)
+	add_child(button)
+	_stage_row = button
+
+func _night_open(requires: Dictionary) -> bool:
+	match String(requires.get("type", "")):
+		"":
+			return true
+		"stage":
+			return Game.stage_cleared(String(requires.get("id", "")))
+		"relics":
+			var owned := 0
+			for rid in Game.save_data.get("relics", {}):
+				if Game.relic_unlocked(String(rid)):
+					owned += 1
+			return owned >= int(requires.get("value", 99))
+	return false
+
+func _night_lock_hint(requires: Dictionary) -> String:
+	match String(requires.get("type", "")):
+		"stage":
+			var gate: Variant = Game.load_json("res://data/waves/%s.json" % String(requires.get("id", "")))
+			if gate is Dictionary:
+				return "survive %s first" % String(gate.get("name", "an earlier night"))
+			return "the path is dark yet"
+		"relics":
+			return "keep %d rites first" % int(requires.get("value", 3))
+	return "the path is dark yet"
+
+func _open_night_picker() -> void:
+	if _night_overlay != null:
+		return
+	_night_overlay = _overlay()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 6)
+	column.add_child(UITheme.make_label("CHOOSE THE NIGHT", 24, Palette.PARCHMENT, true))
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(500, 220)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 4)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var index: Variant = Game.load_json("res://data/waves/_nights.json")
+	if index is Array:
+		for entry in index:
+			list.add_child(_make_night_row(entry))
+	scroll.add_child(list)
+	column.add_child(scroll)
+	var leave := UITheme.make_button("Back to the fire", 11)
+	leave.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_night_overlay.queue_free()
+		_night_overlay = null
+	)
+	column.add_child(leave)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_night_overlay, panel)
+
+func _make_night_row(entry: Dictionary) -> Control:
+	var night_id := String(entry.get("id", ""))
+	var requires: Dictionary = entry.get("requires", {})
+	var open := _night_open(requires)
+	var night: Variant = Game.load_json("res://data/waves/%s.json" % night_id)
+	var def: Dictionary = night if night is Dictionary else {}
 	var row := HBoxContainer.new()
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 8)
-	_place(row, 0.5, 1.0, 0.5, 1.0, Rect2(-280, -72, 560, 26))
-	var stages := [
-		["stage1", "Hollowmere Village", true],
-		["stage2", "The Wailing Forest", Game.stage_cleared("stage1")],
-		["stage3", "Castle Vane", Game.stage_cleared("stage2")],
-	]
-	for entry in stages:
-		var stage_id: String = entry[0]
-		var open: bool = entry[2]
-		var text: String = entry[1] if open else "the path is dark yet"
-		if Game.selected_stage == stage_id:
-			text = "> %s <" % text
-		var button := UITheme.make_button(text, 9)
-		button.disabled = not open
-		button.pressed.connect(func() -> void:
-			Sfx.play("ui")
-			Game.selected_stage = stage_id
-			row.queue_free()
-			_build_stage_row()
-		)
-		row.add_child(button)
-	add_child(row)
+	var pick := UITheme.make_button("", 10)
+	pick.custom_minimum_size = Vector2(190, 0)
+	pick.disabled = not open
+	var pick_name := String(def.get("name", night_id)) if open else "? ? ?"
+	if open and Game.selected_stage == night_id:
+		pick_name = "> %s <" % pick_name
+	pick.text = pick_name
+	pick.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		Game.selected_stage = night_id
+		_night_overlay.queue_free()
+		_night_overlay = null
+		_build_stage_row()
+	)
+	row.add_child(pick)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var line1 := _night_status_line(night_id, def) if open else _night_lock_hint(requires)
+	var status := UITheme.make_label(line1, 9, Palette.ASH)
+	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	info.add_child(status)
+	if open:
+		var tagline := UITheme.make_label(String(def.get("tagline", "")), 9, Palette.STONE)
+		tagline.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		info.add_child(tagline)
+	row.add_child(info)
+	return row
+
+func _night_status_line(night_id: String, def: Dictionary) -> String:
+	if bool(def.get("endless", false)):
+		var record: Dictionary = Game.save_data["stats"].get("long_night_best", {})
+		if record.is_empty():
+			return "no count yet stands"
+		var seconds := int(record.get("time", 0.0))
+		return "deepest count:  %d:%02d  ·  %d dead" % [seconds / 60, seconds % 60, int(record.get("kills", 0))]
+	var bits: Array = []
+	bits.append("survived" if Game.stage_cleared(night_id) else "unsurvived")
+	var rites: Array = def.get("rites", [])
+	if not rites.is_empty():
+		var kept := Game.relic_unlocked(String(rites[0].get("relic", "")))
+		bits.append("rite kept" if kept else "a rite waits")
+	return "  ·  ".join(bits)
 
 # --- Hero cards ---
 

@@ -1,0 +1,78 @@
+{
+	"id": "long_night",
+	"name": "The Long Night",
+	"theme": "graveyard",
+	"tagline": "no dawn. only the count.",
+	"run_length": 300,
+	"endless": true,
+	"boss": "",
+	"events": [
+		{
+			"t": 60,
+			"spawn": "tolling_man",
+			"count": 1,
+			"announce": "A bell tolls. It will not be the last."
+		},
+		{
+			"t": 180,
+			"spawn": "wight",
+			"count": 4,
+			"announce": "The barrows keep giving."
+		}
+	],
+	"waves": [
+		{
+			"from": 0,
+			"to": 300,
+			"type": "shambler",
+			"interval": 1.1,
+			"count": 2
+		},
+		{
+			"from": 30,
+			"to": 300,
+			"type": "gnawer",
+			"interval": 1.8,
+			"count": 2
+		},
+		{
+			"from": 90,
+			"to": 300,
+			"type": "wight",
+			"interval": 3.0,
+			"count": 1
+		},
+		{
+			"from": 150,
+			"to": 300,
+			"type": "hanged_man",
+			"interval": 2.2,
+			"count": 2,
+			"distance": 160
+		},
+		{
+			"from": 210,
+			"to": 300,
+			"type": "bone_stag",
+			"interval": 2.0,
+			"count": 2
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/grave_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_cobbles.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_bones.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_gravedirt.png",
+				0.9
+			]
+		]
+	}
+}
