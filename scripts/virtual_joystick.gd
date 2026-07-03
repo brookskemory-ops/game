@@ -21,9 +21,13 @@ var _knob := Vector2.ZERO
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# MUST keep processing while the tree is paused: otherwise a level-up
+	# draft opening mid-drag swallows the finger-lift event and the hero
+	# runs in the stale direction forever after the menu closes.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _process(_delta: float) -> void:
-	# If a pause/draft/results overlay opened mid-touch, drop the stick.
+	# The moment any overlay pauses the game, drop the stick entirely.
 	if _touch_index != -1 and get_tree().paused:
 		_release()
 
