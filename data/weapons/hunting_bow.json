@@ -1,0 +1,14 @@
+{
+	"id": "hunting_bow",
+	"name": "Hunting Bow",
+	"niche": "nearest-target piercing projectile (docs/ABILITIES.md #1)",
+	"script": "res://scripts/weapons/bow.gd",
+	"cooldown": 0.85,
+	"damage": 12,
+	"range": 230,
+	"projectiles": 1,
+	"spread_deg": 7,
+	"pierce": 2,
+	"proj_speed": 430,
+	"proj_ttl": 0.9
+}

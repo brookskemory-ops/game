@@ -1,8 +1,13 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/arena.gd" id="1_arena"]
-[ext_resource type="Script" path="res://scripts/player.gd" id="2_player"]
-[ext_resource type="Script" path="res://scripts/virtual_joystick.gd" id="3_joy"]
+[ext_resource type="Script" path="res://scripts/gem_manager.gd" id="2_gems"]
+[ext_resource type="Script" path="res://scripts/enemy_manager.gd" id="3_enemies"]
+[ext_resource type="Script" path="res://scripts/projectile_manager.gd" id="4_projectiles"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="5_player"]
+[ext_resource type="Script" path="res://scripts/game_camera.gd" id="6_camera"]
+[ext_resource type="Script" path="res://scripts/virtual_joystick.gd" id="7_joystick"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="8_hud"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(10, 14)
@@ -21,6 +26,30 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.067, 0.059, 0.09, 1)
 
+[node name="NightTint" type="CanvasModulate" parent="."]
+color = Color(0.88, 0.9, 1, 1)
+
+[node name="GemManager" type="Node2D" parent="."]
+script = ExtResource("2_gems")
+
+[node name="EnemyManager" type="Node2D" parent="."]
+script = ExtResource("3_enemies")
+
+[node name="ProjectileManager" type="Node2D" parent="."]
+script = ExtResource("4_projectiles")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(320, 180)
+script = ExtResource("5_player")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
+script = ExtResource("6_camera")
+
 [node name="UILayer" type="CanvasLayer" parent="."]
 
 [node name="Joystick" type="Control" parent="UILayer" groups=["virtual_joystick"]]
@@ -31,39 +60,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("3_joy")
+script = ExtResource("7_joystick")
 
-[node name="HintLabel" type="Label" parent="UILayer"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -220.0
-offset_top = 8.0
-offset_right = 220.0
-offset_bottom = 28.0
+[node name="HUD" type="Control" parent="UILayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.42, 0.4, 0.47, 1)
-theme_override_font_sizes/font_size = 11
-text = "drag anywhere to move  ·  arrow keys on desktop  ·  Esc for title"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Player" type="CharacterBody2D" parent="."]
-position = Vector2(320, 180)
-script = ExtResource("2_player")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-shape = SubResource("RectangleShape2D_player")
-
-[node name="Body" type="Polygon2D" parent="Player"]
-polygon = PackedVector2Array(-5, -4, 5, -4, 6, 8, -6, 8)
-color = Color(0.35, 0.32, 0.28, 1)
-
-[node name="Head" type="Polygon2D" parent="Player"]
-polygon = PackedVector2Array(-4, -10, 4, -10, 4, -4, -4, -4)
-color = Color(0.85, 0.78, 0.66, 1)
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-position_smoothing_enabled = true
-position_smoothing_speed = 6.0
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("8_hud")

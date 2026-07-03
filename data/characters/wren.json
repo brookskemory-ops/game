@@ -1,0 +1,12 @@
+{
+	"id": "wren",
+	"name": "Wren, the Poacher",
+	"sprite": "wren",
+	"max_hp": 80,
+	"move_speed": 130,
+	"radius": 6,
+	"pickup_radius": 48,
+	"weapon": "hunting_bow",
+	"passive": "light_foot",
+	"story_arc": "wren_arc"
+}

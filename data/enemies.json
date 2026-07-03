@@ -1,0 +1,20 @@
+{
+	"shambler": {
+		"name": "Shambler",
+		"sprite": "shambler",
+		"hp": 18,
+		"speed": 38,
+		"damage": 8,
+		"radius": 7,
+		"xp": 1
+	},
+	"gnawer": {
+		"name": "Gnawer",
+		"sprite": "gnawer",
+		"hp": 8,
+		"speed": 92,
+		"damage": 5,
+		"radius": 5,
+		"xp": 1
+	}
+}

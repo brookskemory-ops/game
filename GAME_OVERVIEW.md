@@ -1,8 +1,8 @@
-# GRAVEWAKE — Game Overview
+# VIGIL — Game Overview
 
-> *Working title. Alternates considered: **Nightfall Keep**, **Hollowmere**. "Gravewake" wins
-> for now: it's one word, easy to say, and means both "the wake held for the dead" and
-> "staying awake among graves" — which is literally the game.*
+> ***VIGIL** — the chosen title: keeping watch through the night AND the rite held for the
+> dead, both exactly this game. Tagline: **"hold the night."** (Earlier candidates:
+> Gravewake, Knell, Gravetide, Hollowmere — Hollowmere lives on as the name of the vale.)*
 
 **Genre:** 2D horde-survival roguelike with narrative (Vampire Survivors × Megabonk)
 **Platform:** Mobile (landscape), pixel art

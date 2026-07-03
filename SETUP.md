@@ -1,7 +1,11 @@
-# SETUP — Getting Gravewake Running (Phase 0 Walkthrough)
+# SETUP — Getting VIGIL Running (Phase 0 Walkthrough)
 
 These are the manual steps that have to happen on **your computer**. Everything in the repo is
 ready; this walks you from zero to "the game runs on my phone."
+
+> **Part 0 — zero-install testing:** every push auto-deploys a browser build to
+> **https://brookskemory-ops.github.io/game/** — open that on any device to test instantly.
+> The steps below are for the real dev loop (editor + native phone builds).
 
 **Phase 0 is done when:** you can change one line, re-deploy, and see it on your phone in
 under 5 minutes.
@@ -34,13 +38,15 @@ sign in, *Clone repository* → `brookskemory-ops/game` → make sure you're on 
 
 ### ✅ What you should see
 
-- A near-black title screen: **G R A V E W A K E**, "survive the night", and a pulsing
-  **TAP TO BEGIN**.
-- Click anywhere → a dark field scattered with tombstones and rubble, with a little
-  hooded figure in the middle.
-- **Arrow keys** move him; or **click-and-drag** anywhere and a floating joystick ring
+- A night scene: moon, stars, Castle Vane with one lit window, drifting fog — and
+  **VIGIL / hold the night**, with a pulsing **TAP TO BEGIN**.
+- Click anywhere → the graveyard arena. Wren (a little hooded archer) stands center;
+  the dead start closing in and his bow fires by itself at the nearest one.
+- **Arrow keys** move; or **click-and-drag** anywhere and a floating joystick ring
   appears under your cursor (this is exactly what a thumb will do on the phone).
-- **Esc** returns to the title.
+- Kill shamblers → collect the blue gems → level up (the bow gets stronger). Survive
+  the 5:00 night or die trying — either way you get a results screen.
+- **Esc** opens the pause menu; the **II** button does the same on touch.
 
 If instead you get a red error, copy its exact text and paste it to me — I'll fix it.
 

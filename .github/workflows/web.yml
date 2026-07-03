@@ -1,0 +1,73 @@
+name: Web Build & Deploy
+
+# Exports the Godot project for the web and publishes it to GitHub Pages,
+# giving a play-in-browser test link on every push to the dev branch.
+# The web export uses thread_support=false so it runs on Pages without
+# cross-origin-isolation headers.
+
+on:
+  push:
+    branches:
+      - claude/narrative-roguelike-medieval-design-34nvrc
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Validate & export web build
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Import project
+        run: godot --headless --import || true
+
+      - name: Validate GDScript
+        shell: bash
+        run: |
+          fail=0
+          while IFS= read -r script; do
+            if ! godot --headless --check-only --script "$script"; then
+              echo "::error file=$script::GDScript check failed"
+              fail=1
+            fi
+          done < <(find . -name '*.gd' -not -path './.godot/*')
+          exit $fail
+
+      - name: Export Web
+        run: |
+          mkdir -p build/web
+          godot --headless --export-release "Web" build/web/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
