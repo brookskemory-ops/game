@@ -135,5 +135,15 @@
 				0.85
 			]
 		]
-	}
+	},
+	"rites": [
+		{
+			"id": "cut_him_down",
+			"name": "Cut Him Down",
+			"type": "slay_elite",
+			"target": "tolling_man",
+			"within": 60,
+			"relic": "wisp_jar"
+		}
+	]
 }

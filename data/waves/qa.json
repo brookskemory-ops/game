@@ -46,5 +46,16 @@
 				0.9
 			]
 		]
-	}
+	},
+	"rites": [
+		{
+			"id": "qa_rite",
+			"name": "The Test-Light",
+			"type": "light_candles",
+			"count": 1,
+			"radius": 60,
+			"announce_t": 3,
+			"relic": "kings_coin"
+		}
+	]
 }

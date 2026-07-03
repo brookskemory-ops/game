@@ -21,6 +21,8 @@ const HIDDEN := Transform2D(Vector2.ZERO, Vector2.ZERO, Vector2.ZERO)
 signal boss_spawned(display_name: String)
 signal boss_died(at: Vector2)
 signal enemy_killed(at: Vector2)
+signal elite_spawned(type_name: String)   # elites + bosses (rite windows)
+signal elite_killed(type_name: String)
 
 var kills := 0
 var elite_kills := 0  # elites + bosses felled (weapon unlock conditions)
@@ -126,6 +128,7 @@ func _register_type(type_name: String, def: Dictionary) -> void:
 	mmi.multimesh = mm
 	mmi.texture = tex
 	add_child(mmi)
+	def["_id"] = type_name  # so kill/spawn signals can name the type
 	_name_to_type[type_name] = _type_defs.size()
 	_type_defs.append(def)
 	_type_mm.append(mm)
@@ -155,6 +158,8 @@ func spawn(type_name: String, at: Vector2) -> void:
 		_boss_slot = slot
 		_boss_max_hp = float(_type_defs[type_id].get("hp", 1))
 		boss_spawned.emit(String(_type_defs[type_id].get("name", type_name)))
+	if bool(_type_defs[type_id].get("elite", false)) or bool(_type_defs[type_id].get("boss", false)):
+		elite_spawned.emit(type_name)
 
 func _physics_process(delta: float) -> void:
 	if _player == null:
@@ -163,6 +168,11 @@ func _physics_process(delta: float) -> void:
 	var ppos: Vector2 = _player.global_position
 	_grid.clear()
 	var contact_dps := 0.0
+	# Briar Crown relic: whatever gnaws the wearer is gnawed back.
+	var thorns := 0.0
+	var thorns_v: Variant = _player.get("thorns")
+	if thorns_v != null:
+		thorns = float(thorns_v)
 
 	for i in MAX_ENEMIES:
 		if _alive[i] == 0:
@@ -219,6 +229,9 @@ func _physics_process(delta: float) -> void:
 		# Contact damage accumulates as DPS while touching the player.
 		if _pos[i].distance_to(ppos) < float(def.get("radius", 6)) + player_radius:
 			contact_dps += float(def.get("damage", 5))
+			# Thorns tick roughly twice a second, probabilistically (cheap).
+			if thorns > 0.0 and randf() < delta * 2.0:
+				damage_slot(i, thorns)
 		# Hit flash decay.
 		if _flash[i] > 0.0:
 			_flash[i] -= delta
@@ -339,6 +352,7 @@ func _kill(slot: int) -> void:
 	kills += 1
 	if bool(def.get("elite", false)) or bool(def.get("boss", false)):
 		elite_kills += 1
+		elite_killed.emit(String(def.get("_id", "")))
 	_free.append(slot)
 	_type_mm[_type[slot]].set_instance_transform_2d(slot, HIDDEN)
 	_type_mm[_type[slot]].set_instance_color(slot, Color.WHITE)

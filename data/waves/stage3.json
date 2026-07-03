@@ -129,5 +129,20 @@
 				0.9
 			]
 		]
-	}
+	},
+	"rites": [
+		{
+			"id": "hold_the_nave",
+			"name": "Hold the Nave",
+			"type": "stand_ground",
+			"t": 240,
+			"pos": [
+				260,
+				0
+			],
+			"radius": 80,
+			"seconds": 18,
+			"relic": "briar_crown"
+		}
+	]
 }

@@ -19,6 +19,9 @@ var stage := {}
 var time_elapsed := 0.0
 var run_over := false
 var upgrades: UpgradeSystem
+var rites: RiteTracker
+var _time_scale := 1.0   # Hourless Glass relic
+var _wisp_acc := 0.0     # Wisp in a Jar relic
 var _wave_acc := PackedFloat32Array()
 var _events_fired := PackedByteArray()
 var _draft_open := false
@@ -55,6 +58,16 @@ func _ready() -> void:
 	enemies.boss_died.connect(_on_boss_died)
 	# Level-up juice: vacuum every gem on the ground.
 	player.leveled_up.connect(func(_level: int) -> void: gems.vacuum_all())
+	# The night's rites (data-driven objectives; see rite_tracker.gd).
+	rites = RiteTracker.new()
+	add_child(rites)
+	rites.setup(stage, player, enemies, hud, gems)
+	# Arena-side relic hooks (player-side ones live in player.setup).
+	match Game.relic_equipped():
+		"bell_shard":
+			player.grant_bonus_draft.call_deferred()
+		"hourless_glass":
+			_time_scale = 1.1
 
 # --- Upgrade draft flow (queues if several levels land at once) ---
 
@@ -75,7 +88,10 @@ func _present_draft(fresh: bool) -> void:
 	hud.show_draft(_current_options, _on_draft_pick, _reroll_cost(), _on_reroll_pressed)
 
 ## Escalates per night: 4, 8, 16, 32, then 64 flat.
+## A Ledger-page relic makes the first reroll a courtesy.
 func _reroll_cost() -> int:
+	if _rerolls_tonight == 0 and Game.relic_equipped() == "ledger_page":
+		return 0
 	return mini(64, 4 * (1 << mini(_rerolls_tonight, 4)))
 
 func _on_reroll_pressed() -> void:
@@ -106,7 +122,13 @@ func run_length() -> float:
 func _physics_process(delta: float) -> void:
 	if run_over:
 		return
-	time_elapsed += delta
+	time_elapsed += delta * _time_scale
+	# Wisp in a Jar: every 30s the wisp gathers what glitters.
+	if Game.relic_equipped() == "wisp_jar":
+		_wisp_acc += delta
+		if _wisp_acc >= 30.0:
+			_wisp_acc = 0.0
+			gems.vacuum_all()
 	# The timer running out doesn't end the night — it summons what rings the bell.
 	if not _boss_summoned and time_elapsed >= run_length():
 		_summon_boss()
@@ -219,6 +241,10 @@ func _finish(victory: bool) -> void:
 	if run_over:
 		return
 	run_over = true
+	# Ferryman's Coin: the dead pay double for their crossing.
+	if not victory and Game.relic_equipped() == "ferrymans_coin" and Game.run_gold > 0:
+		Game.add_gold(Game.run_gold)
+		hud.toast("the ferryman pays double")
 	var stats := {
 		"time": time_elapsed,
 		"kills": enemies.kills,

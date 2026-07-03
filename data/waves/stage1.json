@@ -114,5 +114,16 @@
 				0.9
 			]
 		]
-	}
+	},
+	"rites": [
+		{
+			"id": "wake_lights",
+			"name": "The Wake-Lights",
+			"type": "light_candles",
+			"count": 4,
+			"radius": 380,
+			"announce_t": 25,
+			"relic": "bell_shard"
+		}
+	]
 }

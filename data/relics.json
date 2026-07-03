@@ -1,0 +1,42 @@
+{
+	"bell_shard": {
+		"name": "Bell Shard",
+		"desc": "A sliver of the first bell. Begin each night one draft ahead.",
+		"hint": "Keep the Wake-Lights in Hollowmere Village"
+	},
+	"wisp_jar": {
+		"name": "Wisp in a Jar",
+		"desc": "Every half minute, the wisp gathers every gem on the field.",
+		"hint": "Cut the Tolling Man down in the Wailing Forest"
+	},
+	"briar_crown": {
+		"name": "Briar Crown",
+		"desc": "Whatever gnaws you is gnawed back (3 damage to attackers).",
+		"hint": "Hold the Nave at Castle Vane"
+	},
+	"kings_coin": {
+		"name": "King's Coin",
+		"desc": "The dead king's face still buys respect. WARES cost 15% less.",
+		"hint": "A rite kept in the testing night"
+	},
+	"ledger_page": {
+		"name": "Sexton's Ledger-Page",
+		"desc": "The first reroll of every night is free.",
+		"hint": "A rite not yet asked — new nights will ask it"
+	},
+	"ferrymans_coin": {
+		"name": "Ferryman's Coin",
+		"desc": "If the night takes you, the ferryman pays your gold out double.",
+		"hint": "A rite not yet asked — new nights will ask it"
+	},
+	"pilgrims_flask": {
+		"name": "Pilgrim's Flask",
+		"desc": "One desperate swallow: rise once at a quarter of your life.",
+		"hint": "A rite not yet asked — new nights will ask it"
+	},
+	"hourless_glass": {
+		"name": "Hourless Glass",
+		"desc": "The night passes a tenth faster. Dawn comes sooner — so does the bell.",
+		"hint": "A rite not yet asked — new nights will ask it"
+	}
+}

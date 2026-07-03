@@ -67,14 +67,19 @@ func _ready() -> void:
 	)
 	add_child(ledger)
 
-	# What the last night earned for the book.
-	if not Game.newly_unlocked_weapons.is_empty():
+	# What the last night earned for the book (weapons and relics alike).
+	if not Game.newly_unlocked_weapons.is_empty() or not Game.newly_unlocked_relics.is_empty():
 		var names: Array = []
 		for wid in Game.newly_unlocked_weapons:
 			var wdef: Variant = Game.load_json("res://data/weapons/%s.json" % String(wid))
 			if wdef is Dictionary:
 				names.append(String(wdef.get("name", wid)))
+		var relic_defs: Variant = Game.load_json("res://data/relics.json")
+		for rid in Game.newly_unlocked_relics:
+			if relic_defs is Dictionary and relic_defs.has(rid):
+				names.append(String(relic_defs[rid].get("name", rid)))
 		Game.newly_unlocked_weapons.clear()
+		Game.newly_unlocked_relics.clear()
 		if not names.is_empty():
 			var grows := UITheme.make_label("the ledger grows:  %s" % ", ".join(names), 11, Palette.TORCH)
 			_place(grows, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 66, 500, 16))
@@ -363,6 +368,12 @@ func _open_ledger() -> void:
 			catalyst_name = String(passives[catalyst_name].get("name", catalyst_name))
 		var recipe := "%s, carried with %s" % [String(base_def.get("name", "")), catalyst_name]
 		list.add_child(_make_ledger_evo_row(evo, known, recipe))
+	# Relics: earned by keeping rites; one may be carried into the night.
+	list.add_child(UITheme.make_label("— RELICS (carry one) —", 11, Palette.BONE))
+	var relic_defs: Variant = Game.load_json("res://data/relics.json")
+	if relic_defs is Dictionary:
+		for relic_id in relic_defs:
+			list.add_child(_make_relic_row(String(relic_id), relic_defs[relic_id]))
 	scroll.add_child(list)
 	column.add_child(scroll)
 	var leave := UITheme.make_button("Close the book", 11)
@@ -381,12 +392,34 @@ func _make_ledger_row(def: Dictionary, unlocked: bool) -> HBoxContainer:
 	var name_text := String(def.get("name", "?")) if unlocked else "? ? ?"
 	var desc_text := String(def.get("draft_desc", "")) if unlocked \
 		else String(def.get("unlock_hint", "its page is still blank"))
-	return _ledger_line(String(def.get("id", "")), name_text, desc_text, unlocked)
+	return _ledger_line("weapons/" + String(def.get("id", "")), name_text, desc_text, unlocked)
 
 func _make_ledger_evo_row(evo: Dictionary, known: bool, recipe: String) -> HBoxContainer:
 	var name_text := String(evo.get("name", "?")) if known else "? ? ?"
 	var desc_text := recipe if known else "a weapon's final form, unproven"
-	return _ledger_line(String(evo.get("id", "")), name_text, desc_text, known)
+	return _ledger_line("weapons/" + String(evo.get("id", "")), name_text, desc_text, known)
+
+func _make_relic_row(relic_id: String, def: Dictionary) -> HBoxContainer:
+	var unlocked := Game.relic_unlocked(relic_id)
+	var name_text := String(def.get("name", "?")) if unlocked else "? ? ?"
+	var desc_text := String(def.get("desc", "")) if unlocked else String(def.get("hint", ""))
+	var row := _ledger_line("relics/" + relic_id, name_text, desc_text, unlocked)
+	if unlocked:
+		var equip := UITheme.make_button("", 9)
+		equip.custom_minimum_size = Vector2(84, 0)
+		var refresh := func() -> void:
+			equip.text = "CARRIED" if Game.relic_equipped() == relic_id else "carry"
+		refresh.call()
+		equip.pressed.connect(func() -> void:
+			Sfx.play("buy")
+			Game.equip_relic(relic_id)
+			# Rebuild the book so every row's button reflects the single slot.
+			_ledger_overlay.queue_free()
+			_ledger_overlay = null
+			_open_ledger()
+		)
+		row.add_child(equip)
+	return row
 
 func _ledger_line(icon_id: String, name_text: String, desc_text: String, unlocked: bool) -> HBoxContainer:
 	var row := HBoxContainer.new()
@@ -396,7 +429,7 @@ func _ledger_line(icon_id: String, name_text: String, desc_text: String, unlocke
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var icon_path := "res://assets/icons/weapons/%s.png" % icon_id
+	var icon_path := "res://assets/icons/%s.png" % icon_id
 	if ResourceLoader.exists(icon_path):
 		icon.texture = load(icon_path)
 		if not unlocked:

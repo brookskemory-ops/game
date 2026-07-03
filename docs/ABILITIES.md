@@ -89,3 +89,18 @@ A build is **3 weapons + 3 keepsakes, no more** (`Player.MAX_WEAPONS` /
 `Player.MAX_PASSIVES`). Once three distinct keepsakes are held, drafts only offer
 deepening those three. Evolutions remain reachable by design: a weapon and its catalyst
 fit inside 3+3. The HUD build tray (under the HP bar) shows all six slots.
+
+## 7. Relics (v0.14 — earned by rites, one carried per night)
+
+Each relic is ONE hook, none touching a stat a passive already owns:
+
+| Relic | Effect | Earned by |
+|---|---|---|
+| **Bell Shard** | Start each night one draft ahead | The Wake-Lights (stage 1 rite) |
+| **Wisp in a Jar** | Every 30s, all gems vacuum | Cut Him Down (stage 2 rite) |
+| **Briar Crown** | Contact attackers take 3 damage | Hold the Nave (stage 3 rite) |
+| **King's Coin** | WARES prices −15% | testing-night rite |
+| **Sexton's Ledger-Page** | First reroll each night free | a v0.15 variant-night rite |
+| **Ferryman's Coin** | Defeat pays the night's gold out double | a v0.15 variant-night rite |
+| **Pilgrim's Flask** | Rise once at 25% HP | a v0.15 variant-night rite |
+| **Hourless Glass** | Night clock runs 10% faster | a v0.15 variant-night rite |

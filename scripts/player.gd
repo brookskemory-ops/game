@@ -40,6 +40,8 @@ var pickup_radius := 48.0
 var body_radius := 6.0
 var gold_mul := 1.0  # Wages of Death (Maud) and Fortune raise this
 var revives := 0     # Mercy (camp shop)
+var thorns := 0.0    # Briar Crown relic: contact attackers take this much
+var _flask_ready := false  # Pilgrim's Flask relic: one 25% revive
 var dead := false
 var lightfoot_active := false
 var facing := Vector2.RIGHT
@@ -91,6 +93,12 @@ func setup(ctx: Dictionary) -> void:
 			if _enemies != null:
 				_enemies.enemy_killed.connect(_on_enemy_killed)
 	_apply_camp_shop()
+	# The carried relic (one hook each, like signatures — docs/ABILITIES.md §7).
+	match Game.relic_equipped():
+		"briar_crown":
+			thorns = 3.0
+		"pilgrims_flask":
+			_flask_ready = true
 	base_max_hp = float(stats.get("max_hp", 80))
 	base_move_speed = float(stats.get("move_speed", 130))
 	base_pickup_radius = float(stats.get("pickup_radius", 48))
@@ -310,8 +318,20 @@ func take_hit(amount: float) -> void:
 	if hp <= 0.0:
 		if revives > 0:
 			_revive()
+		elif _flask_ready:
+			_flask_revive()
 		else:
 			_die()
+
+## Pilgrim's Flask: one desperate swallow — a quarter of life, once a night.
+func _flask_revive() -> void:
+	_flask_ready = false
+	hp = max_hp * 0.25
+	_invuln = 2.0
+	hp_changed.emit(hp, max_hp)
+	Sfx.play("bell", 0.6)
+	if _sprite != null:
+		_sprite.visible = true
 
 ## Mercy: rise once more — half HP, brief invulnerability.
 func _revive() -> void:

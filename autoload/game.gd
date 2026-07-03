@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.14.0 — rites of the vigil, part i"
+const VERSION := "0.14.0 — rites of the vigil"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -27,6 +27,12 @@ var newly_unlocked: Array = []
 ## Weapon ids that unlocked after the last run ("THE LEDGER GROWS" notice).
 var newly_unlocked_weapons: Array = []
 
+## Relic ids earned by rites in the last run.
+var newly_unlocked_relics: Array = []
+
+## Gold earned during the current night (Ferryman's Coin doubles it on death).
+var run_gold := 0
+
 ## Persistent progress. Written to user://save.json (IndexedDB on web).
 var save_data := {
 	"gold": 0,
@@ -38,6 +44,8 @@ var save_data := {
 	"settings": {},
 	"ending": "",
 	"weapon_unlocks": {},
+	"relics": {},
+	"relic_equipped": "",
 }
 
 ## Stats from the most recent run, for camp/results screens.
@@ -70,6 +78,7 @@ func start_run() -> void:
 				if search.contains("hero=" + String(hero_id)):
 					selected_character = String(hero_id)
 					break
+	run_gold = 0
 	get_tree().paused = false
 	run_started.emit()
 	get_tree().change_scene_to_file("res://scenes/arena.tscn")
@@ -207,6 +216,7 @@ func gold() -> int:
 
 func add_gold(amount: int) -> void:
 	save_data["gold"] = gold() + maxi(0, amount)
+	run_gold += maxi(0, amount)
 	gold_changed.emit(gold())
 
 func spend_gold(amount: int) -> bool:
@@ -220,10 +230,14 @@ func shop_level(id: String) -> int:
 	return int(save_data.get("shop", {}).get(id, 0))
 
 ## Cost scales: base * growth^current_level, rounded to a clean number.
+## The King's Coin relic talks the prices down 15%.
 func shop_cost(id: String, def: Dictionary) -> int:
 	var base := float(def.get("base_cost", 20))
 	var growth := float(def.get("cost_growth", 1.6))
-	return int(round(base * pow(growth, float(shop_level(id)))))
+	var cost := base * pow(growth, float(shop_level(id)))
+	if relic_equipped() == "kings_coin":
+		cost *= 0.85
+	return int(round(cost))
 
 func shop_buy(id: String, def: Dictionary) -> bool:
 	if shop_level(id) >= int(def.get("max", 1)):
@@ -267,6 +281,28 @@ func write_save() -> void:
 ## (docs/NIGHT_SHIFT.md WP2). Ignored everywhere else.
 func stage_cleared(id: String) -> bool:
 	return bool(save_data.get("stages", {}).get(id, false))
+
+# --- Relics (earned by rites; one may be carried into the night) ---
+
+func relic_unlocked(id: String) -> bool:
+	return bool(save_data.get("relics", {}).get(id, false))
+
+func unlock_relic(id: String) -> bool:
+	if id.is_empty() or relic_unlocked(id):
+		return false
+	if not save_data.has("relics"):
+		save_data["relics"] = {}
+	save_data["relics"][id] = true
+	newly_unlocked_relics.append(id)
+	write_save()
+	return true
+
+func relic_equipped() -> String:
+	return String(save_data.get("relic_equipped", ""))
+
+func equip_relic(id: String) -> void:
+	save_data["relic_equipped"] = "" if relic_equipped() == id else id  # tap again to unequip
+	write_save()
 
 # --- The ending (Block B): chosen once, at the camp, by the Hollow King ---
 
