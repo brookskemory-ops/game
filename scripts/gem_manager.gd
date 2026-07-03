@@ -39,7 +39,7 @@ func setup(player: Node2D, pickup_radius: float) -> void:
 		_alive[i] = 0
 		_free[i] = CAP - 1 - i
 	for sprite_id in ["gem", "coin", "scroll"]:
-		var tex := PixelSprites.get_tex(sprite_id)
+		var tex: Texture2D = PixelSprites.flipped_for_multimesh(PixelSprites.get_tex(sprite_id))
 		var quad := QuadMesh.new()
 		quad.size = Vector2(tex.get_width(), tex.get_height())
 		var mm := MultiMesh.new()

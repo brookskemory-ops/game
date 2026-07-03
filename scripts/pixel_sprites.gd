@@ -467,3 +467,11 @@ static func get_tex(id: String) -> ImageTexture:
 static func size_of(id: String) -> Vector2:
 	var tex := get_tex(id)
 	return Vector2(tex.get_width(), tex.get_height())
+
+## QuadMesh UVs are 3D Y-up, so MultiMesh-rendered textures draw upside down
+## in the 2D canvas. Every texture bound to a MultiMeshInstance2D must pass
+## through this flip (regular Sprite2D/TextureRect must NOT).
+static func flipped_for_multimesh(tex: Texture2D) -> ImageTexture:
+	var img := tex.get_image()
+	img.flip_y()
+	return ImageTexture.create_from_image(img)

@@ -85,6 +85,7 @@ func _register_type(type_name: String, def: Dictionary) -> void:
 	else:
 		tex = PixelSprites.get_tex(sprite_id)
 		quad.size = Vector2(tex.get_width(), tex.get_height())
+	tex = PixelSprites.flipped_for_multimesh(tex)
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_2D
 	mm.use_colors = true

@@ -32,7 +32,7 @@ func setup(enemies: EnemyManager) -> void:
 	for i in CAP:
 		_alive[i] = 0
 		_free[i] = CAP - 1 - i
-	var tex := PixelSprites.get_tex("arrow")
+	var tex: Texture2D = PixelSprites.flipped_for_multimesh(PixelSprites.get_tex("arrow"))
 	var quad := QuadMesh.new()
 	quad.size = Vector2(tex.get_width(), tex.get_height())
 	_mm = MultiMesh.new()
