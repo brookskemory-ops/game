@@ -155,3 +155,38 @@ artifacts; a real-phone soak test remains owed. Layout sweep passed at 844×390,
   screenshots for graveyard + forest (`?stage=stage2` probe), seam-free while moving,
   persistence reload OK.
 - **Next**: Block B "The Court of the Hollow King".
+
+---
+
+## Block B — "The Court of the Hollow King" (v0.13.0 → v0.13.3)
+
+**The story is now finishable.** Castle Vane (stage 3), the sixth hero, the twelfth
+weapon, the sixth evolution, the final boss, and the two-choice ending all shipped
+and verified in-game.
+
+- **Cursed Blade + Crownsorrow**: on-kill thralls (spectral, seek-and-strike, pooled
+  in-weapon); evolution makes them persist and detonate. **QA found a real design
+  brick**: pure on-kill means the solo starting weapon can never make the FIRST kill
+  (probe: dead at 0:18 with 0 kills). Fixed with a weak point-blank lash that starts
+  the killing — raise still takes the cooldown tick when a kill is waiting.
+- **The Hollow King**: Deathless (heal() is a no-op; 1 HP leech per kill), unlocked by
+  clearing Castle Vane. Portrait, world sprite, side profile all generated + QA'd.
+- **Castle Vane bestiary**: risen courtiers (fodder), risen knights (flat plate armor
+  in damage_slot), crypt archers (hold-distance AI + a new pooled enemy-bolt system +
+  player.take_hit), chapel choristers (hymn pulse heals nearby dead, visible ring),
+  and **The Thing in the Chapel** (2600 HP, 5-bolt volleys while advancing, courtier
+  trickle) — every one verified alive on screen via Playwright probes.
+- **Story resolution**: the Hollow King's tale; beating stage 3 AS him offers the
+  final choice — break the bell or keep the vigil — two written epilogues, and the
+  chosen epitaph permanently replaces the camp subtitle.
+- **QA infrastructure grew**: ?hero=<id> URL override (bots can play locked heroes),
+  qa3 castle test stage (10s night → probes reliably reach the boss), fleeing-bot
+  pattern for boss capture.
+- **For the Block C balance pass** (bot-run observations, not yet human-tuned):
+  stage 3 opening was softened once already (courtier 1.0→1.4s); accumulated crypt
+  archers produce heavy unavoidable-for-bots bolt rain — watch it in human playtests;
+  boss volley (5×12) is lethal to a low-HP hero in one wave — possibly intended.
+
+Verified: CI green on all four pushes; full qa_suite zero script errors; 6-card camp
+layout fits 640px; castle ground/decals/props reviewed in-game; hollow-king and boss
+probes clean.
