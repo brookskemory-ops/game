@@ -129,3 +129,29 @@ artifacts; a real-phone soak test remains owed. Layout sweep passed at 844×390,
   zero script errors.
 - **Next**: Block B "The Court of the Hollow King" (stage 3, hero 6, Cursed Blade thralls,
   the final boss + story resolution), then Block C polish/v1.0-rc.
+
+---
+
+## v0.12.x addendum — "The Ground Beneath" (map tiles, moon cleanup, facing fix)
+
+- **Generated ground shipped** for both stage themes, no TileMap: `GroundLayer` draws one
+  world-anchored repeating 64px base quad (z -2) plus a deterministic decal scatter
+  (160 decals, seed 777, dimmed). Cost is a handful of draw calls; the 50ms/700-enemy
+  stress baseline held.
+- **Base tiles took two passes.** v1 tiles passed the 3×3 seam sheet but read as blotchy
+  repeating camouflage in-game. v2 = PIL rework: downscale-to-32 grain, brightness crush
+  (×0.62–0.68), 55–60% blend toward a flat night color, re-seamed with the roll-blend.
+  Verified in-game: graveyard and forest both sit darker/lower-contrast than every actor.
+- **7 decals live** (graveyard: cobbles/bones/grave-dirt; forest: roots/moss/mushrooms/
+  leaves). Puddle cut after 2 failed generations. 5/8 decals needed the "single isolated
+  object, nothing else in frame" retry phrasing.
+- **Mob moon cleanup (user report):** 4× audit found baked moon/orb artifacts on shambler,
+  sexton, wight, hanged_man — all four regenerated clean with the anti-moon negative set.
+  Tolling Man's bell glow and Briar Queen's petals kept as intentional.
+- **Facing fix (user report):** gnawer art faces left natively — added per-type `flip_x`
+  in enemies.json, mirrored at texture load so all art faces right and the runtime flip
+  stays uniform. Hanged Man regenerated facing right.
+- **Verified end-to-end:** CI green, QA suite zero script errors, reviewed in-game
+  screenshots for graveyard + forest (`?stage=stage2` probe), seam-free while moving,
+  persistence reload OK.
+- **Next**: Block B "The Court of the Hollow King".

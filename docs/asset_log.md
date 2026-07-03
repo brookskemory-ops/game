@@ -53,3 +53,19 @@ style-matched later. Endpoint: `POST /v1/generate-image-pixflux`.
   animation is not reliable enough to ship; revisit with /animate-with-skeleton (pose
   keypoints) in a future block. Shipped instead: per-direction stills + procedural gait
   (bob/sway/footfall squash) — genre-standard and deterministic.
+
+## v0.12.x ground tiles + decals
+- Base tiles (grave_base, forest_base, 64px seamless): pixflux output passed the 3×3 seam
+  sheet only after the PIL roll-blend; **in-game QA then failed them anyway** — large
+  mid-frequency blobs read as repeating camouflage at zoom 2. Fix was deterministic
+  post-processing, not regeneration: downscale to 32px for fine grain, brightness ×0.62–
+  0.68, blend 55–60% toward a flat night color, re-seam. **Lesson: for ground textures the
+  contrast/frequency budget matters more than the render — always screenshot in-game
+  before shipping a tile.**
+- Decals ×7 approved, puddle cut after 2 fails (kept rendering as a framed scene).
+  **Lesson: isolation phrasing ("single isolated object, nothing else in frame, plain
+  transparent background") rescued 5 of 8 first-round failures; moss + mushrooms still
+  needed a PIL dim to sit into the night palette.**
+- Mob regenerations (shambler, sexton, wight, hanged_man): anti-moon negative set
+  ("moon, moon disc, sky, floating orb, glowing sphere, background scenery, fireflies,
+  sparkles") is now standard for every creature prompt.
