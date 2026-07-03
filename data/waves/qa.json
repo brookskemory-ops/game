@@ -7,10 +7,30 @@
 	"boss_trickle_interval": 2.5,
 	"victory_unlock": "maud",
 	"events": [
-		{ "t": 15, "spawn": "tolling_man", "count": 1, "announce": "A bell tolls in the fog..." }
+		{
+			"t": 15,
+			"spawn": "tolling_man",
+			"count": 1,
+			"announce": "A bell tolls in the fog..."
+		}
 	],
 	"waves": [
-		{ "from": 0,  "to": 30, "type": "shambler", "interval": 1.6, "count": 1 },
-		{ "from": 12, "to": 30, "type": "gnawer",   "interval": 3.0, "count": 1 }
-	]
+		{
+			"from": 0,
+			"to": 30,
+			"type": "shambler",
+			"interval": 1.6,
+			"count": 1
+		},
+		{
+			"from": 12,
+			"to": 30,
+			"type": "gnawer",
+			"interval": 3.0,
+			"count": 1
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/grave_base.png"
+	}
 }

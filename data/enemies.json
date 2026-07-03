@@ -19,7 +19,8 @@
 		"radius": 5,
 		"xp": 1,
 		"gold_chance": 0.03,
-		"gen_scale": 0.26
+		"gen_scale": 0.26,
+		"flip_x": true
 	},
 	"wight": {
 		"name": "Wight",

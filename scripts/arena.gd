@@ -12,6 +12,7 @@ const SCATTER_RANGE := 1500.0
 @onready var projectiles: ProjectileManager = $ProjectileManager
 @onready var gems: GemManager = $GemManager
 @onready var hazards: HazardManager = $HazardManager
+@onready var ground: GroundLayer = $GroundLayer
 @onready var hud: HUD = $UILayer/HUD
 
 var stage := {}
@@ -35,6 +36,7 @@ func _ready() -> void:
 	if String(stage.get("theme", "graveyard")) == "forest":
 		$BackgroundLayer/Background.color = Color(0.055, 0.075, 0.06)
 	_load_theme_props()
+	ground.setup(stage, $Player)
 	_wave_acc.resize(waves().size())
 	_events_fired.resize(events().size())
 	player.setup({"enemies": enemies, "projectiles": projectiles, "hazards": hazards})

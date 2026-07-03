@@ -88,6 +88,12 @@ func _register_type(type_name: String, def: Dictionary) -> void:
 		tex = PixelSprites.get_tex(sprite_id)
 		quad.size = Vector2(tex.get_width(), tex.get_height())
 	tex = PixelSprites.flipped_for_multimesh(tex)
+	# Art that natively faces left gets mirrored at load, so ALL textures face
+	# right and the runtime velocity-flip logic stays uniform.
+	if bool(def.get("flip_x", false)):
+		var img := tex.get_image()
+		img.flip_x()
+		tex = ImageTexture.create_from_image(img)
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_2D
 	mm.use_colors = true

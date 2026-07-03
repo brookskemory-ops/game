@@ -7,15 +7,65 @@
 	"boss_trickle_interval": 2.0,
 	"victory_unlock": "maud",
 	"events": [
-		{ "t": 150, "spawn": "tolling_man", "count": 1, "announce": "A bell tolls in the fog..." }
+		{
+			"t": 150,
+			"spawn": "tolling_man",
+			"count": 1,
+			"announce": "A bell tolls in the fog..."
+		}
 	],
 	"waves": [
-		{ "from": 0,   "to": 45,  "type": "shambler", "interval": 1.3, "count": 2 },
-		{ "from": 30,  "to": 90,  "type": "gnawer",   "interval": 3.0, "count": 1 },
-		{ "from": 45,  "to": 150, "type": "shambler", "interval": 0.9, "count": 3 },
-		{ "from": 90,  "to": 210, "type": "gnawer",   "interval": 1.6, "count": 2 },
-		{ "from": 150, "to": 240, "type": "shambler", "interval": 0.6, "count": 3 },
-		{ "from": 210, "to": 300, "type": "gnawer",   "interval": 1.0, "count": 3 },
-		{ "from": 240, "to": 300, "type": "shambler", "interval": 0.45, "count": 4 }
-	]
+		{
+			"from": 0,
+			"to": 45,
+			"type": "shambler",
+			"interval": 1.3,
+			"count": 2
+		},
+		{
+			"from": 30,
+			"to": 90,
+			"type": "gnawer",
+			"interval": 3.0,
+			"count": 1
+		},
+		{
+			"from": 45,
+			"to": 150,
+			"type": "shambler",
+			"interval": 0.9,
+			"count": 3
+		},
+		{
+			"from": 90,
+			"to": 210,
+			"type": "gnawer",
+			"interval": 1.6,
+			"count": 2
+		},
+		{
+			"from": 150,
+			"to": 240,
+			"type": "shambler",
+			"interval": 0.6,
+			"count": 3
+		},
+		{
+			"from": 210,
+			"to": 300,
+			"type": "gnawer",
+			"interval": 1.0,
+			"count": 3
+		},
+		{
+			"from": 240,
+			"to": 300,
+			"type": "shambler",
+			"interval": 0.45,
+			"count": 4
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/grave_base.png"
+	}
 }
