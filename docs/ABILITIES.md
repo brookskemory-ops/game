@@ -42,7 +42,7 @@ Each passive touches **exactly one stat** no other passive touches.
 | **Gravedust** | +25% gold | Iron Shovel |
 | **Bad Humours** | +30% effect duration | Plague Vials |
 | **Penitence** | +20% aura & orbit area | Burning Censer |
-| **Hourglass** | −12% cooldowns | Cursed Blade |
+| **Hourglass** | −10% cooldowns | Cursed Blade |
 | **Iron Rations** | +20 max HP, slow regen | — |
 | **Lodestone** | +30% pickup radius | — |
 

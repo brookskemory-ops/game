@@ -1,0 +1,58 @@
+{
+	"id": "qa3",
+	"name": "QA Court (45s)",
+	"theme": "castle",
+	"run_length": 45,
+	"boss": "chapel_thing",
+	"boss_banner": "the chapel door stands open",
+	"boss_trickle": "courtier",
+	"boss_trickle_interval": 3.0,
+	"events": [
+		{
+			"t": 14,
+			"spawn": "chorister",
+			"count": 1,
+			"announce": "A hymn drifts from the sealed chapel..."
+		}
+	],
+	"waves": [
+		{
+			"from": 0,
+			"to": 45,
+			"type": "courtier",
+			"interval": 2.0,
+			"count": 1
+		},
+		{
+			"from": 5,
+			"to": 45,
+			"type": "crypt_archer",
+			"interval": 3.5,
+			"count": 1
+		},
+		{
+			"from": 10,
+			"to": 45,
+			"type": "risen_knight",
+			"interval": 7.0,
+			"count": 1
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/castle_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_flagstone_crack.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_rubble.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_bones.png",
+				0.9
+			]
+		]
+	}
+}

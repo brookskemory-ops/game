@@ -56,6 +56,16 @@ func go_camp() -> void:
 	get_tree().change_scene_to_file("res://scenes/camp.tscn")
 
 func start_run() -> void:
+	# Web QA override: ?hero=<id> forces the hero for automated runs
+	# (bypasses unlocks — test builds only reachable by URL, like ?stage=).
+	if OS.has_feature("web"):
+		var search := String(JavaScriptBridge.eval("window.location.search", true))
+		var roster: Variant = load_json("res://data/characters/_roster.json")
+		if roster is Array:
+			for hero_id in roster:
+				if search.contains("hero=" + String(hero_id)):
+					selected_character = String(hero_id)
+					break
 	get_tree().paused = false
 	run_started.emit()
 	get_tree().change_scene_to_file("res://scenes/arena.tscn")
@@ -209,7 +219,8 @@ func ending_pending() -> bool:
 func stage_path() -> String:
 	if OS.has_feature("web"):
 		var search := String(JavaScriptBridge.eval("window.location.search", true))
-		for stage_id in ["qa", "stress", "stage1", "stage2", "stage3"]:
+		# NOTE: "qa3" must precede "qa" — the match is a substring check.
+		for stage_id in ["qa3", "qa", "stress", "stage1", "stage2", "stage3"]:
 			if search.contains("stage=" + stage_id):
 				return "res://data/waves/%s.json" % stage_id
 	return "res://data/waves/%s.json" % selected_stage
