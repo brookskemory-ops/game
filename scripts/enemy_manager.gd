@@ -47,6 +47,7 @@ var _alive_count := 0
 
 var _grid := {}                 # Vector2i cell -> Array of slots (rebuilt every physics tick)
 var _puffs: Array = []          # death puffs: [position: Vector2, age: float]
+var _dmg_numbers: Array = []    # floating damage numbers: [position, value, age]
 var _time := 0.0
 
 func setup(player: Node2D, p_player_radius: float, gems: GemManager) -> void:
@@ -160,9 +161,11 @@ func _physics_process(delta: float) -> void:
 				_type_mm[_type[i]].set_instance_color(i, Color.WHITE)
 		# Render transform: flip toward movement, shamble-bob rotation
 		# (big bodies — elites/bosses — lumber slower and heavier).
+		# Fresh hits scale-pop the body (juice, WP9).
 		var heavy := float(def.get("radius", 6)) >= 10.0
 		var bob := sin(_time * (3.5 if heavy else 7.0) + _phase[i]) * (0.04 if heavy else 0.07)
-		var xform := Transform2D(bob, Vector2(_facing[i], 1.0), 0.0, _pos[i])
+		var pop := 1.0 + maxf(0.0, _flash[i]) * 1.6
+		var xform := Transform2D(bob, Vector2(_facing[i] * pop, pop), 0.0, _pos[i])
 		_type_mm[_type[i]].set_instance_transform_2d(i, xform)
 
 	if contact_dps > 0.0 and _player.has_method("take_contact_dps"):
@@ -172,6 +175,11 @@ func _physics_process(delta: float) -> void:
 		for p in _puffs:
 			p[1] += delta
 		_puffs = _puffs.filter(func(p): return p[1] < PUFF_TIME)
+		queue_redraw()
+	if not _dmg_numbers.is_empty():
+		for n in _dmg_numbers:
+			n[2] += delta
+		_dmg_numbers = _dmg_numbers.filter(func(n): return n[2] < 0.6)
 		queue_redraw()
 
 ## Apply damage to one enemy. White hit-flash; death drops an XP gem + puff.
@@ -183,6 +191,8 @@ func damage_slot(slot: int, amount: float) -> void:
 	# HDR-ish color: texture * (4,4,4) clamps to white for a clean damage flash.
 	_type_mm[_type[slot]].set_instance_color(slot, Color(4.0, 4.0, 4.0, 1.0))
 	Sfx.play("hit", 0.7)
+	if bool(Game.settings.get("damage_numbers", true)) and _dmg_numbers.size() < 48:
+		_dmg_numbers.append([_pos[slot] + Vector2(randf_range(-4, 4), -8.0), amount, 0.0])
 	if _hp[slot] <= 0.0:
 		_kill(slot)
 
@@ -220,6 +230,9 @@ func _drop_pickups(slot: int, def: Dictionary) -> void:
 		for c in coin_count:
 			var value := gold / coin_count + (1 if c < gold % coin_count else 0)
 			_gems.spawn(_scatter(_pos[slot], coin_count), value, GemManager.KIND_COIN)
+	# Elites carry scrolls: a bonus draft for whoever puts them down.
+	if bool(def.get("drops_scroll", false)):
+		_gems.spawn(_pos[slot], 1, GemManager.KIND_SCROLL)
 
 func _scatter(at: Vector2, count: int) -> Vector2:
 	if count <= 1:
@@ -243,6 +256,16 @@ func _draw() -> void:
 		var alpha := (1.0 - age / PUFF_TIME) * 0.5
 		var radius := 3.0 + age * 26.0
 		draw_arc(p[0], radius, 0.0, TAU, 12, Color(Palette.ASH.r, Palette.ASH.g, Palette.ASH.b, alpha), 2.0)
+	# Floating damage numbers (toggleable in the pause menu).
+	if not _dmg_numbers.is_empty():
+		var font := UITheme.body_font()
+		if font != null:
+			for n in _dmg_numbers:
+				var age: float = n[2]
+				var alpha := clampf(1.2 - age * 2.0, 0.0, 1.0)
+				var at: Vector2 = n[0] + Vector2(0.0, -age * 22.0)
+				draw_string(font, at, str(int(round(n[1]))), HORIZONTAL_ALIGNMENT_CENTER,
+					40.0, 8, Color(Palette.BONE.r, Palette.BONE.g, Palette.BONE.b, alpha))
 
 # --- Spatial queries (used by weapons, projectiles, and player passives) ---
 

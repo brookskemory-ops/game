@@ -10,6 +10,7 @@ const HIDDEN := Transform2D(Vector2.ZERO, Vector2.ZERO, Vector2.ZERO)
 
 const KIND_GEM := 0
 const KIND_COIN := 1
+const KIND_SCROLL := 2  # elite drop: grants a bonus draft
 
 var _player: Node2D
 var _pickup_radius := 48.0
@@ -37,7 +38,7 @@ func setup(player: Node2D, pickup_radius: float) -> void:
 	for i in CAP:
 		_alive[i] = 0
 		_free[i] = CAP - 1 - i
-	for sprite_id in ["gem", "coin"]:
+	for sprite_id in ["gem", "coin", "scroll"]:
 		var tex := PixelSprites.get_tex(sprite_id)
 		var quad := QuadMesh.new()
 		quad.size = Vector2(tex.get_width(), tex.get_height())
@@ -99,7 +100,11 @@ func _physics_process(delta: float) -> void:
 		_mm[_kind[i]].set_instance_transform_2d(i, Transform2D(0.0, _pos[i] + Vector2(0.0, bob)))
 
 func _collect(slot: int) -> void:
-	if _kind[slot] == KIND_COIN:
+	if _kind[slot] == KIND_SCROLL:
+		if _player.has_method("grant_bonus_draft"):
+			_player.grant_bonus_draft()
+		Sfx.play("level", 0.7)
+	elif _kind[slot] == KIND_COIN:
 		var gold_mul := 1.0
 		var live_mul: Variant = _player.get("gold_mul")
 		if live_mul != null:

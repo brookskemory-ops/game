@@ -69,7 +69,8 @@
 		"radius": 10,
 		"xp": 10,
 		"gold": 12,
-		"elite": true
+		"elite": true,
+		"drops_scroll": true
 	},
 	"sexton": {
 		"name": "The Sexton",

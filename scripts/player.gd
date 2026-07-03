@@ -265,6 +265,13 @@ func gain_xp(amount: int) -> void:
 func xp_needed(for_level: int) -> int:
 	return 5 + for_level * 4
 
+## Elite scrolls: an extra draft without an extra level.
+func grant_bonus_draft() -> void:
+	if dead:
+		return
+	pending_levels += 1
+	leveled_up.emit(level)
+
 func _die() -> void:
 	dead = true
 	hp = 0.0

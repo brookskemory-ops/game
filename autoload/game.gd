@@ -14,6 +14,7 @@ var settings := {
 	"sfx_volume": 1.0,
 	"music_volume": 1.0,
 	"haptics": true,
+	"damage_numbers": true,
 }
 
 ## Which hero and stage the next run uses (picked at the camp).
@@ -123,6 +124,13 @@ func gold() -> int:
 func add_gold(amount: int) -> void:
 	save_data["gold"] = gold() + maxi(0, amount)
 	gold_changed.emit(gold())
+
+func spend_gold(amount: int) -> bool:
+	if gold() < amount:
+		return false
+	save_data["gold"] = gold() - amount
+	gold_changed.emit(gold())
+	return true
 
 func shop_level(id: String) -> int:
 	return int(save_data.get("shop", {}).get(id, 0))

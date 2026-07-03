@@ -138,6 +138,24 @@ const SPRITES := {
 			"..kkkkkkkkk..",
 		],
 	},
+	# Elite scroll — rolled parchment, 8x8
+	"scroll": {
+		"colors": {
+			"p": "d9d3c0", "P": "c4bfa8", # parchment
+			"r": "8c2f2f",                # wax seal
+			"d": "8a8060",                # shadowed roll
+		},
+		"rows": [
+			".pppppp.",
+			"pPPPPPPp",
+			"pPdddPPp",
+			"pPPPPPPp",
+			"pPPrrPPp",
+			"pPPrrPPp",
+			"pPdddPPp",
+			".pppppp.",
+		],
+	},
 	# Gold coin, 5x5
 	"coin": {
 		"colors": {

@@ -24,6 +24,8 @@ var _draft_open := false
 var _boss_summoned := false
 var _awaiting_chest := false
 var _trickle_acc := 0.0
+var _rerolls_tonight := 0
+var _current_options: Array = []
 
 func _ready() -> void:
 	var data: Variant = Game.load_json(Game.stage_path())
@@ -59,7 +61,23 @@ func _open_draft() -> void:
 		return
 	player.pending_levels -= 1
 	_draft_open = true
-	hud.show_draft(upgrades.roll(), _on_draft_pick)
+	_present_draft(true)
+
+func _present_draft(fresh: bool) -> void:
+	if fresh:
+		_current_options = upgrades.roll()
+	hud.show_draft(_current_options, _on_draft_pick, _reroll_cost(), _on_reroll_pressed)
+
+## Escalates per night: 4, 8, 16, 32, then 64 flat.
+func _reroll_cost() -> int:
+	return mini(64, 4 * (1 << mini(_rerolls_tonight, 4)))
+
+func _on_reroll_pressed() -> void:
+	if Game.spend_gold(_reroll_cost()):
+		_rerolls_tonight += 1
+		_present_draft(true)
+	else:
+		_present_draft(false)  # same options; button was stale
 
 func _on_draft_pick(option: Dictionary) -> String:
 	var message := upgrades.apply(option)

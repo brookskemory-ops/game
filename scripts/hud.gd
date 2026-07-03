@@ -213,11 +213,14 @@ func toast(text: String) -> void:
 
 ## Shows the draft and pauses the night. `on_pick` receives the chosen option
 ## and must return the toast message. Unpausing is the caller's decision
-## (it may chain straight into the next queued draft).
-func show_draft(options: Array, on_pick: Callable) -> void:
+## (it may chain straight into the next queued draft). Passing a valid
+## `on_reroll` adds a gold-costing reroll button (Brotato lesson, WP8).
+func show_draft(options: Array, on_pick: Callable, reroll_cost := 0, on_reroll := Callable()) -> void:
 	if _results_shown:
 		return
 	get_tree().paused = true
+	_pause_button.visible = false
+	close_draft()  # rerolls replace the open panel
 	_pause_button.visible = false
 	_draft_panel = _build_overlay_base()
 	var column := VBoxContainer.new()
@@ -231,6 +234,18 @@ func show_draft(options: Array, on_pick: Callable) -> void:
 	for option in options:
 		row.add_child(_make_draft_card(option, on_pick))
 	column.add_child(row)
+	if on_reroll.is_valid():
+		var reroll := UITheme.make_button("Reroll  ·  %d gold" % reroll_cost, 10)
+		reroll.disabled = Game.gold() < reroll_cost
+		reroll.pressed.connect(func() -> void:
+			Sfx.play("ui")
+			on_reroll.call()
+		)
+		var reroll_center := HBoxContainer.new()
+		reroll_center.alignment = BoxContainer.ALIGNMENT_CENTER
+		reroll_center.add_child(reroll)
+		column.add_child(reroll_center)
+	_gold_label.text = str(Game.gold())
 	_center_in_overlay(_draft_panel, column)
 
 func _make_draft_card(option: Dictionary, on_pick: Callable) -> Button:
@@ -303,6 +318,14 @@ func _build_pause_panel() -> void:
 		Sfx.play("ui")
 	)
 	column.add_child(sound)
+	var numbers := UITheme.make_button(_numbers_label())
+	numbers.pressed.connect(func() -> void:
+		Game.settings["damage_numbers"] = not bool(Game.settings.get("damage_numbers", true))
+		Game.write_save()
+		numbers.text = _numbers_label()
+		Sfx.play("ui")
+	)
+	column.add_child(numbers)
 	var abandon := UITheme.make_button("Abandon the night")
 	abandon.pressed.connect(_abandon_run)
 	column.add_child(abandon)
@@ -311,6 +334,9 @@ func _build_pause_panel() -> void:
 
 func _sound_label() -> String:
 	return "Sound: off" if float(Game.settings.get("sfx_volume", 1.0)) <= 0.01 else "Sound: on"
+
+func _numbers_label() -> String:
+	return "Damage numbers: on" if bool(Game.settings.get("damage_numbers", true)) else "Damage numbers: off"
 
 func _abandon_run() -> void:
 	Game.end_run(false, _snapshot_stats())
