@@ -161,6 +161,7 @@
 		"gold": 100,
 		"boss": true,
 		"gen_scale": 0.5,
+		"flip_x": true,
 		"ranged": {
 			"range": 260,
 			"cooldown": 3.4,

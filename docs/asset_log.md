@@ -69,3 +69,22 @@ style-matched later. Endpoint: `POST /v1/generate-image-pixflux`.
 - Mob regenerations (shambler, sexton, wight, hanged_man): anti-moon negative set
   ("moon, moon disc, sky, floating orb, glowing sphere, background scenery, fireflies,
   sparkles") is now standard for every creature prompt.
+
+## v0.13.x Castle Vane set (Block B)
+- 15 assets in one batch, 10 first-try passes: courtier, risen_knight, chorister, thrall,
+  hollow_king (portrait + strict side profile), decal_rubble, prop_pillar, prop_rubble
+  (statue arm as asked), prop_candelabra (torch-orange accent piece).
+- Retries: crypt_archer (v1 baked a rock outcrop under its feet — fixed with "floating
+  cleanly, no ground under its feet" + rock/base negatives); chapel_thing (v1 came out
+  bright glossy blue slime — fixed with "solid matte near-black violet shadow" + negatives
+  "bright blue, glossy, slime"; v2 faces LEFT → flip_x in enemies.json).
+- castle_base v1 painted GLOWING EMBER MORTAR between every stone ("dim cool night tones"
+  did not stop it). v2 + PIL (warm-hue kill, ×0.72 darken, 38% flatten to #1b1824,
+  roll-blend seams) passed the 3×3 sheet. **Lesson: negatives must name the failure
+  ("glowing cracks, lava, embers") — style adjectives alone don't prevent it.**
+- decal_flagstone_crack took 3 rounds (v1 hallucinated a campfire, v2 a lava-crystal
+  isometric slab). v3 as "flat 2d spiderweb crack lines" filled the square — salvaged
+  with a radial alpha fade + darken, ships as a soft cracked-floor patch.
+- decal_banner_scrap CUT after 3 fails (kept hanging the banner on a wall / cobble scene;
+  the word "banner" appears to force wall-mounted composition). Castle decal slot filled
+  by reusing decal_bones — bones in a fallen court read perfectly.

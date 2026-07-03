@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.13.0 — the court of the hollow king"
+const VERSION := "0.13.1 — the court arrayed"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
