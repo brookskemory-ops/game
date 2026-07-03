@@ -19,6 +19,20 @@
 		}
 	],
 	"ground": {
-		"base": "res://assets/sprites/generated/tiles/grave_base.png"
+		"base": "res://assets/sprites/generated/tiles/grave_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_cobbles.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_bones.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_gravedirt.png",
+				0.9
+			]
+		]
 	}
 }

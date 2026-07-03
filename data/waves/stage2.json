@@ -88,6 +88,24 @@
 		}
 	],
 	"ground": {
-		"base": "res://assets/sprites/generated/tiles/forest_base.png"
+		"base": "res://assets/sprites/generated/tiles/forest_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_roots.png",
+				1.0
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_moss.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_mushrooms.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_leaves.png",
+				0.85
+			]
+		]
 	}
 }

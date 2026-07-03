@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.12.0 — the ground beneath"
+const VERSION := "0.12.1 — the ground beneath"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
