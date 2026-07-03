@@ -94,3 +94,29 @@ jobs:
           publish_dir: build/web
           force_orphan: true
           commit_message: "Deploy web build"
+
+      # GitHub Pages for this repo is locked to the default branch (its
+      # source can only be changed from repo settings, which we can't reach),
+      # so also publish the build into /web on this branch. The 44MB engine
+      # wasm only changes on Godot upgrades; routine deploys rewrite only the
+      # small data pack, so history stays lean. [skip ci] prevents a loop.
+      - name: Publish build to /web on this branch (served by Pages)
+        shell: bash
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          rm -rf web
+          mkdir web
+          cp -r build/web/. web/
+          git add -f web
+          if git diff --cached --quiet; then
+            echo "Web build unchanged — nothing to publish."
+            exit 0
+          fi
+          git commit -m "Publish web build to /web [skip ci]"
+          for i in 1 2 3; do
+            if git push origin HEAD:${GITHUB_REF_NAME}; then exit 0; fi
+            git pull --rebase origin ${GITHUB_REF_NAME}
+          done
+          git push origin HEAD:${GITHUB_REF_NAME}
