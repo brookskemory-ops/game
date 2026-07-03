@@ -130,3 +130,50 @@ backlog item), not trivia.
 ## Priority if time runs short
 WP1 > WP2 > WP5-evolutions > WP3 > WP4-manifest > WP5-balance. Quality gates are never the
 thing that gets cut.
+
+---
+
+# EXTENDED SHIFT (WP7–WP10) — added at the user's request ("whatever you see fit")
+
+Chosen to be independent of the pending morning decisions (art direction, run length).
+
+## WP7 — v0.7.0 "The Wailing Forest" (stage 2 + hero 5)
+
+- **`data/waves/stage2.json`**: 5:30 night in the forest. New enemies (data + ASCII
+  sprites): **Wight** (tanky, slow, high damage), **Hanged Man** (spawns close, ambush
+  flavor), **Bone Stag** (fast charger, heavier than a gnawer). Boss: **The Briar Queen**
+  (thorn wraith; trickles gnawers + bone stags while alive).
+- **Stage select at the camp**: after stage 1 is cleared (Maud's unlock doubles as the
+  flag), a "the path into the forest opens" row appears; selected stage stored on `Game`.
+  QA/stress URL params keep working.
+- **Forest dressing**: stage-driven ground palette + scatter (trees, roots, stones) via a
+  `"theme"` field in stage data — arena reads it instead of hardcoding graveyard scatter.
+- **Greatsword** (weapon #5, docs/ABILITIES.md niche: heavy frontal cleave, slow wind-up,
+  huge burst + heavy knockback — distinct from the shovel's fast short arc) + catalyst
+  Whetstone → evolution **Oathkeeper** (full-circle shockwave slam) per the registry.
+- **Ser Roland** (hero 5): Greatsword start, signature *Bulwark* (percent damage reduction,
+  −10% speed), unlock: clear the Wailing Forest. Vignette included.
+- Gate: full validation + suite + screenshots of forest + stage select.
+
+## WP8 — Draft depth (research actionables from WP3)
+
+- **Draft reroll**: a gold-costing reroll button on the draft (cost escalates per night,
+  data-tuned) — converts meta-currency into in-run agency (Brotato lesson).
+- **Elite scrolls**: the Tolling Man (and stage-2 elite) drops a **scroll pickup** that
+  grants a bonus draft when collected (Halls of Torment lesson: elites must drop
+  excitement).
+- Gate: suite run confirming drafts still flow + no script errors.
+
+## WP9 — Juice: damage numbers + impact feel
+
+- **Damage numbers**: pooled, drawn in the world layer (no Label nodes), rise-and-fade,
+  batched per frame; **toggle in the pause menu** (mobile clarity option, per plan).
+- Impact feel: brief scale-pop on hit (transform pulse via the existing flash pipeline),
+  arrow impact puffs.
+- Gate: stress-stage probe confirms no perf regression at the 700 cap (frame-time table
+  re-measured and compared against WP2's baseline).
+
+## WP10 — Second handoff
+
+- NIGHT_LOG updated with the extended shift; morning summary refreshed; plan checkboxes;
+  final green deploy + live probe. Open-questions list stays capped at 5 total.
