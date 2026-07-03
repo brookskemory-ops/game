@@ -88,3 +88,12 @@ style-matched later. Endpoint: `POST /v1/generate-image-pixflux`.
 - decal_banner_scrap CUT after 3 fails (kept hanging the banner on a wall / cobble scene;
   the word "banner" appears to force wall-mounted composition). Castle decal slot filled
   by reusing decal_bones — bones in a fallen court read perfectly.
+
+## v0.14.x item icon set
+- 28 icons (12 weapons + 6 evolutions + 10 keepsakes, 32px) in one batch: 24 first-try
+  passes. Retries: crownsorrow (crown absent — fixed by making the crown "the biggest
+  element"), pilgrims_chain (rendered a staff — fixed with "large visible oval links
+  coiled in a spiral"), sextons_spade (too thin — "broad pale bone-white blade, thick
+  readable shape"), widowmaker (didn't read as a bow — "clearly a bow shape, drawn wide").
+  **Lesson: at 32px, name the dominant silhouette explicitly ("the crown is the biggest
+  element", "clearly a bow shape") — style words alone don't control composition.**
