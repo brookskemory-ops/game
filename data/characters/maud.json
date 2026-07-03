@@ -1,0 +1,14 @@
+{
+	"id": "maud",
+	"name": "Maud, the Gravedigger",
+	"sprite": "maud",
+	"max_hp": 95,
+	"move_speed": 118,
+	"radius": 6,
+	"pickup_radius": 48,
+	"weapon": "iron_shovel",
+	"signature": "wages_of_death",
+	"signature_desc": "Wages of Death — +50% gold",
+	"unlock_hint": "Put the Sexton to rest",
+	"story_arc": "maud_arc"
+}

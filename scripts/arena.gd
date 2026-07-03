@@ -3,9 +3,9 @@ extends Node2D
 ## data/waves/stage1.json, and decides victory/defeat. Also draws the ground
 ## scatter (graves, crosses, rubble) so movement reads against the dark.
 
-const SPAWN_DISTANCE := 400.0
-const SCATTER_COUNT := 170
-const SCATTER_RANGE := 1700.0
+const SPAWN_DISTANCE := 300.0  # just past the zoom-2 camera's visible edge
+const SCATTER_COUNT := 380
+const SCATTER_RANGE := 1500.0
 
 @onready var player: Player = $Player
 @onready var enemies: EnemyManager = $EnemyManager
@@ -19,13 +19,17 @@ var time_elapsed := 0.0
 var run_over := false
 var upgrades: UpgradeSystem
 var _wave_acc := PackedFloat32Array()
+var _events_fired := PackedByteArray()
 var _draft_open := false
+var _boss_summoned := false
+var _trickle_acc := 0.0
 
 func _ready() -> void:
 	var data: Variant = Game.load_json("res://data/waves/stage1.json")
 	if data is Dictionary:
 		stage = data
 	_wave_acc.resize(waves().size())
+	_events_fired.resize(events().size())
 	player.setup({"enemies": enemies, "projectiles": projectiles, "hazards": hazards})
 	enemies.setup(player, player.body_radius, gems)
 	projectiles.setup(enemies)
@@ -35,6 +39,8 @@ func _ready() -> void:
 	upgrades = UpgradeSystem.new(player)
 	player.died.connect(_on_player_died)
 	player.leveled_up.connect(_on_player_leveled)
+	enemies.boss_spawned.connect(_on_boss_spawned)
+	enemies.boss_died.connect(_on_boss_died)
 
 # --- Upgrade draft flow (queues if several levels land at once) ---
 
@@ -61,6 +67,9 @@ func _on_draft_pick(option: Dictionary) -> String:
 func waves() -> Array:
 	return stage.get("waves", [])
 
+func events() -> Array:
+	return stage.get("events", [])
+
 func run_length() -> float:
 	return float(stage.get("run_length", 300))
 
@@ -68,9 +77,28 @@ func _physics_process(delta: float) -> void:
 	if run_over:
 		return
 	time_elapsed += delta
-	if time_elapsed >= run_length():
-		_finish(true)
-		return
+	# The timer running out doesn't end the night — it summons what rings the bell.
+	if not _boss_summoned and time_elapsed >= run_length():
+		_summon_boss()
+	if _boss_summoned:
+		_trickle_acc += delta
+		var interval := float(stage.get("boss_trickle_interval", 2.0))
+		if _trickle_acc >= interval:
+			_trickle_acc -= interval
+			enemies.spawn(String(stage.get("boss_trickle", "shambler")), _spawn_point())
+	# Timed one-shot events (mini-bosses etc.).
+	var event_list := events()
+	for e in event_list.size():
+		if _events_fired[e] == 1:
+			continue
+		var event: Dictionary = event_list[e]
+		if time_elapsed >= float(event.get("t", 0)):
+			_events_fired[e] = 1
+			for c in int(event.get("count", 1)):
+				enemies.spawn(String(event.get("spawn", "shambler")), _spawn_point())
+			var announce := String(event.get("announce", ""))
+			if not announce.is_empty():
+				hud.toast(announce)
 	var wave_list := waves()
 	for w in wave_list.size():
 		var wave: Dictionary = wave_list[w]
@@ -86,6 +114,24 @@ func _physics_process(delta: float) -> void:
 func _spawn_point() -> Vector2:
 	# Just past the edge of a landscape phone view, in a random direction.
 	return player.global_position + Vector2.from_angle(randf() * TAU) * SPAWN_DISTANCE
+
+func _summon_boss() -> void:
+	_boss_summoned = true
+	var boss_id := String(stage.get("boss", ""))
+	if boss_id.is_empty():
+		_finish(true)  # a stage without a boss simply ends at dawn
+		return
+	enemies.spawn(boss_id, _spawn_point())
+
+func _on_boss_spawned(display_name: String) -> void:
+	hud.set_boss_name(display_name)
+	hud.banner("THE BELL TOLLS", "%s rises from the churchyard" % display_name)
+
+func _on_boss_died() -> void:
+	var unlock_id := String(stage.get("victory_unlock", ""))
+	if not unlock_id.is_empty():
+		Game.unlock(unlock_id)
+	_finish(true)
 
 func _on_player_died() -> void:
 	_finish(false)

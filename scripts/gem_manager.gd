@@ -1,17 +1,23 @@
 class_name GemManager
 extends Node2D
-## Pooled XP gems with magnet pickup. Flat arrays + MultiMesh, like the horde.
+## Pooled ground pickups with magnet collection: XP gems and gold coins.
+## Flat arrays + one MultiMesh per pickup kind, like the horde.
 
 const CAP := 900
 const COLLECT_DIST := 10.0
 const ATTRACT_ACCEL := 1400.0
+const HIDDEN := Transform2D(Vector2.ZERO, Vector2.ZERO, Vector2.ZERO)
+
+const KIND_GEM := 0
+const KIND_COIN := 1
 
 var _player: Node2D
 var _pickup_radius := 48.0
-var _mm: MultiMesh
 var _time := 0.0
+var _mm := []  # MultiMesh per kind
 
 var _alive := PackedByteArray()
+var _kind := PackedByteArray()
 var _pos := PackedVector2Array()
 var _value := PackedInt32Array()
 var _attract := PackedByteArray()
@@ -22,6 +28,7 @@ func setup(player: Node2D, pickup_radius: float) -> void:
 	_player = player
 	_pickup_radius = pickup_radius
 	_alive.resize(CAP)
+	_kind.resize(CAP)
 	_pos.resize(CAP)
 	_value.resize(CAP)
 	_attract.resize(CAP)
@@ -30,27 +37,30 @@ func setup(player: Node2D, pickup_radius: float) -> void:
 	for i in CAP:
 		_alive[i] = 0
 		_free[i] = CAP - 1 - i
-	var tex := PixelSprites.get_tex("gem")
-	var quad := QuadMesh.new()
-	quad.size = Vector2(tex.get_width(), tex.get_height())
-	_mm = MultiMesh.new()
-	_mm.transform_format = MultiMesh.TRANSFORM_2D
-	_mm.mesh = quad
-	_mm.instance_count = CAP
-	for i in CAP:
-		_mm.set_instance_transform_2d(i, Transform2D(Vector2.ZERO, Vector2.ZERO, Vector2.ZERO))
-	var mmi := MultiMeshInstance2D.new()
-	mmi.name = "Gems"
-	mmi.multimesh = _mm
-	mmi.texture = tex
-	add_child(mmi)
+	for sprite_id in ["gem", "coin"]:
+		var tex := PixelSprites.get_tex(sprite_id)
+		var quad := QuadMesh.new()
+		quad.size = Vector2(tex.get_width(), tex.get_height())
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_2D
+		mm.mesh = quad
+		mm.instance_count = CAP
+		for i in CAP:
+			mm.set_instance_transform_2d(i, HIDDEN)
+		var mmi := MultiMeshInstance2D.new()
+		mmi.name = "Pickups_" + sprite_id
+		mmi.multimesh = mm
+		mmi.texture = tex
+		add_child(mmi)
+		_mm.append(mm)
 
-func spawn(at: Vector2, value: int) -> void:
+func spawn(at: Vector2, value: int, kind := KIND_GEM) -> void:
 	if _free.is_empty():
 		return  # cap reached; the ground is already paved with souls
 	var slot := _free[_free.size() - 1]
 	_free.resize(_free.size() - 1)
 	_alive[slot] = 1
+	_kind[slot] = kind
 	_pos[slot] = at + Vector2(randf_range(-5.0, 5.0), randf_range(-5.0, 5.0))
 	_value[slot] = maxi(1, value)
 	_attract[slot] = 0
@@ -80,11 +90,17 @@ func _physics_process(delta: float) -> void:
 				continue
 			_pos[i] += (ppos - _pos[i]) / dist * step
 		var bob := sin(_time * 3.0 + float(i) * 0.7) * 1.5
-		_mm.set_instance_transform_2d(i, Transform2D(0.0, _pos[i] + Vector2(0.0, bob)))
+		_mm[_kind[i]].set_instance_transform_2d(i, Transform2D(0.0, _pos[i] + Vector2(0.0, bob)))
 
 func _collect(slot: int) -> void:
-	if _player.has_method("gain_xp"):
+	if _kind[slot] == KIND_COIN:
+		var gold_mul := 1.0
+		var live_mul: Variant = _player.get("gold_mul")
+		if live_mul != null:
+			gold_mul = float(live_mul)
+		Game.add_gold(int(round(float(_value[slot]) * gold_mul)))
+	elif _player.has_method("gain_xp"):
 		_player.gain_xp(_value[slot])
 	_alive[slot] = 0
 	_free.append(slot)
-	_mm.set_instance_transform_2d(slot, Transform2D(Vector2.ZERO, Vector2.ZERO, Vector2.ZERO))
+	_mm[_kind[slot]].set_instance_transform_2d(slot, HIDDEN)

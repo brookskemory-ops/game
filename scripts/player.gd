@@ -34,9 +34,11 @@ var hp := 80.0
 var move_speed := 130.0
 var pickup_radius := 48.0
 var body_radius := 6.0
+var gold_mul := 1.0  # Wages of Death (Maud) raises this
 var dead := false
 var lightfoot_active := false
 var facing := Vector2.RIGHT
+var _sig_light_foot := false
 
 var weapons: Array = []  # of Weapon
 
@@ -51,9 +53,16 @@ var _hurt_accum := 0.0  # aggregates contact DPS into discrete hurt pulses
 func setup(ctx: Dictionary) -> void:
 	_ctx = ctx
 	_enemies = ctx.get("enemies")
-	var data: Variant = Game.load_json("res://data/characters/wren.json")
+	var data: Variant = Game.load_json("res://data/characters/%s.json" % Game.selected_character)
 	if data is Dictionary:
 		stats = data
+	# Signature passive: exclusive to the hero, resolved from data
+	# (docs/ABILITIES.md §4). Each is one hook, never bespoke subsystems.
+	match String(stats.get("signature", "")):
+		"light_foot":
+			_sig_light_foot = true
+		"wages_of_death":
+			gold_mul = 1.5
 	base_max_hp = float(stats.get("max_hp", 80))
 	base_move_speed = float(stats.get("move_speed", 130))
 	base_pickup_radius = float(stats.get("pickup_radius", 48))
@@ -121,12 +130,13 @@ func _physics_process(delta: float) -> void:
 	var dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	if _joystick != null and _joystick.output.length() > 0.05:
 		dir = _joystick.output
-	# Light Foot (Wren's passive): faster while unthreatened. Checked at 5 Hz.
-	_lightfoot_timer -= delta
-	if _lightfoot_timer <= 0.0:
-		_lightfoot_timer = 0.2
-		lightfoot_active = _enemies != null \
-			and _enemies.count_in_circle(global_position, LIGHTFOOT_RADIUS) == 0
+	# Light Foot (Wren's signature): faster while unthreatened. Checked at 5 Hz.
+	if _sig_light_foot:
+		_lightfoot_timer -= delta
+		if _lightfoot_timer <= 0.0:
+			_lightfoot_timer = 0.2
+			lightfoot_active = _enemies != null \
+				and _enemies.count_in_circle(global_position, LIGHTFOOT_RADIUS) == 0
 	var speed := move_speed * (LIGHTFOOT_BONUS if lightfoot_active else 1.0)
 	velocity = dir.limit_length(1.0) * speed
 	move_and_slide()

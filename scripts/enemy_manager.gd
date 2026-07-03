@@ -15,8 +15,13 @@ const FLASH_TIME := 0.12
 const PUFF_TIME := 0.35
 const HIDDEN := Transform2D(Vector2.ZERO, Vector2.ZERO, Vector2.ZERO)
 
+signal boss_spawned(display_name: String)
+signal boss_died
+
 var kills := 0
 var player_radius := 6.0
+var _boss_slot := -1
+var _boss_max_hp := 1.0
 
 var _player: Node2D
 var _gems: GemManager
@@ -105,6 +110,10 @@ func spawn(type_name: String, at: Vector2) -> void:
 	_facing[slot] = 1.0
 	_push[slot] = Vector2.ZERO
 	_alive_count += 1
+	if bool(_type_defs[type_id].get("boss", false)):
+		_boss_slot = slot
+		_boss_max_hp = float(_type_defs[type_id].get("hp", 1))
+		boss_spawned.emit(String(_type_defs[type_id].get("name", type_name)))
 
 func _physics_process(delta: float) -> void:
 	if _player == null:
@@ -148,8 +157,10 @@ func _physics_process(delta: float) -> void:
 			_flash[i] -= delta
 			if _flash[i] <= 0.0:
 				_type_mm[_type[i]].set_instance_color(i, Color.WHITE)
-		# Render transform: flip toward movement, shamble-bob rotation.
-		var bob := sin(_time * 7.0 + _phase[i]) * 0.07
+		# Render transform: flip toward movement, shamble-bob rotation
+		# (big bodies — elites/bosses — lumber slower and heavier).
+		var heavy := float(def.get("radius", 6)) >= 10.0
+		var bob := sin(_time * (3.5 if heavy else 7.0) + _phase[i]) * (0.04 if heavy else 0.07)
 		var xform := Transform2D(bob, Vector2(_facing[i], 1.0), 0.0, _pos[i])
 		_type_mm[_type[i]].set_instance_transform_2d(i, xform)
 
@@ -181,10 +192,45 @@ func _kill(slot: int) -> void:
 	_free.append(slot)
 	_type_mm[_type[slot]].set_instance_transform_2d(slot, HIDDEN)
 	_type_mm[_type[slot]].set_instance_color(slot, Color.WHITE)
-	if _gems != null:
-		_gems.spawn(_pos[slot], int(def.get("xp", 1)))
+	_drop_pickups(slot, def)
 	_puffs.append([_pos[slot], 0.0])
 	queue_redraw()
+	if slot == _boss_slot:
+		_boss_slot = -1
+		boss_died.emit()
+
+## XP gems always; gold from elites/bosses (and a rare trickle from normals).
+func _drop_pickups(slot: int, def: Dictionary) -> void:
+	if _gems == null:
+		return
+	var xp := int(def.get("xp", 1))
+	var gem_count := clampi(xp, 1, 8)
+	for g in gem_count:
+		var value := xp / gem_count + (1 if g < xp % gem_count else 0)
+		_gems.spawn(_scatter(_pos[slot], gem_count), value, GemManager.KIND_GEM)
+	var gold := int(def.get("gold", 0))
+	if gold == 0 and randf() < float(def.get("gold_chance", 0.0)):
+		gold = 1
+	if gold > 0:
+		var coin_count := clampi(gold, 1, 8)
+		for c in coin_count:
+			var value := gold / coin_count + (1 if c < gold % coin_count else 0)
+			_gems.spawn(_scatter(_pos[slot], coin_count), value, GemManager.KIND_COIN)
+
+func _scatter(at: Vector2, count: int) -> Vector2:
+	if count <= 1:
+		return at
+	return at + Vector2.from_angle(randf() * TAU) * randf_range(4.0, 16.0)
+
+# --- Boss state (polled by the HUD) ---
+
+func boss_active() -> bool:
+	return _boss_slot >= 0
+
+func boss_hp_frac() -> float:
+	if _boss_slot < 0:
+		return 0.0
+	return clampf(_hp[_boss_slot] / _boss_max_hp, 0.0, 1.0)
 
 func _draw() -> void:
 	# Death puffs: an expanding, fading ring. Cheap, batched into this node's canvas item.

@@ -6,7 +6,8 @@
 		"speed": 38,
 		"damage": 8,
 		"radius": 7,
-		"xp": 1
+		"xp": 1,
+		"gold_chance": 0.03
 	},
 	"gnawer": {
 		"name": "Gnawer",
@@ -15,6 +16,29 @@
 		"speed": 92,
 		"damage": 5,
 		"radius": 5,
-		"xp": 1
+		"xp": 1,
+		"gold_chance": 0.03
+	},
+	"tolling_man": {
+		"name": "Tolling Man",
+		"sprite": "tolling_man",
+		"hp": 280,
+		"speed": 26,
+		"damage": 14,
+		"radius": 10,
+		"xp": 10,
+		"gold": 12,
+		"elite": true
+	},
+	"sexton": {
+		"name": "The Sexton",
+		"sprite": "sexton",
+		"hp": 950,
+		"speed": 30,
+		"damage": 20,
+		"radius": 13,
+		"xp": 40,
+		"gold": 40,
+		"boss": true
 	}
 }

@@ -135,4 +135,4 @@ func _input(event: InputEvent) -> void:
 		pressed = true
 	if pressed:
 		_started = true
-		Game.start_run()
+		Game.go_camp()

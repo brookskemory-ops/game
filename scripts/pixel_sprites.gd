@@ -117,6 +117,105 @@ const SPRITES := {
 			".b.b.b.",
 		],
 	},
+	# Gold coin, 5x5
+	"coin": {
+		"colors": {
+			"g": "d9a441", "G": "f0cd7a", "d": "a8752c",
+		},
+		"rows": [
+			".ggg.",
+			"gGGgd",
+			"gGggd",
+			"ggggd",
+			".ddd.",
+		],
+	},
+	# Maud, the Gravedigger — bonnet, apron, shovel on her back, 10x14
+	"maud": {
+		"colors": {
+			"b": "b8b2a0", "B": "cfc9b8", # bonnet
+			"f": "d8c2a0",                # face
+			"d": "5a4a3a", "D": "6b5a46", # dress
+			"a": "9a927e",                # apron
+			"s": "6b5236", "S": "8b8496", # shovel haft / blade
+			"e": "16131c",                # eyes
+		},
+		"rows": [
+			"..bbbb..S.",
+			".bBBBBb.S.",
+			".bBBBBbss.",
+			".befffe.s.",
+			".bffffb.s.",
+			"..ffff..s.",
+			".dDDDDd.s.",
+			"ddDaaDdds.",
+			"d.DaaD.d..",
+			"..DaaD....",
+			".dDDDDd...",
+			".dd..dd...",
+			".dd..dd...",
+			".ss..ss...",
+		],
+	},
+	# Tolling Man — elite with a bronze bell for a head, 11x14
+	"tolling_man": {
+		"colors": {
+			"n": "8a6d3b", "N": "a8894f", # bronze bell
+			"k": "5c4527",                # bell rim / clapper
+			"e": "e08840",                # ember glow inside
+			"c": "3d3830", "C": "4a4438", # ragged vestments
+			"b": "8b8496",                # bone
+		},
+		"rows": [
+			"....nnn....",
+			"...nNNNn...",
+			"..nNNNNNn..",
+			"..nNNNNNn..",
+			".nNNNNNNNn.",
+			".kkkkkkkkk.",
+			"....eke....",
+			"..cCCCCCc..",
+			".ccCCCCCcc.",
+			"cc.CCCCC.cc",
+			"b..CCCCC..b",
+			"...CC.CC...",
+			"...CC.CC...",
+			"...bb.bb...",
+		],
+	},
+	# The Sexton — stage 1 boss: hunched gravekeeper wraith with spade, 16x20
+	"sexton": {
+		"colors": {
+			"h": "2b2733", "H": "3a3542", # wide hat / robe shadow
+			"e": "e08840",                # ember eyes
+			"r": "3d3830", "R": "4a4438", # robes
+			"s": "6b5236", "S": "b8b2a0", # spade haft / blade
+			"g": "6a7a52",                # grave-mold trim
+			"b": "8b8496",                # bone hands
+		},
+		"rows": [
+			"....hhhhhhh.....",
+			"..hhHHHHHHHhh...",
+			".hHHHHHHHHHHHh..",
+			"....hHHHHHh.....",
+			"....He...eH..S..",
+			"....HHHHHHH.SSS.",
+			"...rRRRRRRRr.S..",
+			"..rrRRRRRRRrrs..",
+			".rrRRRRRRRRRrs..",
+			".rRRgRRRRRgRrs..",
+			"rrRRRRRRRRRRrs..",
+			"rbRRRRRRRRRbrs..",
+			"r.RRRRRRRRR.bs..",
+			"..RRRRRRRRR.s...",
+			"..RRRgRgRRR.s...",
+			".rRRRRRRRRRr....",
+			".rRRRRRRRRRr....",
+			"..RRR...RRR.....",
+			"..RRR...RRR.....",
+			"..ggg...ggg.....",
+		],
+	},
 }
 
 static func get_tex(id: String) -> ImageTexture:

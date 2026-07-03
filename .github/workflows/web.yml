@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
           fail=0
-          for scene in res://scenes/main.tscn res://scenes/arena.tscn; do
+          for scene in res://scenes/main.tscn res://scenes/camp.tscn res://scenes/arena.tscn; do
             echo "--- booting $scene ---"
             out=$(godot --headless --quit-after 120 "$scene" 2>&1 || true)
             echo "$out"

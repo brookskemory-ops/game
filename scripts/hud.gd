@@ -15,6 +15,9 @@ var _enemies: EnemyManager
 var _timer_label: Label
 var _kills_label: Label
 var _level_label: Label
+var _gold_label: Label
+var _boss_label: Label
+var _coin_tex: Texture2D
 var _toast_box: VBoxContainer
 var _pause_button: Button
 var _pause_panel: Control
@@ -54,6 +57,17 @@ func _ready() -> void:
 	_place(_kills_label, 1.0, 0.0, 1.0, 0.0, Rect2(-86, 10, 60, 18))
 	add_child(_kills_label)
 
+	_coin_tex = PixelSprites.get_tex("coin")
+	_gold_label = UITheme.make_label("0", 11, Color("f0cd7a"))
+	_gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_place(_gold_label, 0.0, 0.0, 0.0, 0.0, Rect2(26, 26, 90, 14))
+	add_child(_gold_label)
+
+	_boss_label = UITheme.make_label("", 12, Palette.PARCHMENT, true)
+	_place(_boss_label, 0.5, 1.0, 0.5, 1.0, Rect2(-140, -42, 280, 16))
+	_boss_label.visible = false
+	add_child(_boss_label)
+
 	_level_label = UITheme.make_label("LV 1", 12, Palette.TORCH)
 	_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_place(_level_label, 0.0, 1.0, 0.0, 1.0, Rect2(10, -26, 80, 16))
@@ -89,8 +103,10 @@ func _process(delta: float) -> void:
 		_timer_label.text = "%d:%02d" % [int(remaining) / 60, int(remaining) % 60]
 	if _enemies != null:
 		_kills_label.text = str(_enemies.kills)
+		_boss_label.visible = _enemies.boss_active()
 	if _player != null:
 		_level_label.text = "LV %d" % _player.level
+	_gold_label.text = str(Game.gold())
 	_hp_frac = lerpf(_hp_frac, _hp_target, minf(1.0, delta * 10.0))
 	_vignette = maxf(0.0, _vignette - delta * 1.6)
 	_xp_flash = maxf(0.0, _xp_flash - delta * 2.2)
@@ -115,6 +131,21 @@ func _draw() -> void:
 	# --- Kill counter skull icon (next to the number, top right) ---
 	if _skull_tex != null:
 		draw_texture(_skull_tex, Vector2(w - 100.0, 12.0))
+	# --- Gold coin icon (under the HP bar) ---
+	if _coin_tex != null:
+		draw_texture(_coin_tex, Vector2(15.0, 30.0))
+	# --- Boss HP bar (bottom center, above the XP bar) ---
+	if _enemies != null and _enemies.boss_active():
+		var bar_w := minf(w * 0.5, 280.0)
+		var bar := Rect2((w - bar_w) * 0.5, h - 22.0, bar_w, 7.0)
+		draw_rect(Rect2(bar.position - Vector2.ONE, bar.size + Vector2.ONE * 2.0), Palette.IRON)
+		draw_rect(bar, Color(Palette.INK.r, Palette.INK.g, Palette.INK.b, 0.9))
+		var boss_frac := _enemies.boss_hp_frac()
+		if boss_frac > 0.0:
+			var boss_fill := Rect2(bar.position + Vector2.ONE,
+				Vector2((bar.size.x - 2.0) * boss_frac, bar.size.y - 2.0))
+			draw_rect(boss_fill, Palette.EMBER)
+			draw_rect(Rect2(boss_fill.position, Vector2(boss_fill.size.x, 1.0)), Palette.TORCH)
 	# --- XP bar (bottom edge, full width) ---
 	var y := h - XP_BAR_HEIGHT
 	draw_rect(Rect2(0, y, w, XP_BAR_HEIGHT), Color(Palette.IRON.r, Palette.IRON.g, Palette.IRON.b, 0.7))
@@ -145,6 +176,26 @@ func _on_hurt(_amount: float) -> void:
 
 func _on_leveled_up(_level: int) -> void:
 	_xp_flash = 1.0
+
+## Names the boss above the boss HP bar.
+func set_boss_name(display_name: String) -> void:
+	_boss_label.text = display_name
+
+## Full-screen announcement (boss arrivals): big title + subtitle, fades away.
+func banner(title: String, subtitle: String) -> void:
+	var holder := VBoxContainer.new()
+	holder.alignment = BoxContainer.ALIGNMENT_CENTER
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(holder, 0.5, 0.5, 0.5, 0.5, Rect2(-260, -90, 520, 80))
+	holder.add_child(UITheme.make_label(title, 40, Palette.TORCH, true))
+	holder.add_child(UITheme.make_label(subtitle, 12, Palette.ASH))
+	add_child(holder)
+	holder.modulate.a = 0.0
+	var tween := create_tween()
+	tween.tween_property(holder, "modulate:a", 1.0, 0.35)
+	tween.tween_interval(1.8)
+	tween.tween_property(holder, "modulate:a", 0.0, 0.7)
+	tween.tween_callback(holder.queue_free)
 
 func toast(text: String) -> void:
 	var label := UITheme.make_label(text, 12, Palette.TORCH)
