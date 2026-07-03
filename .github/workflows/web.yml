@@ -33,16 +33,22 @@ jobs:
       - name: Import project
         run: godot --headless --import || true
 
-      - name: Validate GDScript
+      # Boot both scenes headless: this compiles every script WITH autoloads
+      # registered (--check-only can't do that) and catches crashes at startup.
+      # The arena run simulates ~2s of real gameplay.
+      - name: Validate scenes boot cleanly
         shell: bash
         run: |
           fail=0
-          while IFS= read -r script; do
-            if ! godot --headless --check-only --script "$script"; then
-              echo "::error file=$script::GDScript check failed"
+          for scene in res://scenes/main.tscn res://scenes/arena.tscn; do
+            echo "--- booting $scene ---"
+            out=$(godot --headless --quit-after 120 "$scene" 2>&1 || true)
+            echo "$out"
+            if echo "$out" | grep -qE "SCRIPT ERROR|Failed to load script|Parse Error"; then
+              echo "::error::Script errors while booting $scene"
               fail=1
             fi
-          done < <(find . -name '*.gd' -not -path './.godot/*')
+          done
           exit $fail
 
       - name: Export Web
