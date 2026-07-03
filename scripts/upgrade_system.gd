@@ -43,6 +43,9 @@ func roll() -> Array:
 			var weapon_id := String(def.get("id", ""))
 			if player.has_weapon(weapon_id):
 				continue
+			# The Ledger's rule: locked weapons never enter the draft.
+			if not Game.is_weapon_unlocked(weapon_id):
+				continue
 			candidates.append({
 				"type": "weapon_new",
 				"id": weapon_id,

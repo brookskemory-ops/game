@@ -4,12 +4,17 @@
 	"family": "seeker",
 	"niche": "autonomous hunter preferring elites (docs/ABILITIES.md #10)",
 	"script": "res://scripts/weapons/falcon.gd",
-	"draft_desc": "Wren's old hunting bird — she picks her own prey, and picks well",
+	"draft_desc": "Wren's old hunting bird \u2014 she picks her own prey, and picks well",
 	"up_desc": "Sharper talons, faster strikes",
 	"cooldown": 999,
 	"damage": 14,
 	"speed": 260,
 	"hunt_range": 340,
 	"hit_interval": 0.5,
-	"max_level": 8
+	"max_level": 8,
+	"unlock": {
+		"type": "stage_cleared",
+		"id": "stage2"
+	},
+	"unlock_hint": "Cleanse the Wailing Forest"
 }

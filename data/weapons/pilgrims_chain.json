@@ -9,5 +9,10 @@
 	"cooldown": 0.55,
 	"damage": 10,
 	"reach": 95,
-	"max_level": 8
+	"max_level": 8,
+	"unlock": {
+		"type": "level_in_night",
+		"value": 10
+	},
+	"unlock_hint": "Reach level 10 in a single night"
 }

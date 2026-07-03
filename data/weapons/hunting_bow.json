@@ -13,5 +13,10 @@
 	"pierce": 2,
 	"proj_speed": 430,
 	"proj_ttl": 0.9,
-	"family": "projectile"
+	"family": "projectile",
+	"unlock": {
+		"type": "hero",
+		"id": "wren"
+	},
+	"unlock_hint": "Wren's own bow \u2014 he shares once you've met"
 }

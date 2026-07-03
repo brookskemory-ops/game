@@ -13,5 +13,10 @@
 	"max_level": 8,
 	"family": "zone",
 	"catalyst": "bad_humours",
-	"evolution": "the_miasma"
+	"evolution": "the_miasma",
+	"unlock": {
+		"type": "hero",
+		"id": "corvus"
+	},
+	"unlock_hint": "Corvus mixes them \u2014 meet the doctor first"
 }

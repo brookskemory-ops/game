@@ -514,5 +514,6 @@ func _snapshot_stats() -> Dictionary:
 	return {
 		"time": time_elapsed,
 		"kills": _enemies.kills if _enemies != null else 0,
+		"elite_kills": _enemies.elite_kills if _enemies != null else 0,
 		"level": _player.level if _player != null else 1,
 	}

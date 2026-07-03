@@ -14,5 +14,10 @@
 	"knockback": 260,
 	"windup": 0.25,
 	"max_level": 8,
-	"family": "cleave"
+	"family": "cleave",
+	"unlock": {
+		"type": "hero",
+		"id": "roland"
+	},
+	"unlock_hint": "Roland's blade \u2014 meet the knight first"
 }

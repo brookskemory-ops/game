@@ -24,6 +24,9 @@ var selected_stage := "stage1"
 ## Hero ids unlocked this session, awaiting their campfire vignette.
 var newly_unlocked: Array = []
 
+## Weapon ids that unlocked after the last run ("THE LEDGER GROWS" notice).
+var newly_unlocked_weapons: Array = []
+
 ## Persistent progress. Written to user://save.json (IndexedDB on web).
 var save_data := {
 	"gold": 0,
@@ -34,6 +37,7 @@ var save_data := {
 	"stages": {},
 	"settings": {},
 	"ending": "",
+	"weapon_unlocks": {},
 }
 
 ## Stats from the most recent run, for camp/results screens.
@@ -71,6 +75,9 @@ func start_run() -> void:
 	get_tree().change_scene_to_file("res://scenes/arena.tscn")
 
 func end_run(victory: bool, stats := {}) -> void:
+	# Snapshot weapon availability first, so post-run stat changes can be
+	# diffed into "THE LEDGER GROWS" notices.
+	var weapons_before := _weapon_unlock_snapshot()
 	last_run = {
 		"victory": victory,
 		"time": stats.get("time", 0.0),
@@ -92,6 +99,7 @@ func end_run(victory: bool, stats := {}) -> void:
 	if float(stats.get("time", 0.0)) > float(best.get("time", 0.0)):
 		save_data["best_run"] = last_run.duplicate()
 	_check_unlocks(stats)
+	_check_weapon_unlocks(stats, weapons_before)
 	write_save()
 	get_tree().paused = false
 	run_ended.emit(victory)
@@ -122,6 +130,67 @@ func _check_unlocks(stats: Dictionary) -> void:
 
 func is_unlocked(id: String) -> bool:
 	return bool(save_data.get("unlocks", {}).get(id, false))
+
+# --- Weapon unlocks (the Ledger, docs/ABILITIES.md; conditions in weapon data) ---
+
+## A weapon may enter drafts when its unlock condition holds. Hero-tied and
+## lifetime-stat conditions evaluate live (past progress always counts);
+## single-run feats (elite_kill, level_in_night) persist as flags set below.
+func is_weapon_unlocked(id: String) -> bool:
+	if bool(save_data.get("weapon_unlocks", {}).get(id, false)):
+		return true
+	var def: Variant = load_json("res://data/weapons/%s.json" % id)
+	if not (def is Dictionary):
+		return false
+	return _weapon_cond_met(def.get("unlock", {}))
+
+func _weapon_cond_met(cond: Dictionary) -> bool:
+	match String(cond.get("type", "")):
+		"":
+			return true
+		"hero":
+			return is_unlocked(String(cond.get("id", "")))
+		"lifetime_kills":
+			return int(save_data["stats"].get("total_kills", 0)) >= int(cond.get("value", 999999))
+		"victory":
+			return int(save_data["stats"].get("nights_survived", 0)) >= 1
+		"stage_cleared":
+			return stage_cleared(String(cond.get("id", "")))
+	return false
+
+func _weapon_unlock_snapshot() -> Dictionary:
+	var snapshot := {}
+	var pool: Variant = load_json("res://data/weapons/_pool.json")
+	if pool is Array:
+		for wid in pool:
+			snapshot[String(wid)] = is_weapon_unlocked(String(wid))
+	return snapshot
+
+## Persist single-run feats as flags, then diff against the pre-run snapshot
+## so the camp can announce what the run earned.
+func _check_weapon_unlocks(stats: Dictionary, before: Dictionary) -> void:
+	var pool: Variant = load_json("res://data/weapons/_pool.json")
+	if not (pool is Array):
+		return
+	if not save_data.has("weapon_unlocks"):
+		save_data["weapon_unlocks"] = {}
+	for wid_v in pool:
+		var wid := String(wid_v)
+		var def: Variant = load_json("res://data/weapons/%s.json" % wid)
+		if not (def is Dictionary):
+			continue
+		var cond: Dictionary = def.get("unlock", {})
+		match String(cond.get("type", "")):
+			"elite_kill":
+				if int(stats.get("elite_kills", 0)) > 0:
+					save_data["weapon_unlocks"][wid] = true
+			"level_in_night":
+				if int(stats.get("level", 1)) >= int(cond.get("value", 999)):
+					save_data["weapon_unlocks"][wid] = true
+	for wid_v in pool:
+		var wid := String(wid_v)
+		if not bool(before.get(wid, false)) and is_weapon_unlocked(wid):
+			newly_unlocked_weapons.append(wid)
 
 func unlock(id: String) -> bool:
 	if is_unlocked(id):

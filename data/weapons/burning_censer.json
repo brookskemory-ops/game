@@ -15,5 +15,10 @@
 	"orb_radius": 9,
 	"hit_interval": 0.5,
 	"max_level": 8,
-	"family": "orbit"
+	"family": "orbit",
+	"unlock": {
+		"type": "hero",
+		"id": "ansel"
+	},
+	"unlock_hint": "Ansel swings it \u2014 meet the monk first"
 }

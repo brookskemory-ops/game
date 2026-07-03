@@ -222,6 +222,7 @@ func _finish(victory: bool) -> void:
 	var stats := {
 		"time": time_elapsed,
 		"kills": enemies.kills,
+		"elite_kills": enemies.elite_kills,
 		"level": player.level,
 		"stage": String(stage.get("id", "stage1")),
 	}

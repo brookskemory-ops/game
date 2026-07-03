@@ -13,5 +13,10 @@
 	"max_level": 8,
 	"family": "melee",
 	"catalyst": "gravedust",
-	"evolution": "sextons_spade"
+	"evolution": "sextons_spade",
+	"unlock": {
+		"type": "hero",
+		"id": "maud"
+	},
+	"unlock_hint": "Maud's own shovel \u2014 she shares once you've met"
 }

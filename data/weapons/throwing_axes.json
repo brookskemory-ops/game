@@ -4,12 +4,17 @@
 	"family": "chaos",
 	"niche": "random-direction tumbling throws, high damage (docs/ABILITIES.md #7)",
 	"script": "res://scripts/weapons/axes.gd",
-	"draft_desc": "Hatchets hurled wherever fate wills — fate favors the bold",
+	"draft_desc": "Hatchets hurled wherever fate wills \u2014 fate favors the bold",
 	"up_desc": "More axes, heavier heads",
 	"cooldown": 1.3,
 	"damage": 30,
 	"count": 2,
 	"throw_speed": 240,
 	"flight_time": 0.7,
-	"max_level": 8
+	"max_level": 8,
+	"unlock": {
+		"type": "lifetime_kills",
+		"value": 100
+	},
+	"unlock_hint": "Put 100 of the dead to rest, across all your nights"
 }

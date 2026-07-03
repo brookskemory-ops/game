@@ -10,5 +10,9 @@
 	"damage": 60,
 	"range": 420,
 	"windup": 0.5,
-	"max_level": 8
+	"max_level": 8,
+	"unlock": {
+		"type": "elite_kill"
+	},
+	"unlock_hint": "Fell an elite of the night"
 }

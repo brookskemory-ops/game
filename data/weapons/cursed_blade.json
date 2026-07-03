@@ -13,5 +13,10 @@
 	"max_thralls": 3,
 	"thrall_hp": 30,
 	"max_level": 8,
-	"family": "summon"
+	"family": "summon",
+	"unlock": {
+		"type": "hero",
+		"id": "hollow_king"
+	},
+	"unlock_hint": "Only the king may first draw it"
 }

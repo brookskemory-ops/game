@@ -23,6 +23,7 @@ signal boss_died(at: Vector2)
 signal enemy_killed(at: Vector2)
 
 var kills := 0
+var elite_kills := 0  # elites + bosses felled (weapon unlock conditions)
 var player_radius := 6.0
 var _boss_slot := -1
 var _boss_max_hp := 1.0
@@ -336,6 +337,8 @@ func _kill(slot: int) -> void:
 	_alive[slot] = 0
 	_alive_count -= 1
 	kills += 1
+	if bool(def.get("elite", false)) or bool(def.get("boss", false)):
+		elite_kills += 1
 	_free.append(slot)
 	_type_mm[_type[slot]].set_instance_transform_2d(slot, HIDDEN)
 	_type_mm[_type[slot]].set_instance_color(slot, Color.WHITE)

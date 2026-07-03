@@ -8,6 +8,7 @@ var _treasury: Label
 var _shop_overlay: Control
 var _vignette_overlay: Control
 var _ending_overlay: Control
+var _ledger_overlay: Control
 var _vignettes := {}
 var _shop_defs := {}
 var _endings := {}
@@ -57,6 +58,30 @@ func _ready() -> void:
 		_open_shop()
 	)
 	add_child(wares)
+
+	var ledger := UITheme.make_button("L E D G E R", 12)
+	_place(ledger, 0.5, 1.0, 0.5, 1.0, Rect2(-196, -40, 124, 30))
+	ledger.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_open_ledger()
+	)
+	add_child(ledger)
+
+	# What the last night earned for the book.
+	if not Game.newly_unlocked_weapons.is_empty():
+		var names: Array = []
+		for wid in Game.newly_unlocked_weapons:
+			var wdef: Variant = Game.load_json("res://data/weapons/%s.json" % String(wid))
+			if wdef is Dictionary:
+				names.append(String(wdef.get("name", wid)))
+		Game.newly_unlocked_weapons.clear()
+		if not names.is_empty():
+			var grows := UITheme.make_label("the ledger grows:  %s" % ", ".join(names), 11, Palette.TORCH)
+			_place(grows, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 66, 500, 16))
+			add_child(grows)
+			var pulse := create_tween().set_loops()
+			pulse.tween_property(grows, "modulate:a", 0.45, 0.8)
+			pulse.tween_property(grows, "modulate:a", 1.0, 0.8)
 
 	_build_stage_row()
 
@@ -298,6 +323,96 @@ func _show_ending_epilogue(ending_id: String) -> void:
 			_show_next_unlock_vignette()
 	_ending_overlay.gui_input.connect(close)
 	panel.gui_input.connect(close)
+
+# --- The Ledger: Maud's grave-book of every weapon the vale remembers ---
+
+func _open_ledger() -> void:
+	if _ledger_overlay != null:
+		return
+	_ledger_overlay = _overlay()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 6)
+	column.add_child(UITheme.make_label("THE LEDGER", 24, Palette.PARCHMENT, true))
+	column.add_child(UITheme.make_label("what the vale remembers", 10, Palette.ASH))
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(500, 220)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 4)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var passives: Variant = Game.load_json("res://data/passives.json")
+	var pool: Variant = Game.load_json("res://data/weapons/_pool.json")
+	list.add_child(UITheme.make_label("— THE ARMORY —", 11, Palette.BONE))
+	var evolutions: Array = []
+	if pool is Array:
+		for wid in pool:
+			var def: Variant = Game.load_json("res://data/weapons/%s.json" % String(wid))
+			if not (def is Dictionary):
+				continue
+			list.add_child(_make_ledger_row(def, Game.is_weapon_unlocked(String(wid))))
+			if not String(def.get("evolution", "")).is_empty():
+				evolutions.append(def)
+	list.add_child(UITheme.make_label("— OLD OATHS —", 11, Palette.BONE))
+	for base_def in evolutions:
+		var evo: Variant = Game.load_json("res://data/weapons/%s.json" % String(base_def.get("evolution", "")))
+		if not (evo is Dictionary):
+			continue
+		var known := Game.is_weapon_unlocked(String(base_def.get("id", "")))
+		var catalyst_name := String(base_def.get("catalyst", ""))
+		if passives is Dictionary and passives.has(catalyst_name):
+			catalyst_name = String(passives[catalyst_name].get("name", catalyst_name))
+		var recipe := "%s, carried with %s" % [String(base_def.get("name", "")), catalyst_name]
+		list.add_child(_make_ledger_evo_row(evo, known, recipe))
+	scroll.add_child(list)
+	column.add_child(scroll)
+	var leave := UITheme.make_button("Close the book", 11)
+	leave.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_ledger_overlay.queue_free()
+		_ledger_overlay = null
+	)
+	column.add_child(leave)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_ledger_overlay, panel)
+
+func _make_ledger_row(def: Dictionary, unlocked: bool) -> HBoxContainer:
+	var name_text := String(def.get("name", "?")) if unlocked else "? ? ?"
+	var desc_text := String(def.get("draft_desc", "")) if unlocked \
+		else String(def.get("unlock_hint", "its page is still blank"))
+	return _ledger_line(String(def.get("id", "")), name_text, desc_text, unlocked)
+
+func _make_ledger_evo_row(evo: Dictionary, known: bool, recipe: String) -> HBoxContainer:
+	var name_text := String(evo.get("name", "?")) if known else "? ? ?"
+	var desc_text := recipe if known else "a weapon's final form, unproven"
+	return _ledger_line(String(evo.get("id", "")), name_text, desc_text, known)
+
+func _ledger_line(icon_id: String, name_text: String, desc_text: String, unlocked: bool) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(22, 22)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var icon_path := "res://assets/icons/weapons/%s.png" % icon_id
+	if ResourceLoader.exists(icon_path):
+		icon.texture = load(icon_path)
+		if not unlocked:
+			icon.modulate = Color(0.12, 0.11, 0.16)  # silhouette, like locked heroes
+	row.add_child(icon)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var name_label := UITheme.make_label(name_text, 12, Palette.TORCH if unlocked else Palette.STONE)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	info.add_child(name_label)
+	var desc := UITheme.make_label(desc_text, 9, Palette.PARCHMENT if unlocked else Palette.ASH)
+	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info.add_child(desc)
+	row.add_child(info)
+	return row
 
 # --- The WARES shop ---
 
