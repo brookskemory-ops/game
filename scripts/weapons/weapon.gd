@@ -45,7 +45,7 @@ func weapon_id() -> String:
 	return String(def.get("id", ""))
 
 func damage() -> float:
-	return float(def.get("damage", 10)) * damage_mul * wielder.mods["damage"]
+	return float(def.get("damage", 10)) * damage_mul * wielder.damage_multiplier()
 
 func cooldown() -> float:
 	return float(def.get("cooldown", 1.0)) * clampf(wielder.mods["cooldown"], 0.5, 2.0)

@@ -1,0 +1,15 @@
+{
+	"id": "ansel",
+	"name": "Brother Ansel, the Heretic Monk",
+	"sprite": "ansel",
+	"max_hp": 85,
+	"move_speed": 122,
+	"radius": 6,
+	"pickup_radius": 48,
+	"weapon": "burning_censer",
+	"signature": "mortification",
+	"signature_desc": "Mortification — suffering is strength: +1% damage per 1% missing HP",
+	"unlock": { "type": "lifetime_deaths", "value": 5 },
+	"unlock_hint": "Fall to the night five times",
+	"story_arc": "ansel_arc"
+}

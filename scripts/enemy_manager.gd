@@ -17,6 +17,7 @@ const HIDDEN := Transform2D(Vector2.ZERO, Vector2.ZERO, Vector2.ZERO)
 
 signal boss_spawned(display_name: String)
 signal boss_died
+signal enemy_killed
 
 var kills := 0
 var player_radius := 6.0
@@ -181,6 +182,7 @@ func damage_slot(slot: int, amount: float) -> void:
 	_flash[slot] = FLASH_TIME
 	# HDR-ish color: texture * (4,4,4) clamps to white for a clean damage flash.
 	_type_mm[_type[slot]].set_instance_color(slot, Color(4.0, 4.0, 4.0, 1.0))
+	Sfx.play("hit", 0.7)
 	if _hp[slot] <= 0.0:
 		_kill(slot)
 
@@ -194,6 +196,8 @@ func _kill(slot: int) -> void:
 	_type_mm[_type[slot]].set_instance_color(slot, Color.WHITE)
 	_drop_pickups(slot, def)
 	_puffs.append([_pos[slot], 0.0])
+	Sfx.play("kill", 0.8)
+	enemy_killed.emit()
 	queue_redraw()
 	if slot == _boss_slot:
 		_boss_slot = -1

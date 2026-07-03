@@ -251,6 +251,7 @@ func _make_draft_card(option: Dictionary, on_pick: Callable) -> Button:
 	inner.add_child(desc)
 	card.add_child(inner)
 	card.pressed.connect(func() -> void:
+		Sfx.play("ui")
 		close_draft()
 		var message: Variant = on_pick.call(option)
 		if message is String and not String(message).is_empty():
@@ -288,13 +289,28 @@ func _build_pause_panel() -> void:
 	column.add_theme_constant_override("separation", 10)
 	column.add_child(UITheme.make_label("THE WATCH PAUSES", 30, Palette.PARCHMENT, true))
 	var resume := UITheme.make_button("Resume the vigil")
-	resume.pressed.connect(toggle_pause)
+	resume.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		toggle_pause()
+	)
 	column.add_child(resume)
+	var sound := UITheme.make_button(_sound_label())
+	sound.pressed.connect(func() -> void:
+		var muted := float(Game.settings.get("sfx_volume", 1.0)) <= 0.01
+		Game.settings["sfx_volume"] = 1.0 if muted else 0.0
+		Game.write_save()
+		sound.text = _sound_label()
+		Sfx.play("ui")
+	)
+	column.add_child(sound)
 	var abandon := UITheme.make_button("Abandon the night")
 	abandon.pressed.connect(_abandon_run)
 	column.add_child(abandon)
 	panel.add_child(column)
 	_center_in_overlay(_pause_panel, panel)
+
+func _sound_label() -> String:
+	return "Sound: off" if float(Game.settings.get("sfx_volume", 1.0)) <= 0.01 else "Sound: on"
 
 func _abandon_run() -> void:
 	Game.end_run(false, _snapshot_stats())

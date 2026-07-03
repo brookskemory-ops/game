@@ -23,6 +23,7 @@ func _try_fire() -> bool:
 		enemies.damage_slot(slot, damage())
 		enemies.push_slot(slot, to_enemy.normalized() * knockback)
 	_swing_time = 0.16
+	Sfx.play("swing", 0.8)
 	queue_redraw()
 	return true
 

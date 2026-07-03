@@ -14,6 +14,7 @@ func _try_fire() -> bool:
 	if target == Vector2.INF:
 		return false
 	_flights.append([wielder.global_position, target, 0.0])
+	Sfx.play("lob", 0.7)
 	return true
 
 ## Sample nearby enemies and pick the one with the most neighbors.

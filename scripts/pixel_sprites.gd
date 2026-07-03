@@ -157,6 +157,59 @@ const SPRITES := {
 			".ss..ss...",
 		],
 	},
+	# Corvus, the Plague Doctor — beaked mask, wide hat, dark coat, 10x14
+	"corvus": {
+		"colors": {
+			"h": "1f1b28", "H": "2b2733", # wide hat
+			"m": "cfc9b8", "M": "b8b2a0", # beak mask
+			"e": "8a3f3f",                # red lens
+			"c": "23303a", "C": "2e4150", # oiled teal-black coat
+			"g": "6a7a52",                # vial glint
+			"b": "3d3830",                # boots
+		},
+		"rows": [
+			".hhhhhhhh.",
+			"..hHHHHh..",
+			"..MMMMMM..",
+			"..MeMMMm..",
+			"...mmmMM..",
+			"....mm.M..",
+			"..cCCCCc..",
+			".ccCCCCcc.",
+			".c.CCCC.c.",
+			".g.CCCC.g.",
+			"...CCCC...",
+			"...CCCC...",
+			"...c..c...",
+			"...b..b...",
+		],
+	},
+	# Brother Ansel, the Heretic Monk — tonsure, rough robe, censer chain, 10x14
+	"ansel": {
+		"colors": {
+			"s": "d8c2a0", "S": "c4ab87", # skin / tonsure
+			"r": "5a4632", "R": "6b5540", # rough brown robe
+			"k": "3a3542",                # rope belt / chain
+			"t": "e08840",                # censer coal glow
+			"e": "16131c",                # eyes
+		},
+		"rows": [
+			"...ssss...",
+			"..sSSSSs..",
+			"..Sessse..",
+			"..ssssss..",
+			"...ssss...",
+			"..rRRRRr..",
+			".rrRRRRrr.",
+			".r.RRRR.r.",
+			".k.RRRR.k.",
+			"...kkkk...",
+			"..rRRRRr..",
+			"..rRRRRr..",
+			"...r..r...",
+			"..tt..rr..",
+		],
+	},
 	# Tolling Man — elite with a bronze bell for a head, 11x14
 	"tolling_man": {
 		"colors": {

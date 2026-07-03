@@ -22,6 +22,7 @@ func _try_fire() -> bool:
 			float(def.get("proj_ttl", 0.9)),
 			int(def.get("pierce", 1))
 		)
+	Sfx.play("shoot", 0.8)
 	return true
 
 func _on_upgrade(new_level: int) -> String:

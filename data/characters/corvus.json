@@ -1,0 +1,15 @@
+{
+	"id": "corvus",
+	"name": "Corvus, the Plague Doctor",
+	"sprite": "corvus",
+	"max_hp": 70,
+	"move_speed": 126,
+	"radius": 6,
+	"pickup_radius": 48,
+	"weapon": "plague_vials",
+	"signature": "malpractice",
+	"signature_desc": "Malpractice — kill streaks mend his wounds",
+	"unlock": { "type": "kills_in_night", "value": 300 },
+	"unlock_hint": "Put down 300 of the dead in a single night",
+	"story_arc": "corvus_arc"
+}

@@ -1,0 +1,38 @@
+{
+	"wren": {
+		"title": "The Poacher",
+		"lines": [
+			"Wren knew every deer track in the vale before the vale knew him.",
+			"He poached to feed a starving village. Now the village is trying to eat him.",
+			"\"Funny thing about mercy,\" he says, nocking an arrow. \"It keeps you in practice.\"",
+			"He watches the churchyard at dusk. The first ones out of the ground never come from the graves he'd expect."
+		]
+	},
+	"maud": {
+		"title": "The Gravedigger",
+		"lines": [
+			"Maud dug every grave in Hollowmere for thirty years. Knows each one by name and depth.",
+			"\"No respect for craftsmanship,\" she mutters, shovel on her shoulder. \"They keep checking out early.\"",
+			"But she's noticed something the others haven't: her graves opened LAST.",
+			"Whatever wakes the dead — it started somewhere else. Somewhere higher. Up where the bell tolls."
+		]
+	},
+	"corvus": {
+		"title": "The Plague Doctor",
+		"lines": [
+			"Corvus came to cure a plague. He stayed because there wasn't one.",
+			"His notes are meticulous: the fevers, the deaths, the risings. All in the wrong order.",
+			"\"A sickness has a source,\" he says through the beak. \"This has an INVITATION.\"",
+			"He keeps mixing his vials. Whatever answered the invitation dislikes them immensely."
+		]
+	},
+	"ansel": {
+		"title": "The Heretic Monk",
+		"lines": [
+			"They burned Ansel's writings and unmade his vows. His crime: asking what the church sealed inside the castle chapel.",
+			"\"Excommunication,\" he says, swinging his censer, \"has done wonders for my schedule.\"",
+			"He was right, of course. The priests knew. They sealed the chapel the night the bell first tolled — and never said why.",
+			"Every night he fights is a prayer. Every dawn, an argument won."
+		]
+	}
+}

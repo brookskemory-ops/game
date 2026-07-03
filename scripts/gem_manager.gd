@@ -99,8 +99,10 @@ func _collect(slot: int) -> void:
 		if live_mul != null:
 			gold_mul = float(live_mul)
 		Game.add_gold(int(round(float(_value[slot]) * gold_mul)))
+		Sfx.play("coin", 0.6)
 	elif _player.has_method("gain_xp"):
 		_player.gain_xp(_value[slot])
+		Sfx.play("gem", 0.5)
 	_alive[slot] = 0
 	_free.append(slot)
 	_mm[_kind[slot]].set_instance_transform_2d(slot, HIDDEN)

@@ -126,8 +126,10 @@ func _summon_boss() -> void:
 func _on_boss_spawned(display_name: String) -> void:
 	hud.set_boss_name(display_name)
 	hud.banner("THE BELL TOLLS", "%s rises from the churchyard" % display_name)
+	Sfx.play("bell")
 
 func _on_boss_died() -> void:
+	Sfx.play("boss_death")
 	var unlock_id := String(stage.get("victory_unlock", ""))
 	if not unlock_id.is_empty():
 		Game.unlock(unlock_id)

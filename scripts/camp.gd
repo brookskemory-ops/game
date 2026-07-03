@@ -1,41 +1,61 @@
 extends Control
-## The camp between nights: a code-drawn campfire on the hill above Hollowmere,
-## and the character select. This is the hub where story scenes will live
-## (DEVELOPMENT_PLAN.md Phase 4) — the roster around the fire grows as heroes
-## are unlocked.
+## The camp between nights: campfire, character select, the WARES shop, and
+## the story vignettes (each survivor's tale, told when they join the fire).
 
 var _time := 0.0
 var _coin_tex: Texture2D
+var _treasury: Label
+var _shop_overlay: Control
+var _vignette_overlay: Control
+var _vignettes := {}
+var _shop_defs := {}
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_coin_tex = PixelSprites.get_tex("coin")
+	var vignette_data: Variant = Game.load_json("res://data/story/vignettes.json")
+	if vignette_data is Dictionary:
+		_vignettes = vignette_data
+	var shop_data: Variant = Game.load_json("res://data/shop.json")
+	if shop_data is Dictionary:
+		_shop_defs = shop_data
 
-	var title := UITheme.make_label("THE CAMP", 34, Palette.PARCHMENT, true)
-	_place(title, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 14, 500, 44))
+	var title := UITheme.make_label("THE CAMP", 32, Palette.PARCHMENT, true)
+	_place(title, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 10, 500, 40))
 	add_child(title)
 
 	var subtitle := UITheme.make_label("who keeps the vigil tonight?", 11, Palette.ASH)
-	_place(subtitle, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 56, 500, 18))
+	_place(subtitle, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 48, 500, 16))
 	add_child(subtitle)
 
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 16)
+	row.add_theme_constant_override("separation", 10)
 	var roster: Variant = Game.load_json("res://data/characters/_roster.json")
 	if roster is Array:
 		for hero_id in roster:
-			row.add_child(_make_hero_card(String(hero_id)))
+			row.add_child(_make_hero_column(String(hero_id)))
 	var center := CenterContainer.new()
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_place(center, 0.0, 0.0, 1.0, 1.0, Rect2(0, 30, 0, -40))
+	_place(center, 0.0, 0.0, 1.0, 1.0, Rect2(0, 26, 0, -44))
 	center.add_child(row)
 	add_child(center)
 
-	var treasury := UITheme.make_label(str(Game.gold()), 12, Color("f0cd7a"))
-	treasury.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_place(treasury, 0.0, 1.0, 0.0, 1.0, Rect2(26, -24, 100, 16))
-	add_child(treasury)
+	var wares := UITheme.make_button("W A R E S", 12)
+	_place(wares, 0.5, 1.0, 0.5, 1.0, Rect2(-62, -40, 124, 30))
+	wares.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_open_shop()
+	)
+	add_child(wares)
+
+	_treasury = UITheme.make_label(str(Game.gold()), 12, Color("f0cd7a"))
+	_treasury.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_place(_treasury, 0.0, 1.0, 0.0, 1.0, Rect2(26, -24, 100, 16))
+	add_child(_treasury)
+	Game.gold_changed.connect(func(total: int) -> void:
+		_treasury.text = str(total)
+	)
 
 	if float(Game.last_run.get("time", 0.0)) > 0.0:
 		var seconds := int(Game.last_run.get("time", 0.0))
@@ -47,45 +67,210 @@ func _ready() -> void:
 		_place(last_run, 1.0, 1.0, 1.0, 1.0, Rect2(-340, -24, 332, 16))
 		add_child(last_run)
 
-func _make_hero_card(hero_id: String) -> Button:
+	# Newly unlocked survivors tell their tale as they join the fire.
+	_show_next_unlock_vignette()
+
+func _show_next_unlock_vignette() -> void:
+	if Game.newly_unlocked.is_empty():
+		return
+	var hero_id := String(Game.newly_unlocked.pop_front())
+	_show_vignette(hero_id, true)
+
+# --- Hero cards ---
+
+func _make_hero_column(hero_id: String) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 4)
 	var data: Variant = Game.load_json("res://data/characters/%s.json" % hero_id)
 	var def: Dictionary = data if data is Dictionary else {}
 	var unlocked := Game.is_unlocked(hero_id)
-	var card := UITheme.make_button("", 12)
-	card.custom_minimum_size = Vector2(158, 172)
+	var card := UITheme.make_button("", 11)
+	card.custom_minimum_size = Vector2(134, 158)
 	card.disabled = not unlocked
 	var inner := VBoxContainer.new()
 	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	inner.add_theme_constant_override("separation", 5)
-	_place(inner, 0.0, 0.0, 1.0, 1.0, Rect2(8, 8, -16, -16))
+	inner.add_theme_constant_override("separation", 4)
+	_place(inner, 0.0, 0.0, 1.0, 1.0, Rect2(6, 6, -12, -12))
 	var portrait := TextureRect.new()
 	portrait.texture = PixelSprites.get_tex(String(def.get("sprite", "wren")))
-	portrait.custom_minimum_size = Vector2(0, 62)
+	portrait.custom_minimum_size = Vector2(0, 54)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	if not unlocked:
 		portrait.modulate = Color(0.05, 0.04, 0.07, 0.9)  # silhouette
 	inner.add_child(portrait)
 	if unlocked:
-		inner.add_child(UITheme.make_label(String(def.get("name", hero_id)), 13, Palette.TORCH))
+		inner.add_child(UITheme.make_label(String(def.get("name", hero_id)).get_slice(",", 0), 12, Palette.TORCH))
 		var weapon_def: Variant = Game.load_json("res://data/weapons/%s.json" % String(def.get("weapon", "")))
 		if weapon_def is Dictionary:
-			inner.add_child(UITheme.make_label(String(weapon_def.get("name", "")), 10, Palette.PARCHMENT))
-		var sig := UITheme.make_label(String(def.get("signature_desc", "")), 9, Palette.ASH)
+			inner.add_child(UITheme.make_label(String(weapon_def.get("name", "")), 9, Palette.PARCHMENT))
+		var sig := UITheme.make_label(String(def.get("signature_desc", "")).get_slice(" — ", 0), 8, Palette.ASH)
 		sig.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		inner.add_child(sig)
 	else:
-		inner.add_child(UITheme.make_label("? ? ?", 13, Palette.STONE))
-		var hint := UITheme.make_label(String(def.get("unlock_hint", "")), 9, Palette.ASH)
+		inner.add_child(UITheme.make_label("? ? ?", 12, Palette.STONE))
+		var hint := UITheme.make_label(String(def.get("unlock_hint", "")), 8, Palette.ASH)
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		inner.add_child(hint)
 	card.add_child(inner)
+	column.add_child(card)
 	if unlocked:
 		card.pressed.connect(func() -> void:
+			Sfx.play("ui")
 			Game.selected_character = hero_id
 			Game.start_run()
 		)
-	return card
+		if _vignettes.has(hero_id):
+			var tale := UITheme.make_button("their tale", 8)
+			tale.pressed.connect(func() -> void:
+				Sfx.play("ui")
+				_show_vignette(hero_id, false)
+			)
+			column.add_child(tale)
+	return column
+
+# --- Story vignettes ---
+
+func _show_vignette(hero_id: String, from_unlock: bool) -> void:
+	if not _vignettes.has(hero_id) or _vignette_overlay != null:
+		return
+	var vignette: Dictionary = _vignettes[hero_id]
+	_vignette_overlay = _overlay()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	column.custom_minimum_size = Vector2(460, 0)
+	if from_unlock:
+		column.add_child(UITheme.make_label("A NEW FACE AT THE FIRE", 13, Palette.ASH))
+	column.add_child(UITheme.make_label(String(vignette.get("title", "")), 28, Palette.TORCH, true))
+	for line in vignette.get("lines", []):
+		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		text.custom_minimum_size = Vector2(440, 0)
+		column.add_child(text)
+	var prompt := UITheme.make_label("tap to return to the fire", 10, Palette.BONE)
+	column.add_child(prompt)
+	var tween := create_tween().set_loops()
+	tween.tween_property(prompt, "modulate:a", 0.35, 0.7)
+	tween.tween_property(prompt, "modulate:a", 1.0, 0.7)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_vignette_overlay, panel)
+	_vignette_overlay.gui_input.connect(func(event: InputEvent) -> void:
+		if _is_press(event):
+			Sfx.play("ui")
+			_vignette_overlay.queue_free()
+			_vignette_overlay = null
+			_show_next_unlock_vignette()
+	)
+
+# --- The WARES shop ---
+
+func _open_shop() -> void:
+	if _shop_overlay != null:
+		return
+	_shop_overlay = _overlay()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 6)
+	column.add_child(UITheme.make_label("WARES OF THE WAKING", 24, Palette.PARCHMENT, true))
+	for item_id in _shop_defs:
+		column.add_child(_make_shop_row(String(item_id)))
+	var leave := UITheme.make_button("Back to the fire", 11)
+	leave.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_shop_overlay.queue_free()
+		_shop_overlay = null
+	)
+	column.add_child(leave)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_shop_overlay, panel)
+
+func _make_shop_row(item_id: String) -> HBoxContainer:
+	var def: Dictionary = _shop_defs[item_id]
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	var info := VBoxContainer.new()
+	info.custom_minimum_size = Vector2(280, 0)
+	var name_label := UITheme.make_label("", 12, Palette.TORCH)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	info.add_child(name_label)
+	var desc := UITheme.make_label(String(def.get("desc", "")), 9, Palette.ASH)
+	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	info.add_child(desc)
+	row.add_child(info)
+	var buy := UITheme.make_button("", 10)
+	buy.custom_minimum_size = Vector2(92, 0)
+	row.add_child(buy)
+	var refresh := func() -> void:
+		var rank := Game.shop_level(item_id)
+		var maxed := rank >= int(def.get("max", 1))
+		name_label.text = "%s  %s" % [String(def.get("name", item_id)), _pips(rank, int(def.get("max", 1)))]
+		buy.text = "OWNED" if maxed else "%d gold" % Game.shop_cost(item_id, def)
+		buy.disabled = maxed or Game.gold() < Game.shop_cost(item_id, def)
+	refresh.call()
+	buy.pressed.connect(func() -> void:
+		if Game.shop_buy(item_id, def):
+			Sfx.play("buy")
+			refresh.call()
+			_refresh_shop_rows()
+		else:
+			Sfx.play("ui", 0.5)
+	)
+	row.set_meta("refresh", refresh)
+	return row
+
+## Re-evaluate every row's affordability after any purchase.
+func _refresh_shop_rows() -> void:
+	if _shop_overlay == null:
+		return
+	for row in _find_shop_rows(_shop_overlay):
+		var refresh: Variant = row.get_meta("refresh")
+		if refresh is Callable:
+			refresh.call()
+
+func _find_shop_rows(node: Node) -> Array:
+	var found: Array = []
+	for child in node.get_children():
+		if child is HBoxContainer and child.has_meta("refresh"):
+			found.append(child)
+		found.append_array(_find_shop_rows(child))
+	return found
+
+func _pips(rank: int, max_rank: int) -> String:
+	var pips := ""
+	for i in max_rank:
+		pips += "●" if i < rank else "○"
+	return pips
+
+# --- Overlay plumbing ---
+
+func _overlay() -> Control:
+	var overlay := Control.new()
+	_place(overlay, 0.0, 0.0, 1.0, 1.0, Rect2(0, 0, 0, 0))
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.75)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(dim, 0.0, 0.0, 1.0, 1.0, Rect2(0, 0, 0, 0))
+	overlay.add_child(dim)
+	add_child(overlay)
+	return overlay
+
+func _center(overlay: Control, content: Control) -> void:
+	var center := CenterContainer.new()
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(center, 0.0, 0.0, 1.0, 1.0, Rect2(0, 0, 0, 0))
+	center.add_child(content)
+	overlay.add_child(center)
+
+func _is_press(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch and event.pressed:
+		return true
+	if event is InputEventMouseButton and event.pressed:
+		return true
+	return false
 
 func _place(control: Control, a_left: float, a_top: float, a_right: float, a_bottom: float, offsets: Rect2) -> void:
 	control.anchor_left = a_left
@@ -150,5 +335,5 @@ func _draw() -> void:
 			var at: Vector2 = fire + seats[seat]
 			seat += 1
 			var shade := Color(0.07, 0.06, 0.1)
-			draw_circle(at + Vector2(0, -9), 3.5, shade)              # head
-			draw_rect(Rect2(at + Vector2(-4, -6), Vector2(8, 8)), shade)  # body
+			draw_circle(at + Vector2(0, -9), 3.5, shade)
+			draw_rect(Rect2(at + Vector2(-4, -6), Vector2(8, 8)), shade)
