@@ -349,6 +349,35 @@ func _migrate_save() -> void:
 		save_data["relic_equipped"] = ""
 	save_data["save_version"] = 1
 
+## Wipe every scrap of saved progress back to a first-night state — unlocks,
+## gold, the bestiary, relics, endings, seen hints, all of it. Audio/display
+## settings are deliberately kept. Reachable from the camp settings overlay.
+func reset_progress() -> void:
+	save_data = {
+		"gold": 0,
+		"unlocks": {"wren": true},
+		"best_run": {},
+		"shop": {},
+		"stats": {"deaths": 0, "total_kills": 0, "nights_survived": 0},
+		"stages": {},
+		"settings": settings,
+		"ending": "",
+		"weapon_unlocks": {},
+		"relics": {},
+		"relic_equipped": "",
+		"relics_equipped": [],
+		"seen_hints": {},
+		"save_version": 1,
+	}
+	# Session-scoped queues, so the camp doesn't replay old unlock vignettes.
+	newly_unlocked.clear()
+	newly_unlocked_weapons.clear()
+	newly_unlocked_relics.clear()
+	selected_character = "wren"
+	selected_stage = "stage1"
+	last_run = {"victory": false, "time": 0.0, "kills": 0, "level": 1, "stage": "", "character": ""}
+	write_save()
+
 func write_save() -> void:
 	save_data["settings"] = settings
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)

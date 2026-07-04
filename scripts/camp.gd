@@ -501,6 +501,19 @@ func _open_settings() -> void:
 		Sfx.play("ui")
 	)
 	column.add_child(numbers)
+	# Destructive: erases all progress, so it takes a second tap to confirm.
+	var reset := UITheme.make_button("Forget every night", 11)
+	reset.pressed.connect(func() -> void:
+		if reset.text == "Forget every night":
+			reset.text = "tap again — this erases all progress"
+			reset.add_theme_color_override("font_color", Palette.BLOOD.lightened(0.35))
+			Sfx.play("ui")
+		else:
+			Game.reset_progress()
+			Sfx.play("ui")
+			Game.go_camp()  # rebuild the camp fresh (heroes relock, tallies clear)
+	)
+	column.add_child(reset)
 	var leave := UITheme.make_button("Back to the fire", 11)
 	leave.pressed.connect(func() -> void:
 		Sfx.play("ui")
