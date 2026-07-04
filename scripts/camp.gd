@@ -20,17 +20,21 @@ var _endings := {}
 var _narrative_dismiss := Callable()
 var _last_dismiss_ms := 0
 
-func _input(event: InputEvent) -> void:
-	if not _narrative_dismiss.is_valid() or not _is_press(event):
+## Close the open narrative card. Called from BOTH a real Continue button (the
+## proven-reliable path — same mechanism as the shop's working buttons) and the
+## tap-anywhere _input handler. Debounced so one physical tap fires once.
+func _dismiss_narrative() -> void:
+	if not _narrative_dismiss.is_valid():
 		return
-	# emulate_touch_from_mouse fires a mouse AND a synthesized touch for one
-	# click; debounce so a single tap doesn't skip two stacked cards.
 	var now := Time.get_ticks_msec()
 	if now - _last_dismiss_ms < 250:
 		return
 	_last_dismiss_ms = now
 	_narrative_dismiss.call()
-	get_viewport().set_input_as_handled()
+
+func _input(event: InputEvent) -> void:
+	if _narrative_dismiss.is_valid() and _is_press(event):
+		_dismiss_narrative()
 
 ## True when the design viewport is portrait-narrow (the bottom controls
 ## stack in two rows instead of one). Fixed per camp visit: rotation reloads
@@ -193,18 +197,15 @@ func _show_story_card(title: String, lines: Array, on_close := Callable()) -> vo
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
 	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 470.0), 0)
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(UITheme.make_label(title, 26, Palette.TORCH, true))
 	for line in lines:
 		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		text.custom_minimum_size = Vector2(UITheme.fit_width(self, 450.0, 60.0), 0)
 		column.add_child(text)
-	var prompt := UITheme.make_label("tap to go on", 10, Palette.BONE)
-	column.add_child(prompt)
-	var tween := create_tween().set_loops()
-	tween.tween_property(prompt, "modulate:a", 0.35, 0.7)
-	tween.tween_property(prompt, "modulate:a", 1.0, 0.7)
+	var cont := UITheme.make_button("Continue  ▸", 13)
+	cont.pressed.connect(_dismiss_narrative)
+	column.add_child(cont)
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	panel.add_child(column)
@@ -446,10 +447,6 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
 	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 460.0), 0)
-	# The whole card is tap-to-close: nothing inside may swallow the click, or
-	# the tap never reaches the overlay's close handler and the game "freezes"
-	# (VBoxContainer defaults to MOUSE_FILTER_STOP — the actual v0.13.4 gap).
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if from_unlock:
 		column.add_child(UITheme.make_label("A NEW FACE AT THE FIRE", 13, Palette.ASH))
 	var face := TextureRect.new()
@@ -464,11 +461,9 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		text.custom_minimum_size = Vector2(UITheme.fit_width(self, 440.0, 60.0), 0)
 		column.add_child(text)
-	var prompt := UITheme.make_label("tap to return to the fire", 10, Palette.BONE)
-	column.add_child(prompt)
-	var tween := create_tween().set_loops()
-	tween.tween_property(prompt, "modulate:a", 0.35, 0.7)
-	tween.tween_property(prompt, "modulate:a", 1.0, 0.7)
+	var cont := UITheme.make_button("Back to the fire", 12)
+	cont.pressed.connect(_dismiss_narrative)
+	column.add_child(cont)
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	panel.add_child(column)
@@ -527,18 +522,15 @@ func _show_ending_epilogue(ending_id: String) -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
 	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 470.0), 0)
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE  # tap-to-close: don't eat it
 	column.add_child(UITheme.make_label(String(epilogue.get("title", "")), 28, Palette.TORCH, true))
 	for line in epilogue.get("lines", []):
 		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		text.custom_minimum_size = Vector2(UITheme.fit_width(self, 450.0, 60.0), 0)
 		column.add_child(text)
-	var prompt := UITheme.make_label("tap to return to the fire", 10, Palette.BONE)
-	column.add_child(prompt)
-	var tween := create_tween().set_loops()
-	tween.tween_property(prompt, "modulate:a", 0.35, 0.7)
-	tween.tween_property(prompt, "modulate:a", 1.0, 0.7)
+	var cont := UITheme.make_button("Back to the fire", 12)
+	cont.pressed.connect(_dismiss_narrative)
+	column.add_child(cont)
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	panel.add_child(column)
