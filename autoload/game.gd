@@ -387,6 +387,15 @@ func write_save() -> void:
 	file.store_string(JSON.stringify(save_data))
 	file.close()
 
+## True when an automated-QA URL override (?stage=/?hero=/?weapon=) is active.
+## Story cards (prologue, stage intros) are skipped in this mode so probes get
+## a clean camp; real players never have these params.
+func qa_web_override() -> bool:
+	if not OS.has_feature("web"):
+		return false
+	var search := String(JavaScriptBridge.eval("window.location.search", true))
+	return search.contains("stage=") or search.contains("hero=") or search.contains("weapon=")
+
 ## Which stage the arena loads. On web builds a `?stage=qa` URL parameter
 ## swaps in the 45-second QA stage so automated tests can play full runs
 ## (docs/NIGHT_SHIFT.md WP2). Ignored everywhere else.

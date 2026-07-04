@@ -153,7 +153,7 @@ func _ready() -> void:
 	# tale as they join the fire.
 	if Game.ending_pending():
 		_show_ending_choice()
-	elif not Game.hint_seen("prologue"):
+	elif not Game.hint_seen("prologue") and not Game.qa_web_override():
 		Game.mark_hint("prologue")
 		var pro: Variant = Game.load_json("res://data/story/prologue.json")
 		if pro is Dictionary:
