@@ -154,6 +154,12 @@ func end_run(victory: bool, stats := {}) -> void:
 	}
 	var lifetime: Dictionary = save_data["stats"]
 	lifetime["total_kills"] = int(lifetime.get("total_kills", 0)) + int(stats.get("kills", 0))
+	# The Bestiary: union of everything seen, sum of everything killed.
+	var book: Dictionary = lifetime.get("bestiary", {})
+	for eid in stats.get("bestiary", {}):
+		var night_kills := int(stats["bestiary"][eid])
+		book[eid] = int(book.get(eid, 0)) + night_kills
+	lifetime["bestiary"] = book
 	if victory:
 		lifetime["nights_survived"] = int(lifetime.get("nights_survived", 0)) + 1
 		var stage_id := String(stats.get("stage", ""))

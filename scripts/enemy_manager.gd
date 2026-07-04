@@ -26,6 +26,10 @@ signal elite_killed(type_name: String)
 
 var kills := 0
 var elite_kills := 0  # elites + bosses felled (weapon unlock conditions)
+## The Bestiary: {type_id: kills}. A key existing at all means "seen this
+## night" (first spawn adds it at 0); the value counts kills. Merged into the
+## lifetime bestiary at run end.
+var bestiary := {}
 var player_radius := 6.0
 var _boss_slot := -1
 var _boss_max_hp := 1.0
@@ -170,6 +174,9 @@ func spawn(type_name: String, at: Vector2) -> void:
 	_slow[slot] = 0.0
 	_shot_cd[slot] = randf_range(0.5, 1.5)  # desync abilities across a squad
 	_alive_count += 1
+	var seen_id := String(_type_defs[type_id].get("_id", type_name))
+	if not bestiary.has(seen_id):
+		bestiary[seen_id] = 0  # first sighting this night — now known
 	if bool(_type_defs[type_id].get("boss", false)):
 		_boss_slot = slot
 		_boss_max_hp = float(_type_defs[type_id].get("hp", 1))
@@ -374,9 +381,11 @@ func _kill(slot: int) -> void:
 	_alive[slot] = 0
 	_alive_count -= 1
 	kills += 1
+	var kill_id := String(def.get("_id", ""))
+	bestiary[kill_id] = int(bestiary.get(kill_id, 0)) + 1
 	if bool(def.get("elite", false)) or bool(def.get("boss", false)):
 		elite_kills += 1
-		elite_killed.emit(String(def.get("_id", "")))
+		elite_killed.emit(kill_id)
 	_free.append(slot)
 	_type_mm[_type[slot]].set_instance_transform_2d(slot, HIDDEN)
 	_type_mm[_type[slot]].set_instance_color(slot, Color.WHITE)

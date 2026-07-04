@@ -573,6 +573,15 @@ func _open_ledger() -> void:
 	if relic_defs is Dictionary:
 		for relic_id in relic_defs:
 			list.add_child(_make_relic_row(String(relic_id), relic_defs[relic_id]))
+	# The Bestiary: every dead thing the vale has shown you, and your tally.
+	var book: Dictionary = Game.save_data.get("stats", {}).get("bestiary", {})
+	var seen_count := book.size()
+	var enemy_defs: Variant = Game.load_json("res://data/enemies.json")
+	var enemy_total := enemy_defs.size() if enemy_defs is Dictionary else 0
+	list.add_child(UITheme.make_label("— THE BESTIARY (%d / %d) —" % [seen_count, enemy_total], 11, Palette.BONE))
+	if enemy_defs is Dictionary:
+		for enemy_id in enemy_defs:
+			list.add_child(_make_bestiary_row(String(enemy_id), enemy_defs[enemy_id], book))
 	scroll.add_child(list)
 	column.add_child(scroll)
 	var leave := UITheme.make_button("Close the book", 11)
@@ -643,6 +652,49 @@ func _ledger_line(icon_id: String, name_text: String, desc_text: String, unlocke
 	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_child(desc)
+	row.add_child(info)
+	return row
+
+## A bestiary entry: the enemy's own sprite (silhouetted until first seen),
+## its name and lore, and how many you have put down. `book` is the lifetime
+## {id: kills} tally — a present key means you have met this one.
+func _make_bestiary_row(enemy_id: String, def: Dictionary, book: Dictionary) -> HBoxContainer:
+	var seen := book.has(enemy_id)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(24, 24)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sprite_path := "res://assets/sprites/generated/%s.png" % String(def.get("sprite", enemy_id))
+	if ResourceLoader.exists(sprite_path):
+		icon.texture = load(sprite_path)
+		if not seen:
+			icon.modulate = Color(0.1, 0.09, 0.14)  # a shape in the dark
+	row.add_child(icon)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var tier := ""
+	if bool(def.get("boss", false)):
+		tier = "  ·  a lord of the night"
+	elif bool(def.get("elite", false)):
+		tier = "  ·  a greater dead"
+	var name_text := (String(def.get("name", "?")) + tier) if seen else "? ? ?"
+	var name_label := UITheme.make_label(name_text, 12, Palette.TORCH if seen else Palette.STONE)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	info.add_child(name_label)
+	var desc_text := String(def.get("lore", "")) if seen else "not yet met — walk the nights and it will find you"
+	var desc := UITheme.make_label(desc_text, 9, Palette.PARCHMENT if seen else Palette.ASH)
+	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info.add_child(desc)
+	if seen:
+		var count := int(book.get(enemy_id, 0))
+		var tally := "put to rest:  %d" % count if count > 0 else "seen, but never felled"
+		var tally_label := UITheme.make_label(tally, 9, Palette.ASH)
+		tally_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		info.add_child(tally_label)
 	row.add_child(info)
 	return row
 

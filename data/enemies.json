@@ -1,6 +1,7 @@
 {
 	"shambler": {
 		"name": "Shambler",
+		"lore": "The freshly risen — slow, witless, and endless. The night's first and most patient argument.",
 		"sprite": "shambler",
 		"hp": 18,
 		"speed": 38,
@@ -12,6 +13,7 @@
 	},
 	"gnawer": {
 		"name": "Gnawer",
+		"lore": "Small dead things that never stopped being hungry. They come low and fast, teeth first.",
 		"sprite": "gnawer",
 		"hp": 8,
 		"speed": 92,
@@ -24,6 +26,7 @@
 	},
 	"wight": {
 		"name": "Wight",
+		"lore": "Grave-cold and still proud of its old strength. It strikes like it remembers a grudge.",
 		"sprite": "wight",
 		"hp": 48,
 		"speed": 30,
@@ -35,6 +38,7 @@
 	},
 	"hanged_man": {
 		"name": "Hanged Man",
+		"lore": "Cut down but never released, it walks with the rope still swinging — quicker than its ruined frame should allow.",
 		"sprite": "hanged_man",
 		"hp": 24,
 		"speed": 55,
@@ -46,6 +50,7 @@
 	},
 	"bone_stag": {
 		"name": "Bone Stag",
+		"lore": "A beast the forest buried and the forest gave back. It charges in a clatter of antlers and old snow.",
 		"sprite": "bone_stag",
 		"hp": 26,
 		"speed": 118,
@@ -57,6 +62,7 @@
 	},
 	"briar_queen": {
 		"name": "The Briar Queen",
+		"lore": "She ruled the Wailing Forest before the thorns took her throat. Now the thorns rule through her.",
 		"sprite": "briar_queen",
 		"hp": 1500,
 		"speed": 34,
@@ -69,6 +75,7 @@
 	},
 	"tolling_man": {
 		"name": "Tolling Man",
+		"lore": "He rings for the dead and the dead answer. Fell him, and the scroll he carries is yours.",
 		"sprite": "tolling_man",
 		"hp": 280,
 		"speed": 26,
@@ -82,6 +89,7 @@
 	},
 	"sexton": {
 		"name": "The Sexton",
+		"lore": "Keeper of Hollowmere's graves, still at his work — only now he digs them back up.",
 		"sprite": "sexton",
 		"hp": 950,
 		"speed": 30,
@@ -94,6 +102,7 @@
 	},
 	"courtier": {
 		"name": "Risen Courtier",
+		"lore": "Once they danced in Castle Vane. The music never stopped; only the dancers changed.",
 		"sprite": "courtier",
 		"hp": 26,
 		"speed": 48,
@@ -105,6 +114,7 @@
 	},
 	"risen_knight": {
 		"name": "Risen Knight",
+		"lore": "Armour outlasts oaths. Its plate turns four blows in five — patience or a heavier weapon undoes it.",
 		"sprite": "risen_knight",
 		"hp": 95,
 		"speed": 26,
@@ -117,6 +127,7 @@
 	},
 	"crypt_archer": {
 		"name": "Crypt Archer",
+		"lore": "It holds its distance and looses from the dark. Close the gap, or learn to read the drawn string.",
 		"sprite": "crypt_archer",
 		"hp": 30,
 		"speed": 46,
@@ -134,6 +145,7 @@
 	},
 	"chorister": {
 		"name": "Chapel Chorister",
+		"lore": "Its hymn knits its kin whole again. Silence the singer before you tire of killing the same dead twice.",
 		"sprite": "chorister",
 		"hp": 320,
 		"speed": 22,
@@ -152,6 +164,7 @@
 	},
 	"chapel_thing": {
 		"name": "The Thing in the Chapel",
+		"lore": "What knelt too long at a broken altar, and answered when something knelt back. Its prayers come in volleys.",
 		"sprite": "chapel_thing",
 		"hp": 2600,
 		"speed": 30,

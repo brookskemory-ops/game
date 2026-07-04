@@ -302,6 +302,7 @@ func _finish(victory: bool) -> void:
 		"level": player.level,
 		"stage": String(stage.get("id", "stage1")),
 		"rite": rites.summary() if rites != null else "",
+		"bestiary": enemies.bestiary,
 	}
 	hud.show_results(victory, stats)
 	# Freeze the night behind the overlay (HUD runs in PROCESS_MODE_ALWAYS).
