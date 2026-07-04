@@ -556,6 +556,17 @@ func _open_settings() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 10)
 	column.add_child(UITheme.make_label("BY THE FIRE", 24, Palette.PARCHMENT, true))
+	# Difficulty: cycles Story / Normal / Hard, applied to the next run.
+	var diff := UITheme.make_button("")
+	var refresh_diff := func() -> void:
+		diff.text = "Difficulty: %s  ·  %s" % [Game.difficulty_name(), String(Game.difficulty_def().get("blurb", ""))]
+	refresh_diff.call()
+	diff.pressed.connect(func() -> void:
+		Game.cycle_difficulty()
+		refresh_diff.call()
+		Sfx.play("ui")
+	)
+	column.add_child(diff)
 	column.add_child(_settings_toggle("Sound", "sfx_volume"))
 	column.add_child(_settings_toggle("Music", "music_volume"))
 	var numbers := UITheme.make_button("")

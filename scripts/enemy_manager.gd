@@ -43,6 +43,7 @@ var _gems: GemManager
 var _hp_mul := 1.0
 var _speed_mul := 1.0
 var _gold_mul := 1.0
+var _damage_mul := 1.0   # difficulty: enemy contact + bolt damage scalar
 var _xp_mul := 1.0
 
 func set_mods(mods: Dictionary) -> void:
@@ -50,6 +51,7 @@ func set_mods(mods: Dictionary) -> void:
 	_speed_mul = float(mods.get("speed_mul", 1.0))
 	_gold_mul = float(mods.get("gold_mul", 1.0))
 	_xp_mul = float(mods.get("xp_mul", 1.0))
+	_damage_mul = float(mods.get("damage_mul", 1.0))
 
 ## Endless escalation: each tier deepens the night (The Long Night).
 func escalate(hp_factor: float) -> void:
@@ -315,7 +317,7 @@ func _physics_process(delta: float) -> void:
 		var crx := float(def.get("_hit_rx", 6.0)) + player_radius
 		var cry := float(def.get("_hit_ry", 6.0)) + player_radius
 		if (cdx * cdx) / (crx * crx) + (cdy * cdy) / (cry * cry) < 1.0:
-			contact_dps += float(def.get("damage", 5))
+			contact_dps += float(def.get("damage", 5)) * _damage_mul
 			# Thorns tick roughly twice a second, probabilistically (cheap).
 			if thorns > 0.0 and randf() < delta * 2.0:
 				damage_slot(i, thorns)
@@ -382,7 +384,7 @@ func _fire_bolts(from: Vector2, at: Vector2, ranged: Dictionary) -> void:
 		_bolt_pos[slot] = from
 		_bolt_vel[slot] = Vector2.from_angle(angle) * speed
 		_bolt_age[slot] = 0.0
-		_bolt_damage[slot] = float(ranged.get("proj_damage", 8))
+		_bolt_damage[slot] = float(ranged.get("proj_damage", 8)) * _damage_mul
 	Sfx.play("shoot", 0.4)
 
 func _free_bolt() -> int:

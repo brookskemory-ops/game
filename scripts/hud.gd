@@ -548,6 +548,7 @@ func show_results(victory: bool, stats: Dictionary) -> void:
 	column.add_child(UITheme.make_label("endured %d:%02d" % [seconds / 60, seconds % 60], 13, Palette.PARCHMENT))
 	column.add_child(UITheme.make_label("%d dead put to rest" % int(stats.get("kills", 0)), 13, Palette.PARCHMENT))
 	column.add_child(UITheme.make_label("reached level %d" % int(stats.get("level", 1)), 13, Palette.PARCHMENT))
+	column.add_child(UITheme.make_label("%s vigil" % Game.difficulty_name().to_lower(), 11, Palette.ASH))
 	var rite_line := String(stats.get("rite", ""))
 	if not rite_line.is_empty():
 		column.add_child(UITheme.make_label(rite_line, 11,

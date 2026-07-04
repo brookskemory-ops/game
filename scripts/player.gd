@@ -38,6 +38,7 @@ var hp := 80.0
 var move_speed := 130.0
 var pickup_radius := 48.0
 var body_radius := 6.0
+var incoming_mul := 1.0  # difficulty: scales all damage the player takes
 var gold_mul := 1.0  # Wages of Death (Maud) and Fortune raise this
 var revives := 0     # Mercy (camp shop)
 var thorns := 0.0    # Briar Crown relic: contact attackers take this much
@@ -297,7 +298,7 @@ func take_contact_dps(dps: float, delta: float) -> void:
 		return
 	if _sig_bulwark:
 		dps *= 0.75  # Ser Roland's wall of steel
-	var amount := maxf(0.0, dps - float(mods["armor"])) * delta
+	var amount := maxf(0.0, dps - float(mods["armor"])) * delta * incoming_mul
 	if amount <= 0.0:
 		return
 	hp -= amount
@@ -324,7 +325,7 @@ func take_hit(amount: float) -> void:
 		return
 	if _sig_bulwark:
 		amount *= 0.75
-	amount = maxf(0.0, amount - float(mods["armor"]))
+	amount = maxf(0.0, amount - float(mods["armor"])) * incoming_mul
 	if amount <= 0.0:
 		return
 	hp -= amount

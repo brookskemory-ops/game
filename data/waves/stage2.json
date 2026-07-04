@@ -41,14 +41,14 @@
 			"from": 0,
 			"to": 70,
 			"type": "shambler",
-			"interval": 0.84,
+			"interval": 0.99,
 			"count": 3
 		},
 		{
 			"from": 30,
 			"to": 160,
 			"type": "hanged_man",
-			"interval": 1.82,
+			"interval": 2.15,
 			"count": 2,
 			"distance": 170
 		},
@@ -56,14 +56,14 @@
 			"from": 60,
 			"to": 240,
 			"type": "wight",
-			"interval": 2.24,
+			"interval": 2.64,
 			"count": 2
 		},
 		{
 			"from": 100,
 			"to": 280,
 			"type": "bone_stag",
-			"interval": 1.96,
+			"interval": 2.31,
 			"count": 3
 		},
 		{

@@ -34,21 +34,21 @@
 			"from": 0,
 			"to": 60,
 			"type": "shambler",
-			"interval": 0.98,
+			"interval": 1.16,
 			"count": 3
 		},
 		{
 			"from": 40,
 			"to": 140,
 			"type": "gnawer",
-			"interval": 2.1,
+			"interval": 2.48,
 			"count": 2
 		},
 		{
 			"from": 60,
 			"to": 180,
 			"type": "shambler",
-			"interval": 0.7,
+			"interval": 0.83,
 			"count": 3
 		},
 		{

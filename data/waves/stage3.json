@@ -42,28 +42,28 @@
 			"from": 0,
 			"to": 90,
 			"type": "courtier",
-			"interval": 0.98,
+			"interval": 1.16,
 			"count": 3
 		},
 		{
 			"from": 45,
 			"to": 180,
 			"type": "crypt_archer",
-			"interval": 2.38,
+			"interval": 2.81,
 			"count": 2
 		},
 		{
 			"from": 75,
 			"to": 260,
 			"type": "risen_knight",
-			"interval": 2.8,
+			"interval": 3.3,
 			"count": 2
 		},
 		{
 			"from": 90,
 			"to": 300,
 			"type": "courtier",
-			"interval": 0.63,
+			"interval": 0.74,
 			"count": 4
 		},
 		{

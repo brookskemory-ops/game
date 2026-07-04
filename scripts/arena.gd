@@ -54,10 +54,21 @@ func _ready() -> void:
 	_events_fired.resize(events().size())
 	player.setup({"enemies": enemies, "projectiles": projectiles, "hazards": hazards})
 	enemies.setup(player, player.body_radius, gems)
-	# Night modifiers (v0.15): tougher/faster/richer nights, mist, endlessness.
-	var mods: Dictionary = stage.get("mods", {})
+	# Night modifiers (v0.15) combined with the chosen difficulty (v1.3):
+	# multiply the shared knobs so, e.g., a Hard blood-toll night is both.
+	var night_mods: Dictionary = stage.get("mods", {})
+	var diff: Dictionary = Game.difficulty_def()
+	var mods := {
+		"hp_mul": float(night_mods.get("hp_mul", 1.0)) * float(diff.get("enemy_hp", 1.0)),
+		"speed_mul": float(night_mods.get("speed_mul", 1.0)) * float(diff.get("enemy_speed", 1.0)),
+		"gold_mul": float(night_mods.get("gold_mul", 1.0)) * float(diff.get("gold", 1.0)),
+		"xp_mul": float(night_mods.get("xp_mul", 1.0)) * float(diff.get("xp", 1.0)),
+		"damage_mul": float(diff.get("enemy_damage", 1.0)),
+		"fog": night_mods.get("fog", false),
+	}
 	enemies.set_mods(mods)
-	_spawn_mul = float(mods.get("spawn_mul", 1.0))
+	_spawn_mul = float(night_mods.get("spawn_mul", 1.0)) * float(diff.get("spawn", 1.0))
+	player.incoming_mul = float(diff.get("player_incoming", 1.0))
 	_endless = bool(stage.get("endless", false))
 	if bool(mods.get("fog", false)):
 		var fog := FogLayer.new()

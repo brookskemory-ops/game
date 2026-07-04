@@ -7,7 +7,7 @@ signal run_ended(victory: bool)
 signal gold_changed(total: int)
 signal orientation_changed  # mobile canvas swapped landscape <-> portrait
 
-const VERSION := "1.2 — the night bites back"
+const VERSION := "1.3 — to each their night"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -16,7 +16,48 @@ var settings := {
 	"music_volume": 1.0,
 	"haptics": true,
 	"damage_numbers": true,
+	"difficulty": "normal",
 }
+
+## Difficulty tiers, multiplied into each night's own mods at run start.
+## Normal is the baseline (all 1.0); Story eases the night, Hard sharpens it.
+const DIFFICULTIES := ["story", "normal", "hard"]
+const DIFFICULTY := {
+	"story": {
+		"name": "Story",
+		"blurb": "a gentler watch",
+		"enemy_hp": 0.7, "enemy_speed": 0.9, "enemy_damage": 0.7,
+		"spawn": 0.8, "xp": 1.15, "gold": 1.0, "player_incoming": 0.7,
+	},
+	"normal": {
+		"name": "Normal",
+		"blurb": "the vigil as meant",
+		"enemy_hp": 1.0, "enemy_speed": 1.0, "enemy_damage": 1.0,
+		"spawn": 1.0, "xp": 1.0, "gold": 1.0, "player_incoming": 1.0,
+	},
+	"hard": {
+		"name": "Hard",
+		"blurb": "the night in full",
+		"enemy_hp": 1.3, "enemy_speed": 1.1, "enemy_damage": 1.25,
+		"spawn": 1.2, "xp": 1.0, "gold": 1.2, "player_incoming": 1.15,
+	},
+}
+
+## The current tier id (always valid), its display record, and its multipliers.
+func difficulty_id() -> String:
+	var id := String(settings.get("difficulty", "normal"))
+	return id if DIFFICULTY.has(id) else "normal"
+
+func difficulty_def() -> Dictionary:
+	return DIFFICULTY[difficulty_id()]
+
+func difficulty_name() -> String:
+	return String(difficulty_def().get("name", "Normal"))
+
+func cycle_difficulty() -> void:
+	var i := DIFFICULTIES.find(difficulty_id())
+	settings["difficulty"] = DIFFICULTIES[(i + 1) % DIFFICULTIES.size()]
+	write_save()
 
 ## Which hero and stage the next run uses (picked at the camp).
 var selected_character := "wren"
