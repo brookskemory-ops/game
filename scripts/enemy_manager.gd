@@ -135,6 +135,20 @@ func _register_type(type_name: String, def: Dictionary) -> void:
 		var img := tex.get_image()
 		img.flip_x()
 		tex = ImageTexture.create_from_image(img)
+	# Contact hitbox from the actual sprite. The bodies are ~1.5x taller than
+	# their tuned `radius` (which matches width), so a round contact test let
+	# you ram a sprite from above/below with no hit. Store the visible half-
+	# extents once and use an ellipse at contact time; `radius` stays the floor
+	# and still drives weapon targeting / spatial queries.
+	var radius := float(def.get("radius", 6))
+	var used := tex.get_image().get_used_rect()
+	if used.size.x > 0 and used.size.y > 0:
+		var vscale := float(def.get("gen_scale", 1.0)) if ResourceLoader.exists(gen_path) else 1.0
+		def["_hit_rx"] = maxf(radius, float(used.size.x) * vscale * 0.5)
+		def["_hit_ry"] = maxf(radius, float(used.size.y) * vscale * 0.5)
+	else:
+		def["_hit_rx"] = radius
+		def["_hit_ry"] = radius
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_2D
 	mm.use_colors = true
@@ -257,8 +271,14 @@ func _physics_process(delta: float) -> void:
 			_grid[cell].append(i)
 		else:
 			_grid[cell] = [i]
-		# Contact damage accumulates as DPS while touching the player.
-		if _pos[i].distance_to(ppos) < float(def.get("radius", 6)) + player_radius:
+		# Contact damage accumulates as DPS while touching the player. The
+		# hitbox is an ellipse matching the sprite (taller than wide), so
+		# ramming a body from any side registers — no vertical dead band.
+		var cdx := _pos[i].x - ppos.x
+		var cdy := _pos[i].y - ppos.y
+		var crx := float(def.get("_hit_rx", 6.0)) + player_radius
+		var cry := float(def.get("_hit_ry", 6.0)) + player_radius
+		if (cdx * cdx) / (crx * crx) + (cdy * cdy) / (cry * cry) < 1.0:
 			contact_dps += float(def.get("damage", 5))
 			# Thorns tick roughly twice a second, probabilistically (cheap).
 			if thorns > 0.0 and randf() < delta * 2.0:

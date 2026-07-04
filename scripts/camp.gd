@@ -370,6 +370,10 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
 	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 460.0), 0)
+	# The whole card is tap-to-close: nothing inside may swallow the click, or
+	# the tap never reaches the overlay's close handler and the game "freezes"
+	# (VBoxContainer defaults to MOUSE_FILTER_STOP — the actual v0.13.4 gap).
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if from_unlock:
 		column.add_child(UITheme.make_label("A NEW FACE AT THE FIRE", 13, Palette.ASH))
 	var face := TextureRect.new()
@@ -451,6 +455,7 @@ func _show_ending_epilogue(ending_id: String) -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
 	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 470.0), 0)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE  # tap-to-close: don't eat it
 	column.add_child(UITheme.make_label(String(epilogue.get("title", "")), 28, Palette.TORCH, true))
 	for line in epilogue.get("lines", []):
 		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
