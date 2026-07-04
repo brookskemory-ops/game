@@ -221,8 +221,16 @@ func _physics_process(delta: float) -> void:
 		# Per-type abilities on the shared per-slot timer.
 		if not ranged.is_empty():
 			_shot_cd[i] -= delta
+			# Volley telegraph: the Thing glows ember for 0.6s before loosing
+			# (bot runs: an untelegraphed 5-bolt volley reads as unfair).
+			if int(ranged.get("volley", 1)) > 1 and _flash[i] <= 0.0 \
+					and _shot_cd[i] > 0.0 and _shot_cd[i] <= 0.6:
+				var pulse := 0.75 + 0.25 * sin(_time * 24.0)
+				_type_mm[_type[i]].set_instance_color(i, Color(1.9 * pulse, 1.0 * pulse, 0.45))
 			if _shot_cd[i] <= 0.0 and dist <= float(ranged.get("range", 150)):
 				_shot_cd[i] = float(ranged.get("cooldown", 2.5))
+				if int(ranged.get("volley", 1)) > 1:
+					_type_mm[_type[i]].set_instance_color(i, Color.WHITE)
 				_fire_bolts(_pos[i], ppos, ranged)
 		var choir: Dictionary = def.get("heals_allies", {})
 		if not choir.is_empty():

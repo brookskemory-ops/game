@@ -67,7 +67,7 @@
 			"from": 180,
 			"to": 420,
 			"type": "crypt_archer",
-			"interval": 2.4,
+			"interval": 3.0,
 			"count": 2
 		},
 		{
@@ -95,7 +95,7 @@
 			"from": 420,
 			"to": 600,
 			"type": "crypt_archer",
-			"interval": 1.8,
+			"interval": 2.4,
 			"count": 2
 		},
 		{

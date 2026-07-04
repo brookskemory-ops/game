@@ -90,7 +90,7 @@ A build is **3 weapons + 3 keepsakes, no more** (`Player.MAX_WEAPONS` /
 deepening those three. Evolutions remain reachable by design: a weapon and its catalyst
 fit inside 3+3. The HUD build tray (under the HP bar) shows all six slots.
 
-## 7. Relics (v0.14 — earned by rites, one carried per night)
+## 7. Relics (v0.14 — earned by rites; one carried per night, two with the Reliquary Chain)
 
 Each relic is ONE hook, none touching a stat a passive already owns:
 

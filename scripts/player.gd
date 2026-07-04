@@ -93,12 +93,11 @@ func setup(ctx: Dictionary) -> void:
 			if _enemies != null:
 				_enemies.enemy_killed.connect(_on_enemy_killed)
 	_apply_camp_shop()
-	# The carried relic (one hook each, like signatures — docs/ABILITIES.md §7).
-	match Game.relic_equipped():
-		"briar_crown":
-			thorns = 3.0
-		"pilgrims_flask":
-			_flask_ready = true
+	# Carried relics (one hook each, like signatures — docs/ABILITIES.md §7).
+	if Game.relic_active("briar_crown"):
+		thorns = 3.0
+	if Game.relic_active("pilgrims_flask"):
+		_flask_ready = true
 	base_max_hp = float(stats.get("max_hp", 80))
 	base_move_speed = float(stats.get("move_speed", 130))
 	base_pickup_radius = float(stats.get("pickup_radius", 48))
@@ -176,7 +175,9 @@ func _apply_camp_shop() -> void:
 ## Deathless (the Hollow King): EVERY kill leeches life — his only healing.
 func _on_enemy_killed(_at: Vector2) -> void:
 	if _sig_deathless:
-		hp = minf(max_hp, hp + 1.0)
+		# 1.5/kill (was 1.0): bot runs showed Deathless as by far the
+		# hardest opening — the leech is his only healing.
+		hp = minf(max_hp, hp + 1.5)
 		hp_changed.emit(hp, max_hp)
 		return
 	var now := float(Time.get_ticks_msec()) / 1000.0

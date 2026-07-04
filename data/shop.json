@@ -2,7 +2,9 @@
 	"vigor": {
 		"name": "Vigor",
 		"desc": "+10 max HP per rank",
-		"effect": { "max_hp": 10 },
+		"effect": {
+			"max_hp": 10
+		},
 		"base_cost": 20,
 		"cost_growth": 1.6,
 		"max": 5
@@ -10,7 +12,9 @@
 	"whetting": {
 		"name": "Whetting",
 		"desc": "+5% damage per rank",
-		"effect": { "damage": 0.05 },
+		"effect": {
+			"damage": 0.05
+		},
 		"base_cost": 25,
 		"cost_growth": 1.7,
 		"max": 5
@@ -18,7 +22,9 @@
 	"haste": {
 		"name": "Haste",
 		"desc": "+4% move speed per rank",
-		"effect": { "speed": 0.04 },
+		"effect": {
+			"speed": 0.04
+		},
 		"base_cost": 30,
 		"cost_growth": 1.8,
 		"max": 3
@@ -26,7 +32,9 @@
 	"fortune": {
 		"name": "Fortune",
 		"desc": "+10% gold per rank",
-		"effect": { "gold": 0.10 },
+		"effect": {
+			"gold": 0.1
+		},
 		"base_cost": 25,
 		"cost_growth": 1.7,
 		"max": 3
@@ -34,7 +42,9 @@
 	"reach": {
 		"name": "Reach",
 		"desc": "+10% gem pickup range per rank",
-		"effect": { "pickup": 0.10 },
+		"effect": {
+			"pickup": 0.1
+		},
 		"base_cost": 15,
 		"cost_growth": 1.5,
 		"max": 3
@@ -42,8 +52,18 @@
 	"mercy": {
 		"name": "Mercy",
 		"desc": "Rise once more after falling (once per night)",
-		"effect": { "revive": 1 },
+		"effect": {
+			"revive": 1
+		},
 		"base_cost": 150,
+		"cost_growth": 1.0,
+		"max": 1
+	},
+	"reliquary_chain": {
+		"name": "Reliquary Chain",
+		"desc": "Carry a second relic into the night",
+		"effect": {},
+		"base_cost": 400,
 		"cost_growth": 1.0,
 		"max": 1
 	}

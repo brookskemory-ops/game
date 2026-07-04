@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.16.0 — the sound of the night"
+const VERSION := "0.16.1 — the scales balance"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -46,6 +46,7 @@ var save_data := {
 	"weapon_unlocks": {},
 	"relics": {},
 	"relic_equipped": "",
+	"relics_equipped": [],
 }
 
 ## Stats from the most recent run, for camp/results screens.
@@ -246,7 +247,7 @@ func shop_cost(id: String, def: Dictionary) -> int:
 	var base := float(def.get("base_cost", 20))
 	var growth := float(def.get("cost_growth", 1.6))
 	var cost := base * pow(growth, float(shop_level(id)))
-	if relic_equipped() == "kings_coin":
+	if relic_active("kings_coin"):
 		cost *= 0.85
 	return int(round(cost))
 
@@ -277,6 +278,11 @@ func load_save() -> void:
 	for key in settings:
 		if saved_settings.has(key):
 			settings[key] = saved_settings[key]
+	# Migration: the single relic slot (v0.14) became a list (v0.16.1).
+	var old_relic := String(save_data.get("relic_equipped", ""))
+	if not old_relic.is_empty() and (save_data.get("relics_equipped", []) as Array).is_empty():
+		save_data["relics_equipped"] = [old_relic]
+		save_data["relic_equipped"] = ""
 
 func write_save() -> void:
 	save_data["settings"] = settings
@@ -308,11 +314,26 @@ func unlock_relic(id: String) -> bool:
 	write_save()
 	return true
 
-func relic_equipped() -> String:
-	return String(save_data.get("relic_equipped", ""))
+## How many relics may be carried (the Reliquary Chain adds a second).
+func relic_slots() -> int:
+	return 1 + shop_level("reliquary_chain")
 
+func equipped_relics() -> Array:
+	return save_data.get("relics_equipped", [])
+
+func relic_active(id: String) -> bool:
+	return id in equipped_relics()
+
+## Tap to carry; tap again to set down; at capacity the oldest is set down.
 func equip_relic(id: String) -> void:
-	save_data["relic_equipped"] = "" if relic_equipped() == id else id  # tap again to unequip
+	var carried: Array = save_data.get("relics_equipped", [])
+	if id in carried:
+		carried.erase(id)
+	else:
+		while carried.size() >= relic_slots():
+			carried.pop_front()
+		carried.append(id)
+	save_data["relics_equipped"] = carried
 	write_save()
 
 # --- The ending (Block B): chosen once, at the camp, by the Hollow King ---

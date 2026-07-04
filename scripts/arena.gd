@@ -77,11 +77,10 @@ func _ready() -> void:
 	add_child(rites)
 	rites.setup(stage, player, enemies, hud, gems)
 	# Arena-side relic hooks (player-side ones live in player.setup).
-	match Game.relic_equipped():
-		"bell_shard":
-			player.grant_bonus_draft.call_deferred()
-		"hourless_glass":
-			_time_scale = 1.1
+	if Game.relic_active("bell_shard"):
+		player.grant_bonus_draft.call_deferred()
+	if Game.relic_active("hourless_glass"):
+		_time_scale = 1.1
 
 # --- Upgrade draft flow (queues if several levels land at once) ---
 
@@ -104,7 +103,7 @@ func _present_draft(fresh: bool) -> void:
 ## Escalates per night: 4, 8, 16, 32, then 64 flat.
 ## A Ledger-page relic makes the first reroll a courtesy.
 func _reroll_cost() -> int:
-	if _rerolls_tonight == 0 and Game.relic_equipped() == "ledger_page":
+	if _rerolls_tonight == 0 and Game.relic_active("ledger_page"):
 		return 0
 	return mini(64, 4 * (1 << mini(_rerolls_tonight, 4)))
 
@@ -143,7 +142,7 @@ func _physics_process(delta: float) -> void:
 		return
 	time_elapsed += delta * _time_scale
 	# Wisp in a Jar: every 30s the wisp gathers what glitters.
-	if Game.relic_equipped() == "wisp_jar":
+	if Game.relic_active("wisp_jar"):
 		_wisp_acc += delta
 		if _wisp_acc >= 30.0:
 			_wisp_acc = 0.0
@@ -162,12 +161,14 @@ func _physics_process(delta: float) -> void:
 			_loop_count = loop
 			for e in _events_fired.size():
 				_events_fired[e] = 0
-		var tier := int(time_elapsed / 180.0)
+		# Escalate every 2:30 (was 3:00 — the early curve read too flat)
+		# and number the tiers so the record chase is legible.
+		var tier := int(time_elapsed / 150.0)
 		if tier != _endless_tier:
 			_endless_tier = tier
 			enemies.escalate(1.35)
 			_spawn_mul *= 1.1
-			hud.toast("the dark deepens...")
+			hud.toast("the dark deepens...  (tier %d)" % tier)
 			Sfx.play("bell", 0.6)
 		var storm := int(time_elapsed / 300.0)
 		if storm != _storm_count:
@@ -291,7 +292,7 @@ func _finish(victory: bool) -> void:
 		return
 	run_over = true
 	# Ferryman's Coin: the dead pay double for their crossing.
-	if not victory and Game.relic_equipped() == "ferrymans_coin" and Game.run_gold > 0:
+	if not victory and Game.relic_active("ferrymans_coin") and Game.run_gold > 0:
 		Game.add_gold(Game.run_gold)
 		hud.toast("the ferryman pays double")
 	var stats := {

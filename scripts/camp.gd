@@ -467,8 +467,8 @@ func _open_ledger() -> void:
 			catalyst_name = String(passives[catalyst_name].get("name", catalyst_name))
 		var recipe := "%s, carried with %s" % [String(base_def.get("name", "")), catalyst_name]
 		list.add_child(_make_ledger_evo_row(evo, known, recipe))
-	# Relics: earned by keeping rites; one may be carried into the night.
-	list.add_child(UITheme.make_label("— RELICS (carry one) —", 11, Palette.BONE))
+	# Relics: earned by keeping rites; the Reliquary Chain adds a second slot.
+	list.add_child(UITheme.make_label("— RELICS (carry %d) —" % Game.relic_slots(), 11, Palette.BONE))
 	var relic_defs: Variant = Game.load_json("res://data/relics.json")
 	if relic_defs is Dictionary:
 		for relic_id in relic_defs:
@@ -507,7 +507,7 @@ func _make_relic_row(relic_id: String, def: Dictionary) -> HBoxContainer:
 		var equip := UITheme.make_button("", 9)
 		equip.custom_minimum_size = Vector2(84, 0)
 		var refresh := func() -> void:
-			equip.text = "CARRIED" if Game.relic_equipped() == relic_id else "carry"
+			equip.text = "CARRIED" if Game.relic_active(relic_id) else "carry"
 		refresh.call()
 		equip.pressed.connect(func() -> void:
 			Sfx.play("buy")
