@@ -125,7 +125,24 @@ func setup(ctx: Dictionary) -> void:
 		_side_tex = load(side_path)
 	_sprite_base_scale = _sprite.scale.x
 	add_child(_sprite)
-	equip(String(stats.get("weapon", "hunting_bow")))
+	equip(_qa_weapon_override(String(stats.get("weapon", "hunting_bow"))))
+
+## Web QA: ?weapon=<id> forces the starting weapon so every weapon's attack
+## can be driven and screenshotted deterministically (mirrors ?hero=/?stage=).
+## Ignored off web and for unknown ids.
+func _qa_weapon_override(default_id: String) -> String:
+	if not OS.has_feature("web"):
+		return default_id
+	var search := String(JavaScriptBridge.eval("window.location.search", true))
+	var idx := search.find("weapon=")
+	if idx < 0:
+		return default_id
+	var rest := search.substr(idx + 7)
+	var amp := rest.find("&")
+	var wid := rest.substr(0, amp) if amp >= 0 else rest
+	if wid.is_empty() or not ResourceLoader.exists("res://data/weapons/%s.json" % wid):
+		return default_id
+	return wid
 
 ## Add a weapon by id. Returns the Weapon node, or null if slots are full / data missing.
 func equip(weapon_id: String) -> Weapon:

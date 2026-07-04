@@ -39,6 +39,9 @@ func _physics_process(delta: float) -> void:
 func _draw() -> void:
 	var orb_count := int(def.get("orbs", 2)) + extra_projectiles
 	var orbit_radius := float(def.get("orbit_radius", 36)) * area_mul()
+	# The burning glow spans the orb's actual hit radius (which grows with area
+	# upgrades), so the fire you see is the fire that burns.
+	var orb_radius := float(def.get("orb_radius", 9)) * area_mul()
 	# Faint orbit ring.
 	draw_arc(Vector2.ZERO, orbit_radius, 0.0, TAU, 28,
 		Color(Palette.EMBER.r, Palette.EMBER.g, Palette.EMBER.b, 0.10), 1.0)
@@ -46,7 +49,7 @@ func _draw() -> void:
 		var local := Vector2.from_angle(_angle + TAU * float(k) / float(orb_count)) * orbit_radius
 		# Chain from the wielder, then the burning orb with a glow.
 		draw_line(Vector2.ZERO, local, Color(Palette.IRON.r, Palette.IRON.g, Palette.IRON.b, 0.35), 1.0)
-		_draw_orb(local, _angle)
+		_draw_orb(local, orb_radius)
 	if bool(def.get("second_ring", false)):
 		var halo_radius := orbit_radius + 15.0
 		for k in orb_count:
@@ -55,12 +58,14 @@ func _draw() -> void:
 			# Ember trail behind each halo coal.
 			draw_arc(Vector2.ZERO, halo_radius, halo_angle + 0.5, halo_angle + 0.06, 8,
 				Color(Palette.EMBER.r, Palette.EMBER.g, Palette.EMBER.b, 0.28), 2.0)
-			_draw_orb(local, halo_angle)
+			_draw_orb(local, orb_radius)
 
-func _draw_orb(local: Vector2, _orb_angle: float) -> void:
-	draw_circle(local, 6.0, Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, 0.18))
-	draw_circle(local, 3.5, Palette.TORCH)
-	draw_circle(local, 1.5, Color(1.0, 0.95, 0.8))
+func _draw_orb(local: Vector2, hit_radius: float) -> void:
+	# Outer glow = the damage radius; the coal and hot core sit at its heart.
+	draw_circle(local, hit_radius, Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, 0.16))
+	draw_circle(local, hit_radius * 0.6, Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, 0.45))
+	draw_circle(local, maxf(2.5, hit_radius * 0.4), Palette.TORCH)
+	draw_circle(local, maxf(1.0, hit_radius * 0.18), Color(1.0, 0.95, 0.8))
 
 func _on_upgrade(new_level: int) -> String:
 	if new_level % 2 == 0:

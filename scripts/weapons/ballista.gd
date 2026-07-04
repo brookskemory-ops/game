@@ -57,10 +57,15 @@ func _draw() -> void:
 			Color(Palette.BONE.r, Palette.BONE.g, Palette.BONE.b, 0.2 + readiness * 0.5), 2.0)
 	if _beam_time > 0.0:
 		var alpha := _beam_time / 0.18
-		draw_line(Vector2.ZERO, _beam_dir * attack_range(),
+		var tip := _beam_dir * attack_range()
+		# Wide soft lane first — the bolt pierces everything within ~13px of the
+		# line, so a width-26 wash shows the true catch — then the bright core.
+		draw_line(Vector2.ZERO, tip,
+			Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, alpha * 0.28), 26.0)
+		draw_line(Vector2.ZERO, tip,
+			Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, alpha * 0.4), 10.0)
+		draw_line(Vector2.ZERO, tip,
 			Color(Palette.PARCHMENT.r, Palette.PARCHMENT.g, Palette.PARCHMENT.b, alpha * 0.9), 3.0)
-		draw_line(Vector2.ZERO, _beam_dir * attack_range(),
-			Color(Palette.TORCH.r, Palette.TORCH.g, Palette.TORCH.b, alpha * 0.4), 6.0)
 
 func _on_upgrade(new_level: int) -> String:
 	if new_level % 3 == 0:
