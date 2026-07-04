@@ -577,7 +577,7 @@ func _open_ledger() -> void:
 	var book: Dictionary = Game.save_data.get("stats", {}).get("bestiary", {})
 	var seen_count := book.size()
 	var enemy_defs: Variant = Game.load_json("res://data/enemies.json")
-	var enemy_total := enemy_defs.size() if enemy_defs is Dictionary else 0
+	var enemy_total: int = enemy_defs.size() if enemy_defs is Dictionary else 0
 	list.add_child(UITheme.make_label("— THE BESTIARY (%d / %d) —" % [seen_count, enemy_total], 11, Palette.BONE))
 	if enemy_defs is Dictionary:
 		for enemy_id in enemy_defs:
