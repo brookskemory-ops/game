@@ -268,13 +268,24 @@ func _physics_process(delta: float) -> void:
 			_flash[i] -= delta
 			if _flash[i] <= 0.0:
 				_type_mm[_type[i]].set_instance_color(i, Color.WHITE)
-		# Render transform: flip toward movement, shamble-bob rotation
-		# (big bodies — elites/bosses — lumber slower and heavier).
-		# Fresh hits scale-pop the body (juice, WP9).
+		# Render transform: a procedural walk cycle so the horde shambles
+		# rather than slides. The body leans into each stride, rises and
+		# stretches between footfalls, then settles and widens as a foot
+		# lands — one sin drives both. Big bodies (elites/bosses) step slower
+		# and heavier. Fresh hits scale-pop the body (juice, WP9).
+		# (A true 2-frame sprite swap needs matched art the generator can't
+		# produce; see docs/asset_log.md.)
 		var heavy := float(def.get("radius", 6)) >= 10.0
-		var bob := sin(_time * (3.5 if heavy else 7.0) + _phase[i]) * (0.04 if heavy else 0.07)
+		var s := sin(_time * (4.0 if heavy else 7.0) + _phase[i])
+		var lean := s * (0.05 if heavy else 0.08)
+		var foot := absf(s)                                   # 1 on footfall, 0 mid-step
+		var rise := 1.0 - foot                                # tall and light between steps
+		var squash := 1.0 + rise * (0.05 if heavy else 0.09)
 		var pop := 1.0 + maxf(0.0, _flash[i]) * 1.6
-		var xform := Transform2D(bob, Vector2(_facing[i] * pop, pop), 0.0, _pos[i])
+		var sx := _facing[i] * pop * (2.0 - squash)           # counter-stretch preserves volume
+		var sy := pop * squash
+		var hop := -rise * (0.5 if heavy else 0.9)
+		var xform := Transform2D(lean, Vector2(sx, sy), 0.0, _pos[i] + Vector2(0.0, hop))
 		_type_mm[_type[i]].set_instance_transform_2d(i, xform)
 
 	if contact_dps > 0.0 and _player.has_method("take_contact_dps"):

@@ -97,3 +97,15 @@ style-matched later. Endpoint: `POST /v1/generate-image-pixflux`.
   readable shape"), widowmaker (didn't read as a bow — "clearly a bow shape, drawn wide").
   **Lesson: at 32px, name the dominant silhouette explicitly ("the crown is the biggest
   element", "clearly a bow shape") — style words alone don't control composition.**
+
+## v1.1 The Living Night — enemy animation spike
+- Retried a 2-frame enemy walk via pixflux (generate a "mid-stride" second frame per
+  enemy, alternate A/B). **FAILED the same way as v0.10's text animation:** the two
+  independent generations produce *different creatures*, not two poses of one — the
+  shambler spike gave a hooded front-facing robe (A) vs. an unhooded side-profile green
+  zombie (B). Alternating them reads as morphing, not walking. pixflux has no
+  same-sprite frame coherence; only `/animate-with-skeleton` (per-sprite keypoint
+  rigging, still unrun) could, at large manual cost.
+- Shipped instead: a **procedural walk cycle** in the enemy multimesh transform
+  (lean + footfall squash + between-step hop, one sin per enemy) — deterministic,
+  zero-art, holds the 700-enemy perf budget. The horde now shambles rather than slides.
