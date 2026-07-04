@@ -60,18 +60,47 @@
 		"gold_chance": 0.04,
 		"gen_scale": 0.3
 	},
+	"antler_tyrant": {
+		"name": "The Antlered Dead",
+		"lore": "A stag the Wailing Forest killed and would not keep. It charges in a storm of bone.",
+		"sprite": "bone_stag",
+		"hp": 780,
+		"speed": 104,
+		"damage": 20,
+		"radius": 12,
+		"xp": 30,
+		"gold": 25,
+		"boss": true,
+		"mid_boss": true,
+		"gen_scale": 0.44,
+		"enrage": {
+			"below": 0.35,
+			"speed_mul": 1.5,
+			"cooldown_mul": 0.6
+		}
+	},
 	"briar_queen": {
 		"name": "The Briar Queen",
 		"lore": "She ruled the Wailing Forest before the thorns took her throat. Now the thorns rule through her.",
 		"sprite": "briar_queen",
-		"hp": 1500,
+		"hp": 2000,
 		"speed": 34,
-		"damage": 22,
+		"damage": 26,
 		"radius": 13,
 		"xp": 60,
 		"gold": 60,
 		"boss": true,
-		"gen_scale": 0.46
+		"gen_scale": 0.46,
+		"enrage": {
+			"below": 0.35,
+			"speed_mul": 1.6,
+			"cooldown_mul": 0.55
+		},
+		"summons": {
+			"type": "gnawer",
+			"count": 3,
+			"interval": 5.0
+		}
 	},
 	"tolling_man": {
 		"name": "Tolling Man",
@@ -87,18 +116,52 @@
 		"drops_scroll": true,
 		"gen_scale": 0.38
 	},
+	"grave_tender": {
+		"name": "The Grave-Tender",
+		"lore": "The Sexton's own hand, sent ahead to ready the ground. It rings the lesser dead up out of the mud.",
+		"sprite": "tolling_man",
+		"hp": 650,
+		"speed": 34,
+		"damage": 18,
+		"radius": 12,
+		"xp": 30,
+		"gold": 25,
+		"boss": true,
+		"mid_boss": true,
+		"gen_scale": 0.42,
+		"enrage": {
+			"below": 0.35,
+			"speed_mul": 1.6,
+			"cooldown_mul": 0.6
+		},
+		"summons": {
+			"type": "shambler",
+			"count": 2,
+			"interval": 4.5
+		}
+	},
 	"sexton": {
 		"name": "The Sexton",
 		"lore": "Keeper of Hollowmere's graves, still at his work — only now he digs them back up.",
 		"sprite": "sexton",
-		"hp": 950,
+		"hp": 1300,
 		"speed": 30,
-		"damage": 20,
+		"damage": 24,
 		"radius": 13,
 		"xp": 40,
 		"gold": 40,
 		"boss": true,
-		"gen_scale": 0.46
+		"gen_scale": 0.46,
+		"enrage": {
+			"below": 0.35,
+			"speed_mul": 1.55,
+			"cooldown_mul": 0.6
+		},
+		"summons": {
+			"type": "shambler",
+			"count": 3,
+			"interval": 5.0
+		}
 	},
 	"courtier": {
 		"name": "Risen Courtier",
@@ -124,6 +187,31 @@
 		"armor": 4,
 		"gold_chance": 0.08,
 		"gen_scale": 0.3
+	},
+	"iron_revenant": {
+		"name": "The Iron Revenant",
+		"lore": "A knight of Castle Vane who never yielded, and death did not change that. Its plate turns all but the heaviest blow.",
+		"sprite": "risen_knight",
+		"hp": 1000,
+		"speed": 30,
+		"damage": 24,
+		"radius": 12,
+		"xp": 30,
+		"gold": 25,
+		"boss": true,
+		"mid_boss": true,
+		"gen_scale": 0.44,
+		"armor": 4,
+		"enrage": {
+			"below": 0.35,
+			"speed_mul": 1.5,
+			"cooldown_mul": 0.55
+		},
+		"summons": {
+			"type": "courtier",
+			"count": 2,
+			"interval": 5.5
+		}
 	},
 	"crypt_archer": {
 		"name": "Crypt Archer",
@@ -166,9 +254,9 @@
 		"name": "The Thing in the Chapel",
 		"lore": "What knelt too long at a broken altar, and answered when something knelt back. Its prayers come in volleys.",
 		"sprite": "chapel_thing",
-		"hp": 2600,
+		"hp": 3400,
 		"speed": 30,
-		"damage": 26,
+		"damage": 30,
 		"radius": 15,
 		"xp": 100,
 		"gold": 100,
@@ -183,6 +271,16 @@
 			"volley": 5,
 			"spread_deg": 55,
 			"hold_distance": false
+		},
+		"enrage": {
+			"below": 0.35,
+			"speed_mul": 1.4,
+			"cooldown_mul": 0.5
+		},
+		"summons": {
+			"type": "courtier",
+			"count": 2,
+			"interval": 6.0
 		}
 	}
 }

@@ -4,6 +4,9 @@
 	"theme": "forest",
 	"run_length": 600,
 	"boss": "briar_queen",
+	"mid_boss": "antler_tyrant",
+	"mid_boss_t": 300,
+	"mid_boss_banner": "The Antlered Dead breaks the treeline",
 	"boss_trickle": "bone_stag",
 	"boss_trickle_interval": 2.2,
 	"victory_unlock": "roland",
@@ -38,65 +41,65 @@
 			"from": 0,
 			"to": 70,
 			"type": "shambler",
-			"interval": 1.2,
-			"count": 2
+			"interval": 0.84,
+			"count": 3
 		},
 		{
 			"from": 30,
 			"to": 160,
 			"type": "hanged_man",
-			"interval": 2.6,
-			"count": 1,
+			"interval": 1.82,
+			"count": 2,
 			"distance": 170
 		},
 		{
 			"from": 60,
 			"to": 240,
 			"type": "wight",
-			"interval": 3.2,
-			"count": 1
+			"interval": 2.24,
+			"count": 2
 		},
 		{
 			"from": 100,
 			"to": 280,
 			"type": "bone_stag",
-			"interval": 2.8,
-			"count": 2
+			"interval": 1.96,
+			"count": 3
 		},
 		{
 			"from": 160,
 			"to": 380,
 			"type": "hanged_man",
-			"interval": 1.6,
-			"count": 2,
+			"interval": 1.12,
+			"count": 3,
 			"distance": 170
 		},
 		{
 			"from": 240,
 			"to": 460,
 			"type": "wight",
-			"interval": 2.0,
+			"interval": 1.4,
 			"count": 2
 		},
 		{
 			"from": 280,
 			"to": 500,
 			"type": "bone_stag",
-			"interval": 1.6,
+			"interval": 1.12,
 			"count": 2
 		},
 		{
 			"from": 300,
 			"to": 450,
 			"type": "shambler",
-			"interval": 0.8,
+			"interval": 0.56,
 			"count": 3
 		},
 		{
 			"from": 380,
 			"to": 600,
 			"type": "hanged_man",
-			"interval": 1.2,
+			"interval": 0.84,
 			"count": 3,
 			"distance": 170
 		},
@@ -104,14 +107,14 @@
 			"from": 460,
 			"to": 600,
 			"type": "wight",
-			"interval": 1.4,
+			"interval": 0.98,
 			"count": 2
 		},
 		{
 			"from": 500,
 			"to": 600,
 			"type": "bone_stag",
-			"interval": 1.0,
+			"interval": 0.7,
 			"count": 3
 		}
 	],

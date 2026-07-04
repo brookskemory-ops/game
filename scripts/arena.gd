@@ -31,6 +31,8 @@ var _wave_acc := PackedFloat32Array()
 var _events_fired := PackedByteArray()
 var _draft_open := false
 var _boss_summoned := false
+var _mid_boss_summoned := false   # the 5-minute boss (a fight, not the finale)
+var _mid_boss_active := false     # true while it lives, so its death != dawn
 var _awaiting_chest := false
 var _trickle_acc := 0.0
 var _rerolls_tonight := 0
@@ -177,6 +179,15 @@ func _physics_process(delta: float) -> void:
 			for c in 3:
 				enemies.spawn("tolling_man", _spawn_point())
 			enemies.spawn("chorister", _spawn_point())
+	# Mid-night boss: a real fight at the halfway mark (default 5:00) so a boss
+	# is reachable well before the finale. Its death is handled apart from the
+	# finale — no chest, no dawn (see _on_boss_died).
+	var mid_id := String(stage.get("mid_boss", ""))
+	if not _endless and not _mid_boss_summoned and not mid_id.is_empty() \
+			and not _boss_summoned and wave_time >= float(stage.get("mid_boss_t", 300)):
+		_mid_boss_summoned = true
+		_mid_boss_active = true
+		enemies.spawn(mid_id, _spawn_point())
 	# The timer running out doesn't end the night — it summons what rings the bell.
 	if not _endless and not _boss_summoned and time_elapsed >= run_length():
 		_summon_boss()
@@ -228,10 +239,16 @@ func _summon_boss() -> void:
 func _on_boss_spawned(display_name: String) -> void:
 	Music.set_boss(true)
 	hud.set_boss_name(display_name)
-	var sub := String(stage.get("boss_banner", ""))
-	if sub.is_empty():
-		sub = "%s rises from the churchyard" % display_name
-	hud.banner("THE BELL TOLLS", sub)
+	var title := "THE BELL TOLLS"
+	var sub := ""
+	if _mid_boss_active:
+		title = "A HERALD COMES"
+		sub = String(stage.get("mid_boss_banner", "%s stirs" % display_name))
+	else:
+		sub = String(stage.get("boss_banner", ""))
+		if sub.is_empty():
+			sub = "%s rises from the churchyard" % display_name
+	hud.banner(title, sub)
 	Sfx.play("bell")
 	player.get_node("Camera2D").add_trauma(0.45)
 
@@ -239,6 +256,16 @@ func _on_boss_spawned(display_name: String) -> void:
 func _on_boss_died(at: Vector2) -> void:
 	Music.set_boss(false)
 	Sfx.play("boss_death")
+	# The mid-night boss is a milestone, not the finale: reward the kill and let
+	# the night roll on — no reliquary, no dawn.
+	if _mid_boss_active:
+		_mid_boss_active = false
+		for c in 10:
+			gems.spawn(at, 5, GemManager.KIND_COIN)
+		player.heal(player.max_hp * 0.35)
+		hud.banner("THE HERALD FALLS", "the night is not done with you")
+		player.get_node("Camera2D").add_trauma(0.25)
+		return
 	_awaiting_chest = true
 	var chest := Reliquary.new()
 	chest.global_position = at

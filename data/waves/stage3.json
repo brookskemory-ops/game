@@ -4,6 +4,9 @@
 	"theme": "castle",
 	"run_length": 600,
 	"boss": "chapel_thing",
+	"mid_boss": "iron_revenant",
+	"mid_boss_t": 300,
+	"mid_boss_banner": "The Iron Revenant will not yield",
 	"boss_banner": "the chapel door stands open",
 	"boss_trickle": "courtier",
 	"boss_trickle_interval": 1.6,
@@ -39,77 +42,77 @@
 			"from": 0,
 			"to": 90,
 			"type": "courtier",
-			"interval": 1.4,
-			"count": 2
+			"interval": 0.98,
+			"count": 3
 		},
 		{
 			"from": 45,
 			"to": 180,
 			"type": "crypt_archer",
-			"interval": 3.4,
-			"count": 1
+			"interval": 2.38,
+			"count": 2
 		},
 		{
 			"from": 75,
 			"to": 260,
 			"type": "risen_knight",
-			"interval": 4.0,
-			"count": 1
+			"interval": 2.8,
+			"count": 2
 		},
 		{
 			"from": 90,
 			"to": 300,
 			"type": "courtier",
-			"interval": 0.9,
-			"count": 3
+			"interval": 0.63,
+			"count": 4
 		},
 		{
 			"from": 180,
 			"to": 420,
 			"type": "crypt_archer",
-			"interval": 3.0,
-			"count": 2
+			"interval": 2.1,
+			"count": 3
 		},
 		{
 			"from": 260,
 			"to": 480,
 			"type": "risen_knight",
-			"interval": 2.2,
+			"interval": 1.54,
 			"count": 2
 		},
 		{
 			"from": 300,
 			"to": 520,
 			"type": "courtier",
-			"interval": 0.7,
+			"interval": 0.49,
 			"count": 3
 		},
 		{
 			"from": 350,
 			"to": 550,
 			"type": "gnawer",
-			"interval": 1.4,
+			"interval": 0.98,
 			"count": 3
 		},
 		{
 			"from": 420,
 			"to": 600,
 			"type": "crypt_archer",
-			"interval": 2.4,
+			"interval": 1.68,
 			"count": 2
 		},
 		{
 			"from": 480,
 			"to": 600,
 			"type": "risen_knight",
-			"interval": 1.6,
+			"interval": 1.12,
 			"count": 3
 		},
 		{
 			"from": 520,
 			"to": 600,
 			"type": "courtier",
-			"interval": 0.5,
+			"interval": 0.35,
 			"count": 4
 		}
 	],

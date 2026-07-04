@@ -33,6 +33,8 @@ var bestiary := {}
 var player_radius := 6.0
 var _boss_slot := -1
 var _boss_max_hp := 1.0
+var _boss_enraged := false      # wounded boss: faster + more aggressive
+var _boss_summon_cd := 0.0      # boss add-summon timer
 
 var _player: Node2D
 var _gems: GemManager
@@ -194,14 +196,42 @@ func spawn(type_name: String, at: Vector2) -> void:
 	if bool(_type_defs[type_id].get("boss", false)):
 		_boss_slot = slot
 		_boss_max_hp = float(_type_defs[type_id].get("hp", 1))
+		_boss_enraged = false
+		# First add-wave waits one interval so the arrival isn't a swarm.
+		_boss_summon_cd = float(_type_defs[type_id].get("summons", {}).get("interval", 5.0))
 		boss_spawned.emit(String(_type_defs[type_id].get("name", type_name)))
 	if bool(_type_defs[type_id].get("elite", false)) or bool(_type_defs[type_id].get("boss", false)):
 		elite_spawned.emit(type_name)
+
+## Boss mechanics, run once per frame for the active boss: enrage below a HP
+## threshold (faster + more aggressive) and periodic add-summons. Cheap — it
+## only touches _boss_slot, not the whole horde.
+func _update_boss_mechanics(delta: float) -> void:
+	_boss_enraged = false
+	if _boss_slot < 0 or _alive[_boss_slot] == 0:
+		return
+	var bdef: Dictionary = _type_defs[_type[_boss_slot]]
+	var enr: Dictionary = bdef.get("enrage", {})
+	var frac := boss_hp_frac()
+	if not enr.is_empty() and frac > 0.0 and frac <= float(enr.get("below", 0.0)):
+		_boss_enraged = true
+	var summ: Dictionary = bdef.get("summons", {})
+	if not summ.is_empty():
+		_boss_summon_cd -= delta
+		if _boss_summon_cd <= 0.0:
+			var s_int := float(summ.get("interval", 5.0))
+			if _boss_enraged:
+				s_int *= float(enr.get("cooldown_mul", 1.0))
+			_boss_summon_cd = s_int
+			for s in int(summ.get("count", 2)):
+				spawn(String(summ.get("type", "shambler")),
+					_pos[_boss_slot] + Vector2.from_angle(randf() * TAU) * 44.0)
 
 func _physics_process(delta: float) -> void:
 	if _player == null:
 		return
 	_time += delta
+	_update_boss_mechanics(delta)
 	var ppos: Vector2 = _player.global_position
 	_grid.clear()
 	var contact_dps := 0.0
@@ -236,6 +266,9 @@ func _physics_process(delta: float) -> void:
 			if _slow[i] > 0.0:
 				_slow[i] -= delta
 				speed_mul = 0.6
+			# A wounded boss surges: enrage quickens its step.
+			if i == _boss_slot and _boss_enraged:
+				speed_mul *= float(def.get("enrage", {}).get("speed_mul", 1.0))
 			_pos[i] += dir * float(def.get("speed", 40)) * speed_mul * _speed_mul * move_sign * delta
 			if absf(dir.x) > 0.1:
 				_facing[i] = -1.0 if dir.x < 0.0 else 1.0
@@ -250,6 +283,9 @@ func _physics_process(delta: float) -> void:
 				_type_mm[_type[i]].set_instance_color(i, Color(1.9 * pulse, 1.0 * pulse, 0.45))
 			if _shot_cd[i] <= 0.0 and dist <= float(ranged.get("range", 150)):
 				_shot_cd[i] = float(ranged.get("cooldown", 2.5))
+				# A wounded ranged boss looses faster.
+				if i == _boss_slot and _boss_enraged:
+					_shot_cd[i] *= float(def.get("enrage", {}).get("cooldown_mul", 1.0))
 				if int(ranged.get("volley", 1)) > 1:
 					_type_mm[_type[i]].set_instance_color(i, Color.WHITE)
 				_fire_bolts(_pos[i], ppos, ranged)

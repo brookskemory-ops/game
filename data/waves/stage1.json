@@ -3,6 +3,9 @@
 	"name": "Hollowmere Village",
 	"run_length": 600,
 	"boss": "sexton",
+	"mid_boss": "grave_tender",
+	"mid_boss_t": 300,
+	"mid_boss_banner": "The Grave-Tender walks the rows",
 	"boss_trickle": "shambler",
 	"boss_trickle_interval": 2.0,
 	"victory_unlock": "maud",
@@ -31,70 +34,70 @@
 			"from": 0,
 			"to": 60,
 			"type": "shambler",
-			"interval": 1.4,
-			"count": 2
+			"interval": 0.98,
+			"count": 3
 		},
 		{
 			"from": 40,
 			"to": 140,
 			"type": "gnawer",
-			"interval": 3.0,
-			"count": 1
+			"interval": 2.1,
+			"count": 2
 		},
 		{
 			"from": 60,
 			"to": 180,
 			"type": "shambler",
-			"interval": 1.0,
-			"count": 2
+			"interval": 0.7,
+			"count": 3
 		},
 		{
 			"from": 120,
 			"to": 300,
 			"type": "gnawer",
-			"interval": 1.8,
-			"count": 2
+			"interval": 1.26,
+			"count": 3
 		},
 		{
 			"from": 180,
 			"to": 360,
 			"type": "shambler",
-			"interval": 0.75,
-			"count": 3
+			"interval": 0.52,
+			"count": 4
 		},
 		{
 			"from": 300,
 			"to": 480,
 			"type": "gnawer",
-			"interval": 1.2,
+			"interval": 0.84,
 			"count": 2
 		},
 		{
 			"from": 360,
 			"to": 540,
 			"type": "wight",
-			"interval": 4.0,
+			"interval": 2.8,
 			"count": 1
 		},
 		{
 			"from": 360,
 			"to": 520,
 			"type": "shambler",
-			"interval": 0.55,
+			"interval": 0.39,
 			"count": 3
 		},
 		{
 			"from": 480,
 			"to": 600,
 			"type": "gnawer",
-			"interval": 0.9,
+			"interval": 0.63,
 			"count": 3
 		},
 		{
 			"from": 520,
 			"to": 600,
 			"type": "shambler",
-			"interval": 0.4,
+			"interval": 0.28,
 			"count": 4
 		}
 	],
