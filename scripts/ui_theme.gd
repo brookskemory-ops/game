@@ -17,6 +17,13 @@ static func fit_width(node: Node, desired: float, margin := 40.0) -> float:
 		return desired
 	return minf(desired, viewport.get_visible_rect().size.x - margin)
 
+## Overlay body height that leaves room for a title above and a button below.
+static func fit_height(node: Node, desired: float, reserved := 110.0) -> float:
+	var viewport := node.get_viewport()
+	if viewport == null:
+		return desired
+	return minf(desired, viewport.get_visible_rect().size.y - reserved)
+
 static func title_font() -> Font:
 	if _title_font == null and ResourceLoader.exists(TITLE_FONT_PATH):
 		_title_font = load(TITLE_FONT_PATH)

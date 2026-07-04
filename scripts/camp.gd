@@ -631,8 +631,19 @@ func _open_shop() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 6)
 	column.add_child(UITheme.make_label("WARES OF THE WAKING", 24, Palette.PARCHMENT, true))
+	# The rows scroll so the leave button always stays on screen (the mobile
+	# profile's shorter viewport can't fit all wares at once).
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 420.0),
+		UITheme.fit_height(self, 240.0))
+	var rows := VBoxContainer.new()
+	rows.add_theme_constant_override("separation", 6)
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for item_id in _shop_defs:
-		column.add_child(_make_shop_row(String(item_id)))
+		rows.add_child(_make_shop_row(String(item_id)))
+	scroll.add_child(rows)
+	column.add_child(scroll)
 	var leave := UITheme.make_button("Back to the fire", 11)
 	leave.pressed.connect(func() -> void:
 		Sfx.play("ui")
