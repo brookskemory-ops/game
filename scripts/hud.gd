@@ -534,7 +534,8 @@ func show_results(victory: bool, stats: Dictionary) -> void:
 	_results_panel = _build_overlay_base()
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
-	var headline := 30 if _narrow else 46
+	# 22 on the 270-wide canvas: "THE NIGHT TAKES YOU" must fit edge to edge.
+	var headline := 22 if _narrow else 46
 	if victory:
 		column.add_child(UITheme.make_label("DAWN BREAKS", headline, Palette.TORCH, true))
 		column.add_child(UITheme.make_label("the vigil holds.", 13, Palette.ASH))
