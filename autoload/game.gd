@@ -75,8 +75,10 @@ func _ready() -> void:
 func _apply_device_profile() -> void:
 	if not OS.has_feature("web"):
 		return
-	is_mobile = DisplayServer.is_touchscreen_available() \
-		or bool(JavaScriptBridge.eval("'ontouchstart' in window", true))
+	# Ask the browser directly: DisplayServer.is_touchscreen_available() is
+	# always true here because emulate_touch_from_mouse is on project-wide.
+	is_mobile = bool(JavaScriptBridge.eval(
+		"('ontouchstart' in window) || navigator.maxTouchPoints > 0", true))
 	if is_mobile:
 		get_window().content_scale_size = Vector2i(480, 270)
 
