@@ -129,6 +129,96 @@ jobs:
           done
           git push origin HEAD:${GITHUB_REF_NAME}
 
+  # PC is the first release target: build self-contained Linux and Windows
+  # executables and upload them as workflow artifacts (itch.io / Steam ready).
+  # Runs in parallel with the web build; does not gate the Pages deploy.
+  desktop:
+    name: Export desktop builds (Linux + Windows)
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Import project
+        run: godot --headless --import || true
+
+      # Same template-visibility problem as the web job (HOME=/github/home):
+      # fetch the standard export templates and drop in the desktop ones.
+      - name: Cache desktop export templates
+        id: cache-desktop
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.local/share/godot/export_templates/4.4.1.stable
+          key: godot-4.4.1-desktop-v1
+
+      - name: Install desktop templates
+        if: steps.cache-desktop.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          url="https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+          if command -v wget >/dev/null 2>&1; then
+            wget -q -O /tmp/templates.tpz "$url"
+          else
+            apt-get update -qq && apt-get install -y -qq wget
+            wget -q -O /tmp/templates.tpz "$url"
+          fi
+          cd /tmp
+          unzip -o templates.tpz "templates/linux_*" "templates/windows_*"
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          cp templates/linux_* templates/windows_* "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
+          ls -la "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
+
+      - name: Export Linux
+        shell: bash
+        run: |
+          mkdir -p build/linux
+          godot --headless --export-release "Linux" build/linux/vigil.x86_64
+          chmod +x build/linux/vigil.x86_64
+          ls -la build/linux
+
+      - name: Export Windows
+        shell: bash
+        run: |
+          mkdir -p build/windows
+          godot --headless --export-release "Windows Desktop" build/windows/vigil.exe
+          ls -la build/windows
+
+      # Smoke-test the Linux export the same way we boot the project headless:
+      # run the real exported binary for ~2s and fail on any script error.
+      - name: Smoke-test Linux build
+        shell: bash
+        run: |
+          out=$(./build/linux/vigil.x86_64 --headless --quit-after 120 2>&1 || true)
+          echo "$out"
+          if echo "$out" | grep -qE "SCRIPT ERROR|Failed to load script|Parse Error"; then
+            echo "::error::Script errors in the exported Linux build"
+            exit 1
+          fi
+
+      - name: Package Linux
+        shell: bash
+        run: |
+          cd build/linux && zip -r ../../vigil-linux.zip . && cd ../..
+
+      - name: Package Windows
+        shell: bash
+        run: |
+          cd build/windows && zip -r ../../vigil-windows.zip . && cd ../..
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vigil-linux
+          path: vigil-linux.zip
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vigil-windows
+          path: vigil-windows.zip
+
   # The Pages site exists in "GitHub Actions" mode (branch pushes never
   # rebuild it), so deploy the artifact directly. The earlier failure was
   # only at site *creation* — deploying to the existing site works with

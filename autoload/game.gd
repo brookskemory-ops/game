@@ -7,7 +7,7 @@ signal run_ended(victory: bool)
 signal gold_changed(total: int)
 signal orientation_changed  # mobile canvas swapped landscape <-> portrait
 
-const VERSION := "1.0-rc4 — held either way"
+const VERSION := "1.1-pc — at the desk"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -69,6 +69,25 @@ func _ready() -> void:
 	_apply_device_profile()
 	load_save()
 	Music.play_camp.call_deferred()  # the title shares the fire's theme
+
+## F11 toggles fullscreen anywhere in the game (desktop and web).
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("toggle_fullscreen"):
+		toggle_fullscreen()
+		get_viewport().set_input_as_handled()
+
+func toggle_fullscreen() -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval(
+			"document.fullscreenElement ? document.exitFullscreen() : (document.documentElement.requestFullscreen && document.documentElement.requestFullscreen())",
+			true)
+		return
+	var mode := DisplayServer.window_get_mode()
+	if mode == DisplayServer.WINDOW_MODE_FULLSCREEN \
+			or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 
 const MOBILE_LANDSCAPE := Vector2i(480, 270)
 const MOBILE_PORTRAIT := Vector2i(270, 480)

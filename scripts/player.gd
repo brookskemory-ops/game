@@ -230,7 +230,9 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if dead:
 		return
-	var dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	# WASD and arrow keys both move (see project.godot [input]); on touch the
+	# virtual joystick overrides whenever it has meaningful output.
+	var dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if _joystick != null and _joystick.output.length() > 0.05:
 		dir = _joystick.output
 	# Light Foot (Wren's signature): faster while unthreatened. Checked at 5 Hz.

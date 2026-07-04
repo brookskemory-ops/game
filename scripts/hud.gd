@@ -91,7 +91,9 @@ func _ready() -> void:
 
 	# First night ever: one movement nudge, gone the moment they move.
 	if not Game.hint_seen("move"):
-		_move_hint = UITheme.make_label("touch and drag anywhere to move", 12, Palette.BONE)
+		var move_text := "touch and drag anywhere to move" if Game.is_mobile \
+			else "WASD or arrows to move"
+		_move_hint = UITheme.make_label(move_text, 12, Palette.BONE)
 		add_child(_move_hint)
 
 	_layout_statics()

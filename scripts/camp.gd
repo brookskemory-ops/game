@@ -130,7 +130,9 @@ func _ready() -> void:
 
 	# The very first visitor gets one nudge toward the fire.
 	if not Game.hint_seen("begin"):
-		var nudge := UITheme.make_label("tap Wren — begin the vigil", 11, Palette.TORCH)
+		var nudge_text := "tap Wren — begin the vigil" if Game.is_mobile \
+			else "click a survivor — begin the vigil"
+		var nudge := UITheme.make_label(nudge_text, 11, Palette.TORCH)
 		_place(nudge, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 66, 500, 16))
 		add_child(nudge)
 		var pulse := create_tween().set_loops()

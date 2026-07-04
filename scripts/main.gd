@@ -32,7 +32,8 @@ func _ready() -> void:
 	_place(subtitle, 0.5, 0.5, 0.5, 0.5, Rect2(-300, -24, 600, 22))
 	add_child(subtitle)
 
-	_prompt = UITheme.make_label("TAP TO BEGIN", 13, Palette.BONE)
+	var begin_text := "TAP TO BEGIN" if Game.is_mobile else "CLICK OR PRESS ANY KEY"
+	_prompt = UITheme.make_label(begin_text, 13, Palette.BONE)
 	_place(_prompt, 0.5, 1.0, 0.5, 1.0, Rect2(-150, -64, 300, 22))
 	add_child(_prompt)
 
