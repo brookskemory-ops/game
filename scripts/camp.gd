@@ -13,6 +13,25 @@ var _vignettes := {}
 var _shop_defs := {}
 var _endings := {}
 
+## Set while a tap-to-close narrative card (prologue / stage intro / hero tale /
+## ending epilogue) is open. Driven from _input so the dismiss can't be eaten
+## by the card's own panel or labels — the gui_input + mouse_filter route was
+## fragile and left the card un-closable ("frozen").
+var _narrative_dismiss := Callable()
+var _last_dismiss_ms := 0
+
+func _input(event: InputEvent) -> void:
+	if not _narrative_dismiss.is_valid() or not _is_press(event):
+		return
+	# emulate_touch_from_mouse fires a mouse AND a synthesized touch for one
+	# click; debounce so a single tap doesn't skip two stacked cards.
+	var now := Time.get_ticks_msec()
+	if now - _last_dismiss_ms < 250:
+		return
+	_last_dismiss_ms = now
+	_narrative_dismiss.call()
+	get_viewport().set_input_as_handled()
+
 ## True when the design viewport is portrait-narrow (the bottom controls
 ## stack in two rows instead of one). Fixed per camp visit: rotation reloads
 ## the scene, so the layout is always built for the current orientation.
@@ -190,16 +209,15 @@ func _show_story_card(title: String, lines: Array, on_close := Callable()) -> vo
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	panel.add_child(column)
 	_center(_story_overlay, panel)
-	panel.mouse_filter = Control.MOUSE_FILTER_PASS
-	var close := func(event: InputEvent) -> void:
-		if _is_press(event) and _story_overlay != null:
-			Sfx.play("ui")
-			_story_overlay.queue_free()
-			_story_overlay = null
-			if on_close.is_valid():
-				on_close.call()
-	_story_overlay.gui_input.connect(close)
-	panel.gui_input.connect(close)
+	_narrative_dismiss = func() -> void:
+		if _story_overlay == null:
+			return
+		Sfx.play("ui")
+		_story_overlay.queue_free()
+		_story_overlay = null
+		_narrative_dismiss = Callable()
+		if on_close.is_valid():
+			on_close.call()
 
 ## First time a night is chosen, set its scene before the vigil begins.
 func _maybe_show_stage_intro(stage_id: String) -> void:
@@ -455,19 +473,15 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	panel.add_child(column)
 	_center(_vignette_overlay, panel)
-	# Tap ANYWHERE closes — including on the panel itself, which otherwise
-	# swallows the tap (PanelContainer defaults to MOUSE_FILTER_STOP; on a
-	# phone the panel is most of the screen, so the game read as frozen).
-	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.mouse_filter = Control.MOUSE_FILTER_PASS
-	var close := func(event: InputEvent) -> void:
-		if _is_press(event) and _vignette_overlay != null:
-			Sfx.play("ui")
-			_vignette_overlay.queue_free()
-			_vignette_overlay = null
-			_show_next_unlock_vignette()
-	_vignette_overlay.gui_input.connect(close)
-	panel.gui_input.connect(close)
+	# Tap ANYWHERE closes, dismissed from _input (see _narrative_dismiss).
+	_narrative_dismiss = func() -> void:
+		if _vignette_overlay == null:
+			return
+		Sfx.play("ui")
+		_vignette_overlay.queue_free()
+		_vignette_overlay = null
+		_narrative_dismiss = Callable()
+		_show_next_unlock_vignette()
 
 # --- The ending (Block B): the Hollow King's last bargain ---
 
@@ -529,16 +543,15 @@ func _show_ending_epilogue(ending_id: String) -> void:
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	panel.add_child(column)
 	_center(_ending_overlay, panel)
-	# Same tap-anywhere rule as vignettes (the panel must not eat the tap).
-	panel.mouse_filter = Control.MOUSE_FILTER_PASS
-	var close := func(event: InputEvent) -> void:
-		if _is_press(event) and _ending_overlay != null:
-			Sfx.play("ui")
-			_ending_overlay.queue_free()
-			_ending_overlay = null
-			_show_next_unlock_vignette()
-	_ending_overlay.gui_input.connect(close)
-	panel.gui_input.connect(close)
+	# Tap anywhere closes, dismissed from _input (see _narrative_dismiss).
+	_narrative_dismiss = func() -> void:
+		if _ending_overlay == null:
+			return
+		Sfx.play("ui")
+		_ending_overlay.queue_free()
+		_ending_overlay = null
+		_narrative_dismiss = Callable()
+		_show_next_unlock_vignette()
 
 # --- Settings by the fire ---
 
