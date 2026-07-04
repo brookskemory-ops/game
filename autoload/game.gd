@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.15.0 — many nights"
+const VERSION := "0.16.0 — the sound of the night"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -60,11 +60,13 @@ var last_run := {
 
 func _ready() -> void:
 	load_save()
+	Music.play_camp.call_deferred()  # the title shares the fire's theme
 
 # --- Scene routing ---
 
 func go_camp() -> void:
 	get_tree().paused = false
+	Music.play_camp()
 	get_tree().change_scene_to_file("res://scenes/camp.tscn")
 
 func start_run() -> void:
@@ -80,6 +82,7 @@ func start_run() -> void:
 					break
 	run_gold = 0
 	get_tree().paused = false
+	Music.play_night()
 	run_started.emit()
 	get_tree().change_scene_to_file("res://scenes/arena.tscn")
 

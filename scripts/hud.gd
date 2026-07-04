@@ -403,6 +403,15 @@ func _build_pause_panel() -> void:
 		Sfx.play("ui")
 	)
 	column.add_child(sound)
+	var music := UITheme.make_button(_music_label())
+	music.pressed.connect(func() -> void:
+		var muted := float(Game.settings.get("music_volume", 1.0)) <= 0.01
+		Game.settings["music_volume"] = 1.0 if muted else 0.0
+		Game.write_save()
+		music.text = _music_label()
+		Sfx.play("ui")
+	)
+	column.add_child(music)
 	var numbers := UITheme.make_button(_numbers_label())
 	numbers.pressed.connect(func() -> void:
 		Game.settings["damage_numbers"] = not bool(Game.settings.get("damage_numbers", true))
@@ -419,6 +428,9 @@ func _build_pause_panel() -> void:
 
 func _sound_label() -> String:
 	return "Sound: off" if float(Game.settings.get("sfx_volume", 1.0)) <= 0.01 else "Sound: on"
+
+func _music_label() -> String:
+	return "Music: off" if float(Game.settings.get("music_volume", 1.0)) <= 0.01 else "Music: on"
 
 func _numbers_label() -> String:
 	return "Damage numbers: on" if bool(Game.settings.get("damage_numbers", true)) else "Damage numbers: off"

@@ -23,6 +23,7 @@ var rites: RiteTracker
 var _time_scale := 1.0   # Hourless Glass relic
 var _wisp_acc := 0.0     # Wisp in a Jar relic
 var _spawn_mul := 1.0    # night modifier: spawn-rate multiplier
+var _music_acc := 0.0    # danger-layer update timer
 var _endless := false    # The Long Night: no dawn, only deeper dark
 var _endless_tier := 0
 var _storm_count := 0
@@ -147,6 +148,11 @@ func _physics_process(delta: float) -> void:
 		if _wisp_acc >= 30.0:
 			_wisp_acc = 0.0
 			gems.vacuum_all()
+	# The danger layer swells with the horde (checked at ~2 Hz).
+	_music_acc += delta
+	if _music_acc >= 0.5:
+		_music_acc = 0.0
+		Music.set_danger(clampf(float(enemies.alive_count()) / 250.0, 0.0, 1.0))
 	# The Long Night: waves loop, the dark deepens, storms toll — no dawn.
 	var wave_time := time_elapsed
 	if _endless:
@@ -219,6 +225,7 @@ func _summon_boss() -> void:
 	enemies.spawn(boss_id, _spawn_point())
 
 func _on_boss_spawned(display_name: String) -> void:
+	Music.set_boss(true)
 	hud.set_boss_name(display_name)
 	var sub := String(stage.get("boss_banner", ""))
 	if sub.is_empty():
@@ -229,6 +236,7 @@ func _on_boss_spawned(display_name: String) -> void:
 
 ## The boss drops the reliquary; the run ends after it is claimed.
 func _on_boss_died(at: Vector2) -> void:
+	Music.set_boss(false)
 	Sfx.play("boss_death")
 	_awaiting_chest = true
 	var chest := Reliquary.new()
