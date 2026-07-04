@@ -148,12 +148,69 @@ func _ready() -> void:
 	)
 	add_child(gear)
 
-	# The Hollow King's victory poses the final choice; otherwise, newly
-	# unlocked survivors tell their tale as they join the fire.
+	# The Hollow King's victory poses the final choice; otherwise the very
+	# first visitor gets the prologue, and newly unlocked survivors tell their
+	# tale as they join the fire.
 	if Game.ending_pending():
 		_show_ending_choice()
+	elif not Game.hint_seen("prologue"):
+		Game.mark_hint("prologue")
+		var pro: Variant = Game.load_json("res://data/story/prologue.json")
+		if pro is Dictionary:
+			_show_story_card(String(pro.get("title", "")), pro.get("lines", []), _show_next_unlock_vignette)
+		else:
+			_show_next_unlock_vignette()
 	else:
 		_show_next_unlock_vignette()
+
+## A generic tap-to-close story card (prologue, stage intros). Same overlay as
+## the hero vignettes, with the same click-through rule so it never freezes.
+var _story_overlay: Control
+
+func _show_story_card(title: String, lines: Array, on_close := Callable()) -> void:
+	if _story_overlay != null:
+		return
+	_story_overlay = _overlay()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 470.0), 0)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(UITheme.make_label(title, 26, Palette.TORCH, true))
+	for line in lines:
+		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		text.custom_minimum_size = Vector2(UITheme.fit_width(self, 450.0, 60.0), 0)
+		column.add_child(text)
+	var prompt := UITheme.make_label("tap to go on", 10, Palette.BONE)
+	column.add_child(prompt)
+	var tween := create_tween().set_loops()
+	tween.tween_property(prompt, "modulate:a", 0.35, 0.7)
+	tween.tween_property(prompt, "modulate:a", 1.0, 0.7)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_story_overlay, panel)
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	var close := func(event: InputEvent) -> void:
+		if _is_press(event) and _story_overlay != null:
+			Sfx.play("ui")
+			_story_overlay.queue_free()
+			_story_overlay = null
+			if on_close.is_valid():
+				on_close.call()
+	_story_overlay.gui_input.connect(close)
+	panel.gui_input.connect(close)
+
+## First time a night is chosen, set its scene before the vigil begins.
+func _maybe_show_stage_intro(stage_id: String) -> void:
+	var key := "intro_" + stage_id
+	if Game.hint_seen(key):
+		return
+	var intros: Variant = Game.load_json("res://data/story/stage_intros.json")
+	if intros is Dictionary and intros.has(stage_id):
+		Game.mark_hint(key)
+		var it: Dictionary = intros[stage_id]
+		_show_story_card(String(it.get("title", "")), it.get("lines", []))
 
 ## The camp is a menu — rebuilding it for the new orientation is cheap and
 ## closes any overlay sized for the old one.
@@ -268,6 +325,7 @@ func _make_night_row(entry: Dictionary) -> Control:
 		_night_overlay.queue_free()
 		_night_overlay = null
 		_build_stage_row()
+		_maybe_show_stage_intro(night_id)
 	)
 	row.add_child(pick)
 	var info := VBoxContainer.new()

@@ -1,0 +1,23 @@
+{
+	"stage1": {
+		"title": "Hollowmere Village",
+		"lines": [
+			"The village first. This is where the dead come thickest — they have the least ground to climb, and they know the streets as well as you do.",
+			"Hold the square. Somewhere out in the fog, the one who tends the graves has heard you, and is coming to put you back in yours."
+		]
+	},
+	"stage2": {
+		"title": "The Wailing Forest",
+		"lines": [
+			"Past the last house the Wailing Forest crowds down to the water. The trees here were buried once too, and they remember it.",
+			"Something with antlers moves between the trunks, and something older still rules from the briar. The forest does not want to be walked tonight."
+		]
+	},
+	"stage3": {
+		"title": "Castle Vane",
+		"lines": [
+			"The road climbs at last to Castle Vane, where the bell hangs and the bargain was struck.",
+			"Whatever the king let into the chapel is still there, and it has been waiting a long time to be met. This is where the night is decided — one way, or the other."
+		]
+	}
+}
