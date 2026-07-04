@@ -9,6 +9,14 @@ const BODY_FONT_PATH := "res://assets/fonts/PixelifySans.ttf"
 static var _title_font: Font
 static var _body_font: Font
 
+## Panels/columns designed for the 640-wide desktop canvas must shrink on the
+## mobile profile (480-wide minimum). Pass any node for viewport access.
+static func fit_width(node: Node, desired: float, margin := 40.0) -> float:
+	var viewport := node.get_viewport()
+	if viewport == null:
+		return desired
+	return minf(desired, viewport.get_visible_rect().size.x - margin)
+
 static func title_font() -> Font:
 	if _title_font == null and ResourceLoader.exists(TITLE_FONT_PATH):
 		_title_font = load(TITLE_FONT_PATH)

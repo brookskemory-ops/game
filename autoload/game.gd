@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "1.0-rc2 — fits in the hand"
+const VERSION := "1.0-rc3 — made for the thumb"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -61,9 +61,24 @@ var last_run := {
 	"character": "",
 }
 
+## True on touch devices: the mobile profile renders everything ~33% larger.
+var is_mobile := false
+
 func _ready() -> void:
+	_apply_device_profile()
 	load_save()
 	Music.play_camp.call_deferred()  # the title shares the fire's theme
+
+## One build, two profiles: phones get a smaller design canvas so the world
+## and UI render larger; desktop keeps the original 640x360. Runtime-detected,
+## no separate branches.
+func _apply_device_profile() -> void:
+	if not OS.has_feature("web"):
+		return
+	is_mobile = DisplayServer.is_touchscreen_available() \
+		or bool(JavaScriptBridge.eval("'ontouchstart' in window", true))
+	if is_mobile:
+		get_window().content_scale_size = Vector2i(480, 270)
 
 # --- Scene routing ---
 

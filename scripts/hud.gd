@@ -329,7 +329,7 @@ func show_draft(options: Array, on_pick: Callable, reroll_cost := 0, on_reroll :
 
 func _make_draft_card(option: Dictionary, on_pick: Callable) -> Button:
 	var card := UITheme.make_button("", 12)
-	card.custom_minimum_size = Vector2(150, 132)
+	card.custom_minimum_size = Vector2(minf(150.0, (get_viewport().get_visible_rect().size.x - 72.0) / 3.0), 132)
 	var inner := VBoxContainer.new()
 	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_theme_constant_override("separation", 6)

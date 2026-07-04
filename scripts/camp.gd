@@ -45,10 +45,17 @@ func _ready() -> void:
 	if roster is Array:
 		for hero_id in roster:
 			row.add_child(_make_hero_column(String(hero_id)))
+	# The row (618px of cards) fits the desktop canvas whole; on the mobile
+	# profile (480-wide minimum) it becomes a swipeable strip instead.
+	var hero_scroll := ScrollContainer.new()
+	hero_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	hero_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	hero_scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 624.0, 12.0), 196)
+	hero_scroll.add_child(row)
 	var center := CenterContainer.new()
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_place(center, 0.0, 0.0, 1.0, 1.0, Rect2(0, 26, 0, -44))
-	center.add_child(row)
+	center.add_child(hero_scroll)
 	add_child(center)
 
 	var wares := UITheme.make_button("W A R E S", 12)
@@ -193,7 +200,7 @@ func _open_night_picker() -> void:
 	column.add_theme_constant_override("separation", 6)
 	column.add_child(UITheme.make_label("CHOOSE THE NIGHT", 24, Palette.PARCHMENT, true))
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(500, 220)
+	scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 500.0), 220)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
@@ -338,7 +345,7 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 	_vignette_overlay = _overlay()
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
-	column.custom_minimum_size = Vector2(460, 0)
+	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 460.0), 0)
 	if from_unlock:
 		column.add_child(UITheme.make_label("A NEW FACE AT THE FIRE", 13, Palette.ASH))
 	var face := TextureRect.new()
@@ -351,7 +358,7 @@ func _show_vignette(hero_id: String, from_unlock: bool) -> void:
 	for line in vignette.get("lines", []):
 		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		text.custom_minimum_size = Vector2(440, 0)
+		text.custom_minimum_size = Vector2(UITheme.fit_width(self, 440.0, 60.0), 0)
 		column.add_child(text)
 	var prompt := UITheme.make_label("tap to return to the fire", 10, Palette.BONE)
 	column.add_child(prompt)
@@ -385,12 +392,12 @@ func _show_ending_choice() -> void:
 	_ending_overlay = _overlay()
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 10)
-	column.custom_minimum_size = Vector2(470, 0)
+	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 470.0), 0)
 	column.add_child(UITheme.make_label(String(prompt.get("title", "")), 28, Palette.TORCH, true))
 	for line in prompt.get("lines", []):
 		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		text.custom_minimum_size = Vector2(450, 0)
+		text.custom_minimum_size = Vector2(UITheme.fit_width(self, 450.0, 60.0), 0)
 		column.add_child(text)
 	for choice in prompt.get("choices", []):
 		var choice_id := String(choice.get("id", ""))
@@ -405,7 +412,7 @@ func _show_ending_choice() -> void:
 		column.add_child(button)
 		var hint := UITheme.make_label(String(choice.get("hint", "")), 9, Palette.ASH)
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		hint.custom_minimum_size = Vector2(450, 0)
+		hint.custom_minimum_size = Vector2(UITheme.fit_width(self, 450.0, 60.0), 0)
 		column.add_child(hint)
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
@@ -419,12 +426,12 @@ func _show_ending_epilogue(ending_id: String) -> void:
 	_ending_overlay = _overlay()
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
-	column.custom_minimum_size = Vector2(470, 0)
+	column.custom_minimum_size = Vector2(UITheme.fit_width(self, 470.0), 0)
 	column.add_child(UITheme.make_label(String(epilogue.get("title", "")), 28, Palette.TORCH, true))
 	for line in epilogue.get("lines", []):
 		var text := UITheme.make_label(String(line), 11, Palette.PARCHMENT)
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		text.custom_minimum_size = Vector2(450, 0)
+		text.custom_minimum_size = Vector2(UITheme.fit_width(self, 450.0, 60.0), 0)
 		column.add_child(text)
 	var prompt := UITheme.make_label("tap to return to the fire", 10, Palette.BONE)
 	column.add_child(prompt)
@@ -508,7 +515,7 @@ func _open_ledger() -> void:
 	column.add_child(UITheme.make_label("THE LEDGER", 24, Palette.PARCHMENT, true))
 	column.add_child(UITheme.make_label("what the vale remembers", 10, Palette.ASH))
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(500, 220)
+	scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 500.0), 220)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
