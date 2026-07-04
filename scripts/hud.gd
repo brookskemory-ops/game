@@ -436,6 +436,15 @@ func _build_pause_panel() -> void:
 		Sfx.play("ui")
 	)
 	column.add_child(numbers)
+	if OS.has_feature("web"):
+		var full := UITheme.make_button("Fullscreen")
+		full.pressed.connect(func() -> void:
+			Sfx.play("ui")
+			JavaScriptBridge.eval(
+				"document.fullscreenElement ? document.exitFullscreen() : (document.documentElement.requestFullscreen && document.documentElement.requestFullscreen())",
+				true)
+		)
+		column.add_child(full)
 	var restart := UITheme.make_button("Restart the night")
 	restart.pressed.connect(func() -> void:
 		if restart.text == "Restart the night":

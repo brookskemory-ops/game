@@ -8,6 +8,7 @@ var _time := 0.0
 var _prompt: Label
 var _moon_tex: Texture2D
 var _hero_texs: Array = []  # unlocked survivors' side profiles, walking the road
+var _full_btn: Button
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -39,6 +40,19 @@ func _ready() -> void:
 	version.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_place(version, 0.0, 1.0, 0.0, 1.0, Rect2(8, -20, 300, 14))
 	add_child(version)
+
+	# Web: offer fullscreen (a phone browser's chrome eats a lot of night).
+	# The tap-to-begin handler ignores taps on this button (it consumes them).
+	if OS.has_feature("web"):
+		_full_btn = UITheme.make_button("fullscreen", 9)
+		_place(_full_btn, 1.0, 0.0, 1.0, 0.0, Rect2(-104, 10, 96, 26))
+		_full_btn.pressed.connect(func() -> void:
+			Sfx.play("ui")
+			JavaScriptBridge.eval(
+				"document.documentElement.requestFullscreen && document.documentElement.requestFullscreen()",
+				true)
+		)
+		add_child(_full_btn)
 
 	if float(Game.last_run.get("time", 0.0)) > 0.0:
 		var seconds := int(Game.last_run.get("time", 0.0))
@@ -159,12 +173,19 @@ func _input(event: InputEvent) -> void:
 	if _started:
 		return
 	var pressed := false
+	var at := Vector2(-1000, -1000)
 	if event is InputEventScreenTouch and event.pressed:
 		pressed = true
+		at = event.position
 	elif event is InputEventMouseButton and event.pressed:
 		pressed = true
+		at = event.position
 	elif event is InputEventKey and event.pressed and not event.echo:
 		pressed = true
+	# _input runs before button handlers: a tap on the fullscreen button
+	# must not double as tap-to-begin.
+	if pressed and _full_btn != null and _full_btn.get_global_rect().has_point(at):
+		return
 	if pressed:
 		_started = true
 		Game.go_camp()
