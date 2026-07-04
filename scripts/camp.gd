@@ -203,7 +203,7 @@ func _show_story_card(title: String, lines: Array, on_close := Callable()) -> vo
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		text.custom_minimum_size = Vector2(UITheme.fit_width(self, 450.0, 60.0), 0)
 		column.add_child(text)
-	var cont := UITheme.make_button("Continue  ▸", 13)
+	var cont := UITheme.make_button("Continue", 13)
 	cont.pressed.connect(_dismiss_narrative)
 	column.add_child(cont)
 	var panel := PanelContainer.new()
