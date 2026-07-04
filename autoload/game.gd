@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.17.0 — first night"
+const VERSION := "1.0-rc — the vigil holds"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -48,6 +48,7 @@ var save_data := {
 	"relic_equipped": "",
 	"relics_equipped": [],
 	"seen_hints": {},
+	"save_version": 1,
 }
 
 ## Stats from the most recent run, for camp/results screens.
@@ -281,11 +282,17 @@ func load_save() -> void:
 	for key in settings:
 		if saved_settings.has(key):
 			settings[key] = saved_settings[key]
-	# Migration: the single relic slot (v0.14) became a list (v0.16.1).
+	_migrate_save()
+
+## One place for schema migrations, keyed on save_version, so no future
+## change ever eats a player's progress. Bump save_version when adding one.
+func _migrate_save() -> void:
+	# v0 -> v1: the single relic slot (v0.14) became a list (v0.16.1).
 	var old_relic := String(save_data.get("relic_equipped", ""))
 	if not old_relic.is_empty() and (save_data.get("relics_equipped", []) as Array).is_empty():
 		save_data["relics_equipped"] = [old_relic]
 		save_data["relic_equipped"] = ""
+	save_data["save_version"] = 1
 
 func write_save() -> void:
 	save_data["settings"] = settings

@@ -218,3 +218,22 @@ story-tied objectives, more maps, and an endless mode.
 - **Verified**: CI green on all six pushes; full qa_suite zero errors on the final build;
   reviewed in-game: build tray + icons, Test-Light rite candle lit, night picker with
   lock hints, Deep Mist fog + shrine, Long Night count-up at 1:48 with 113 kills.
+
+---
+
+## Block C — "The Dawn" (v0.16.0 → v1.0-rc)
+
+- **v0.16.0 "The Sound of the Night"**: four synthesized loops (numpy → WAV, tails
+  crossfaded into heads), blended by a Music autoload — camp/night crossfade on routing,
+  a danger layer that swells with the living horde, a boss layer that ducks the night
+  under the bell. 1.5MB added; Music toggle in the pause menu.
+- **v0.16.1 "The Scales Balance"**: archer bolt/wave tuning, an ember telegraph before
+  the Thing's volleys, Deathless leech 1.5, Long Night escalation every 2:30 with
+  numbered tiers, and the Reliquary Chain — WARES sells a second relic slot (carry list
+  with automatic migration from the single-slot save).
+- **v0.17.0 "First Night"**: save-persisted one-time hints (begin / move / draft /
+  rite), a camp settings overlay, Restart-the-night in the pause menu, rite outcome on
+  the results screen, and the unlocked survivors walking the title-screen road.
+- **v1.0-rc "The Vigil Holds"**: save_version + a single migration hook, README rewritten
+  as a landing page, and the full QA battery (suite + all-night boots + perf + layout)
+  run against the final build. The release gate from here is the user's own playtests.
