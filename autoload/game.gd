@@ -5,8 +5,9 @@ extends Node
 signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
+signal orientation_changed  # mobile canvas swapped landscape <-> portrait
 
-const VERSION := "1.0-rc3 — made for the thumb"
+const VERSION := "1.0-rc4 — held either way"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -69,9 +70,13 @@ func _ready() -> void:
 	load_save()
 	Music.play_camp.call_deferred()  # the title shares the fire's theme
 
+const MOBILE_LANDSCAPE := Vector2i(480, 270)
+const MOBILE_PORTRAIT := Vector2i(270, 480)
+
 ## One build, two profiles: phones get a smaller design canvas so the world
 ## and UI render larger; desktop keeps the original 640x360. Runtime-detected,
-## no separate branches.
+## no separate branches. The vigil is kept in either orientation: the canvas
+## follows the phone whenever it rotates.
 func _apply_device_profile() -> void:
 	if not OS.has_feature("web"):
 		return
@@ -80,7 +85,15 @@ func _apply_device_profile() -> void:
 	is_mobile = bool(JavaScriptBridge.eval(
 		"('ontouchstart' in window) || navigator.maxTouchPoints > 0", true))
 	if is_mobile:
-		get_window().content_scale_size = Vector2i(480, 270)
+		_update_mobile_scale()
+		get_window().size_changed.connect(_update_mobile_scale)
+
+func _update_mobile_scale() -> void:
+	var win := get_window()
+	var target := MOBILE_PORTRAIT if win.size.y > win.size.x else MOBILE_LANDSCAPE
+	if win.content_scale_size != target:
+		win.content_scale_size = target
+		orientation_changed.emit()
 
 # --- Scene routing ---
 

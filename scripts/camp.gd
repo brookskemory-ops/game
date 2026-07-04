@@ -13,8 +13,15 @@ var _vignettes := {}
 var _shop_defs := {}
 var _endings := {}
 
+## True when the design viewport is portrait-narrow (the bottom controls
+## stack in two rows instead of one). Fixed per camp visit: rotation reloads
+## the scene, so the layout is always built for the current orientation.
+var _narrow := false
+
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	_narrow = get_viewport().get_visible_rect().size.x < 400.0
+	Game.orientation_changed.connect(_on_orientation_changed)
 	_coin_tex = PixelSprites.get_tex("coin")
 	var vignette_data: Variant = Game.load_json("res://data/story/vignettes.json")
 	if vignette_data is Dictionary:
@@ -58,8 +65,10 @@ func _ready() -> void:
 	center.add_child(hero_scroll)
 	add_child(center)
 
+	# Portrait stacks the bottom controls in two rows; landscape keeps one.
 	var wares := UITheme.make_button("W A R E S", 12)
-	_place(wares, 0.5, 1.0, 0.5, 1.0, Rect2(-62, -40, 124, 30))
+	_place(wares, 0.5, 1.0, 0.5, 1.0,
+		Rect2(5, -110, 124, 30) if _narrow else Rect2(-62, -40, 124, 30))
 	wares.pressed.connect(func() -> void:
 		Sfx.play("ui")
 		_open_shop()
@@ -67,7 +76,8 @@ func _ready() -> void:
 	add_child(wares)
 
 	var ledger := UITheme.make_button("L E D G E R", 12)
-	_place(ledger, 0.5, 1.0, 0.5, 1.0, Rect2(-196, -40, 124, 30))
+	_place(ledger, 0.5, 1.0, 0.5, 1.0,
+		Rect2(-129, -110, 124, 30) if _narrow else Rect2(-196, -40, 124, 30))
 	ledger.pressed.connect(func() -> void:
 		Sfx.play("ui")
 		_open_ledger()
@@ -111,8 +121,11 @@ func _ready() -> void:
 		var text := "last night:  %s  ·  %d:%02d  ·  %d dead" % [
 			verdict, seconds / 60, seconds % 60, int(Game.last_run.get("kills", 0))]
 		var last_run := UITheme.make_label(text, 10, Palette.ASH)
-		last_run.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		_place(last_run, 1.0, 1.0, 1.0, 1.0, Rect2(-340, -24, 332, 16))
+		if _narrow:
+			_place(last_run, 0.5, 1.0, 0.5, 1.0, Rect2(-129, -76, 258, 16))
+		else:
+			last_run.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			_place(last_run, 1.0, 1.0, 1.0, 1.0, Rect2(-340, -24, 332, 16))
 		add_child(last_run)
 
 	# The very first visitor gets one nudge toward the fire.
@@ -140,6 +153,11 @@ func _ready() -> void:
 	else:
 		_show_next_unlock_vignette()
 
+## The camp is a menu — rebuilding it for the new orientation is cheap and
+## closes any overlay sized for the old one.
+func _on_orientation_changed() -> void:
+	Game.go_camp()
+
 func _show_next_unlock_vignette() -> void:
 	if Game.newly_unlocked.is_empty():
 		return
@@ -159,7 +177,11 @@ func _build_stage_row() -> void:
 	if selected is Dictionary:
 		night_name = String(selected.get("name", night_name))
 	var button := UITheme.make_button("night:  > %s <" % night_name, 10)
-	_place(button, 0.5, 1.0, 0.5, 1.0, Rect2(-160, -72, 320, 26))
+	if _narrow:
+		var night_w := UITheme.fit_width(self, 320.0, 12.0)
+		_place(button, 0.5, 1.0, 0.5, 1.0, Rect2(-night_w * 0.5, -146, night_w, 26))
+	else:
+		_place(button, 0.5, 1.0, 0.5, 1.0, Rect2(-160, -72, 320, 26))
 	button.pressed.connect(func() -> void:
 		Sfx.play("ui")
 		_open_night_picker()
@@ -200,7 +222,7 @@ func _open_night_picker() -> void:
 	column.add_theme_constant_override("separation", 6)
 	column.add_child(UITheme.make_label("CHOOSE THE NIGHT", 24, Palette.PARCHMENT, true))
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 500.0), 220)
+	scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 500.0), UITheme.fit_height(self, 220.0))
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
@@ -515,7 +537,7 @@ func _open_ledger() -> void:
 	column.add_child(UITheme.make_label("THE LEDGER", 24, Palette.PARCHMENT, true))
 	column.add_child(UITheme.make_label("what the vale remembers", 10, Palette.ASH))
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 500.0), 220)
+	scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 500.0), UITheme.fit_height(self, 220.0))
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)

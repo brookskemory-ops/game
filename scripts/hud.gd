@@ -4,7 +4,6 @@ extends Control
 ## vignette, pause menu, and the results overlay. Built entirely from UITheme
 ## so every screen shares one visual language.
 
-const HP_BAR := Rect2(14, 12, 150, 10)
 const XP_BAR_HEIGHT := 5.0
 const RESULTS_INPUT_DELAY_MS := 600
 const TRAY_POS := Vector2(14, 46)  # 3+3 build tray under the gold count
@@ -38,6 +37,15 @@ var _results_victory := false
 var _results_stats := {}
 var _results_at_ms := 0
 
+# Orientation-aware statics: portrait's 270-wide canvas squeezes the top row,
+# so the HP bar shortens and the timer shrinks. Recomputed on rotation.
+var _narrow := false
+var _hp_rect := Rect2(14, 12, 150, 10)
+
+# The open draft's arguments, kept so rotation can rebuild it for the new
+# canvas (the card row flips between horizontal and vertical).
+var _draft_args: Array = []
+
 func setup(arena, player: Player, enemies: EnemyManager) -> void:
 	_arena = arena
 	_player = player
@@ -53,46 +61,73 @@ func _ready() -> void:
 	_skull_tex = PixelSprites.get_tex("skull")
 
 	_timer_label = UITheme.make_label("0:00", 30, Palette.PARCHMENT, true)
-	_place(_timer_label, 0.5, 0.0, 0.5, 0.0, Rect2(-70, 2, 140, 34))
 	add_child(_timer_label)
 
 	_kills_label = UITheme.make_label("0", 13, Palette.ASH)
 	_kills_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_place(_kills_label, 1.0, 0.0, 1.0, 0.0, Rect2(-86, 10, 60, 18))
 	add_child(_kills_label)
 
 	_coin_tex = PixelSprites.get_tex("coin")
 	_gold_label = UITheme.make_label("0", 11, Color("f0cd7a"))
 	_gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_place(_gold_label, 0.0, 0.0, 0.0, 0.0, Rect2(26, 26, 90, 14))
 	add_child(_gold_label)
 
 	_boss_label = UITheme.make_label("", 12, Palette.PARCHMENT, true)
-	_place(_boss_label, 0.5, 1.0, 0.5, 1.0, Rect2(-140, -42, 280, 16))
 	_boss_label.visible = false
 	add_child(_boss_label)
 
 	_level_label = UITheme.make_label("LV 1", 12, Palette.TORCH)
 	_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_place(_level_label, 0.0, 1.0, 0.0, 1.0, Rect2(10, -26, 80, 16))
 	add_child(_level_label)
 
 	_toast_box = VBoxContainer.new()
 	_toast_box.alignment = BoxContainer.ALIGNMENT_BEGIN
 	_toast_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_place(_toast_box, 0.5, 0.0, 0.5, 0.0, Rect2(-160, 42, 320, 90))
 	add_child(_toast_box)
 
 	_pause_button = UITheme.make_button("II", 12)
-	_place(_pause_button, 1.0, 0.0, 1.0, 0.0, Rect2(-42, 34, 32, 28))
 	_pause_button.pressed.connect(toggle_pause)
 	add_child(_pause_button)
 
 	# First night ever: one movement nudge, gone the moment they move.
 	if not Game.hint_seen("move"):
 		_move_hint = UITheme.make_label("touch and drag anywhere to move", 12, Palette.BONE)
-		_place(_move_hint, 0.5, 0.5, 0.5, 0.5, Rect2(-200, 40, 400, 18))
 		add_child(_move_hint)
+
+	_layout_statics()
+	Game.orientation_changed.connect(_on_orientation_changed)
+
+## Anchors + sizes for the always-on HUD, chosen for the current canvas.
+## Called at build and again whenever the phone rotates mid-run.
+func _layout_statics() -> void:
+	_narrow = get_viewport().get_visible_rect().size.x < 400.0
+	_hp_rect = Rect2(14, 12, 80.0 if _narrow else 150.0, 10)
+	_timer_label.label_settings.font_size = 22 if _narrow else 30
+	_place(_timer_label, 0.5, 0.0, 0.5, 0.0,
+		Rect2(-56, 4, 112, 28) if _narrow else Rect2(-70, 2, 140, 34))
+	_place(_kills_label, 1.0, 0.0, 1.0, 0.0, Rect2(-86, 10, 60, 18))
+	_place(_gold_label, 0.0, 0.0, 0.0, 0.0, Rect2(26, 26, 90, 14))
+	var boss_w := UITheme.fit_width(self, 280.0, 12.0)
+	_place(_boss_label, 0.5, 1.0, 0.5, 1.0, Rect2(-boss_w * 0.5, -42, boss_w, 16))
+	_place(_level_label, 0.0, 1.0, 0.0, 1.0, Rect2(10, -26, 80, 16))
+	var toast_w := UITheme.fit_width(self, 320.0, 36.0)
+	_place(_toast_box, 0.5, 0.0, 0.5, 0.0, Rect2(-toast_w * 0.5, 42, toast_w, 90))
+	_place(_pause_button, 1.0, 0.0, 1.0, 0.0, Rect2(-42, 34, 32, 28))
+	if _move_hint != null:
+		var hint_w := UITheme.fit_width(self, 400.0, 20.0)
+		_place(_move_hint, 0.5, 0.5, 0.5, 0.5, Rect2(-hint_w * 0.5, 40, hint_w, 18))
+
+func _on_orientation_changed() -> void:
+	_layout_statics()
+	# Overlays were sized for the old canvas: rebuild the ones that are open.
+	if _pause_panel != null:
+		var was_open := _pause_panel.visible
+		_pause_panel.queue_free()
+		_pause_panel = null
+		if was_open:
+			_build_pause_panel()
+	if _draft_panel != null and _draft_args.size() == 4:
+		show_draft(_draft_args[0], _draft_args[1], _draft_args[2], _draft_args[3])
 
 ## Anchor + offset helper for code-built controls.
 func _place(control: Control, a_left: float, a_top: float, a_right: float, a_bottom: float, offsets: Rect2) -> void:
@@ -136,16 +171,16 @@ func _draw() -> void:
 	var w := size.x
 	var h := size.y
 	# --- HP bar (top left): iron frame, ink well, blood fill with a lit top edge ---
-	draw_rect(Rect2(HP_BAR.position - Vector2.ONE, HP_BAR.size + Vector2.ONE * 2.0), Palette.IRON)
-	draw_rect(HP_BAR, Color(Palette.INK.r, Palette.INK.g, Palette.INK.b, 0.9))
+	draw_rect(Rect2(_hp_rect.position - Vector2.ONE, _hp_rect.size + Vector2.ONE * 2.0), Palette.IRON)
+	draw_rect(_hp_rect, Color(Palette.INK.r, Palette.INK.g, Palette.INK.b, 0.9))
 	var frac := clampf(_hp_frac, 0.0, 1.0)
 	if frac > 0.0:
-		var fill := Rect2(HP_BAR.position + Vector2.ONE, Vector2((HP_BAR.size.x - 2.0) * frac, HP_BAR.size.y - 2.0))
+		var fill := Rect2(_hp_rect.position + Vector2.ONE, Vector2((_hp_rect.size.x - 2.0) * frac, _hp_rect.size.y - 2.0))
 		draw_rect(fill, Palette.BLOOD)
 		draw_rect(Rect2(fill.position, Vector2(fill.size.x, 2.0)), Palette.BLOOD.lightened(0.25))
 	for notch in range(1, 4):
-		var nx := HP_BAR.position.x + HP_BAR.size.x * 0.25 * float(notch)
-		draw_rect(Rect2(nx, HP_BAR.position.y, 1.0, HP_BAR.size.y), Color(0, 0, 0, 0.35))
+		var nx := _hp_rect.position.x + _hp_rect.size.x * 0.25 * float(notch)
+		draw_rect(Rect2(nx, _hp_rect.position.y, 1.0, _hp_rect.size.y), Color(0, 0, 0, 0.35))
 	# --- Kill counter skull icon (next to the number, top right) ---
 	if _skull_tex != null:
 		draw_texture(_skull_tex, Vector2(w - 100.0, 12.0))
@@ -262,8 +297,11 @@ func banner(title: String, subtitle: String) -> void:
 	var holder := VBoxContainer.new()
 	holder.alignment = BoxContainer.ALIGNMENT_CENTER
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_place(holder, 0.5, 0.5, 0.5, 0.5, Rect2(-260, -90, 520, 80))
-	holder.add_child(UITheme.make_label(title, 40, Palette.TORCH, true))
+	var banner_w := UITheme.fit_width(self, 520.0, 12.0)
+	_place(holder, 0.5, 0.5, 0.5, 0.5, Rect2(-banner_w * 0.5, -90, banner_w, 80))
+	var banner_title := UITheme.make_label(title, 26 if _narrow else 40, Palette.TORCH, true)
+	banner_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	holder.add_child(banner_title)
 	holder.add_child(UITheme.make_label(subtitle, 12, Palette.ASH))
 	add_child(holder)
 	holder.modulate.a = 0.0
@@ -298,17 +336,23 @@ func show_draft(options: Array, on_pick: Callable, reroll_cost := 0, on_reroll :
 	_pause_button.visible = false
 	close_draft()  # rerolls replace the open panel
 	_pause_button.visible = false
+	_draft_args = [options, on_pick, reroll_cost, on_reroll]
 	_draft_panel = _build_overlay_base()
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 12)
+	column.add_theme_constant_override("separation", 8 if _narrow else 12)
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
-	column.add_child(UITheme.make_label("THE NIGHT PROVIDES", 26, Palette.PARCHMENT, true))
+	column.add_child(UITheme.make_label("THE NIGHT PROVIDES", 22 if _narrow else 26, Palette.PARCHMENT, true))
 	column.add_child(UITheme.make_label("choose one", 11, Palette.ASH))
 	if not Game.hint_seen("draft"):
 		Game.mark_hint("draft")
-		column.add_child(UITheme.make_label("a build is 3 weapons and 3 keepsakes — choose like it matters", 9, Palette.STONE))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
+		var build_hint := UITheme.make_label("a build is 3 weapons and 3 keepsakes — choose like it matters", 9, Palette.STONE)
+		build_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		build_hint.custom_minimum_size = Vector2(UITheme.fit_width(self, 340.0, 30.0), 0)
+		column.add_child(build_hint)
+	# Portrait: the three cards stack vertically (wide and short) instead of
+	# side by side (the 270-wide canvas can't fit three readable columns).
+	var row: BoxContainer = VBoxContainer.new() if _narrow else HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8 if _narrow else 12)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	for option in options:
 		row.add_child(_make_draft_card(option, on_pick))
@@ -329,7 +373,9 @@ func show_draft(options: Array, on_pick: Callable, reroll_cost := 0, on_reroll :
 
 func _make_draft_card(option: Dictionary, on_pick: Callable) -> Button:
 	var card := UITheme.make_button("", 12)
-	card.custom_minimum_size = Vector2(minf(150.0, (get_viewport().get_visible_rect().size.x - 72.0) / 3.0), 132)
+	var vw := get_viewport().get_visible_rect().size.x
+	card.custom_minimum_size = Vector2(minf(240.0, vw - 30.0), 96) if _narrow \
+		else Vector2(minf(150.0, (vw - 72.0) / 3.0), 132)
 	var inner := VBoxContainer.new()
 	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_theme_constant_override("separation", 6)
@@ -403,7 +449,7 @@ func _build_pause_panel() -> void:
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 10)
-	column.add_child(UITheme.make_label("THE WATCH PAUSES", 30, Palette.PARCHMENT, true))
+	column.add_child(UITheme.make_label("THE WATCH PAUSES", 22 if _narrow else 30, Palette.PARCHMENT, true))
 	var resume := UITheme.make_button("Resume the vigil")
 	resume.pressed.connect(func() -> void:
 		Sfx.play("ui")
@@ -488,11 +534,12 @@ func show_results(victory: bool, stats: Dictionary) -> void:
 	_results_panel = _build_overlay_base()
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
+	var headline := 30 if _narrow else 46
 	if victory:
-		column.add_child(UITheme.make_label("DAWN BREAKS", 46, Palette.TORCH, true))
+		column.add_child(UITheme.make_label("DAWN BREAKS", headline, Palette.TORCH, true))
 		column.add_child(UITheme.make_label("the vigil holds.", 13, Palette.ASH))
 	else:
-		column.add_child(UITheme.make_label("THE NIGHT TAKES YOU", 46, Palette.BLOOD.lightened(0.25), true))
+		column.add_child(UITheme.make_label("THE NIGHT TAKES YOU", headline, Palette.BLOOD.lightened(0.25), true))
 		column.add_child(UITheme.make_label("Hollowmere will remember.", 13, Palette.ASH))
 	var seconds := int(stats.get("time", 0.0))
 	column.add_child(UITheme.make_label("endured %d:%02d" % [seconds / 60, seconds % 60], 13, Palette.PARCHMENT))
