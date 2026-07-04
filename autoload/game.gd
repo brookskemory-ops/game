@@ -109,6 +109,13 @@ var is_mobile := false
 func _ready() -> void:
 	_apply_device_profile()
 	load_save()
+	# Web QA: ?difficulty=<tier> forces the tier for this session (not saved),
+	# so probes can exercise each without clicking through the menu.
+	if OS.has_feature("web"):
+		var search := String(JavaScriptBridge.eval("window.location.search", true))
+		for tier in DIFFICULTIES:
+			if search.contains("difficulty=" + tier):
+				settings["difficulty"] = tier
 	Music.play_camp.call_deferred()  # the title shares the fire's theme
 
 ## F11 toggles fullscreen anywhere in the game (desktop and web).
