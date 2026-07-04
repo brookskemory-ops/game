@@ -7,12 +7,21 @@ var _started := false
 var _time := 0.0
 var _prompt: Label
 var _moon_tex: Texture2D
+var _hero_texs: Array = []  # unlocked survivors' side profiles, walking the road
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var moon_path := "res://assets/sprites/generated/props/moon.png"
 	if ResourceLoader.exists(moon_path):
 		_moon_tex = load(moon_path)
+	var roster: Variant = Game.load_json("res://data/characters/_roster.json")
+	if roster is Array:
+		for hero_id in roster:
+			if not Game.is_unlocked(String(hero_id)):
+				continue
+			var side_path := "res://assets/sprites/generated/side/%s.png" % String(hero_id)
+			if ResourceLoader.exists(side_path):
+				_hero_texs.append(load(side_path))
 
 	var title := UITheme.make_label("VIGIL", 78, Palette.PARCHMENT, true)
 	_place(title, 0.5, 0.5, 0.5, 0.5, Rect2(-300, -118, 600, 92))
@@ -123,6 +132,21 @@ func _draw() -> void:
 			draw_rect(Rect2(gx, gy - gh + 3.0, 6.0, 2.0), stone)
 		else:
 			draw_rect(Rect2(gx, gy - gh, rng.randf_range(5.0, 9.0), gh), stone)
+
+	# The unlocked survivors walk the road, single file, toward the castle.
+	if not _hero_texs.is_empty():
+		var walk_y := h - 34.0
+		for i in _hero_texs.size():
+			var tex: Texture2D = _hero_texs[i]
+			var walk_x := fmod(_time * 14.0 + float(i) * 44.0, w + 200.0) - 100.0
+			var hero_scale := 30.0 / float(tex.get_height())
+			var hero_size := Vector2(tex.get_width(), tex.get_height()) * hero_scale
+			var bob := absf(sin(_time * 5.0 + float(i) * 1.7)) * 1.6
+			# They walk right-to-left (art faces right; flip via negative width).
+			draw_texture_rect(tex,
+				Rect2(Vector2(w - walk_x + hero_size.x, walk_y - bob) - Vector2(0, hero_size.y),
+					Vector2(-hero_size.x, hero_size.y)),
+				false, Color(0.55, 0.55, 0.65))
 
 	# Low fog: two translucent sheets drifting in opposite directions.
 	var fog := Color(Palette.ASH.r, Palette.ASH.g, Palette.ASH.b, 0.045)

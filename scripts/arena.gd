@@ -301,6 +301,7 @@ func _finish(victory: bool) -> void:
 		"elite_kills": enemies.elite_kills,
 		"level": player.level,
 		"stage": String(stage.get("id", "stage1")),
+		"rite": rites.summary() if rites != null else "",
 	}
 	hud.show_results(victory, stats)
 	# Freeze the night behind the overlay (HUD runs in PROCESS_MODE_ALWAYS).

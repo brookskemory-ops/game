@@ -32,6 +32,7 @@ var _xp_flash := 0.0
 var _hp_frac := 1.0        # smoothed toward _hp_target for a draining bar
 var _hp_target := 1.0
 var _draft_panel: Control
+var _move_hint: Label
 var _results_shown := false
 var _results_victory := false
 var _results_stats := {}
@@ -87,6 +88,12 @@ func _ready() -> void:
 	_pause_button.pressed.connect(toggle_pause)
 	add_child(_pause_button)
 
+	# First night ever: one movement nudge, gone the moment they move.
+	if not Game.hint_seen("move"):
+		_move_hint = UITheme.make_label("touch and drag anywhere to move", 12, Palette.BONE)
+		_place(_move_hint, 0.5, 0.5, 0.5, 0.5, Rect2(-200, 40, 400, 18))
+		add_child(_move_hint)
+
 ## Anchor + offset helper for code-built controls.
 func _place(control: Control, a_left: float, a_top: float, a_right: float, a_bottom: float, offsets: Rect2) -> void:
 	control.anchor_left = a_left
@@ -115,6 +122,12 @@ func _process(delta: float) -> void:
 	_hp_frac = lerpf(_hp_frac, _hp_target, minf(1.0, delta * 10.0))
 	_vignette = maxf(0.0, _vignette - delta * 1.6)
 	_xp_flash = maxf(0.0, _xp_flash - delta * 2.2)
+	if _move_hint != null:
+		_move_hint.modulate.a = 0.55 + 0.45 * sin(Time.get_ticks_msec() / 350.0)
+		if _player != null and _player.velocity.length_squared() > 1.0:
+			Game.mark_hint("move")
+			_move_hint.queue_free()
+			_move_hint = null
 	queue_redraw()
 
 func _draw() -> void:
@@ -291,6 +304,9 @@ func show_draft(options: Array, on_pick: Callable, reroll_cost := 0, on_reroll :
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	column.add_child(UITheme.make_label("THE NIGHT PROVIDES", 26, Palette.PARCHMENT, true))
 	column.add_child(UITheme.make_label("choose one", 11, Palette.ASH))
+	if not Game.hint_seen("draft"):
+		Game.mark_hint("draft")
+		column.add_child(UITheme.make_label("a build is 3 weapons and 3 keepsakes — choose like it matters", 9, Palette.STONE))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -420,6 +436,15 @@ func _build_pause_panel() -> void:
 		Sfx.play("ui")
 	)
 	column.add_child(numbers)
+	var restart := UITheme.make_button("Restart the night")
+	restart.pressed.connect(func() -> void:
+		if restart.text == "Restart the night":
+			restart.text = "tap again — the night restarts"
+			Sfx.play("ui")
+		else:
+			Game.start_run()
+	)
+	column.add_child(restart)
 	var abandon := UITheme.make_button("Abandon the night")
 	abandon.pressed.connect(_abandon_run)
 	column.add_child(abandon)
@@ -464,6 +489,10 @@ func show_results(victory: bool, stats: Dictionary) -> void:
 	column.add_child(UITheme.make_label("endured %d:%02d" % [seconds / 60, seconds % 60], 13, Palette.PARCHMENT))
 	column.add_child(UITheme.make_label("%d dead put to rest" % int(stats.get("kills", 0)), 13, Palette.PARCHMENT))
 	column.add_child(UITheme.make_label("reached level %d" % int(stats.get("level", 1)), 13, Palette.PARCHMENT))
+	var rite_line := String(stats.get("rite", ""))
+	if not rite_line.is_empty():
+		column.add_child(UITheme.make_label(rite_line, 11,
+			Palette.TORCH if rite_line.contains("kept") and not rite_line.contains("unkept") else Palette.ASH))
 	var prompt := UITheme.make_label("tap to return to camp", 12, Palette.BONE)
 	column.add_child(prompt)
 	_center_in_overlay(_results_panel, column)

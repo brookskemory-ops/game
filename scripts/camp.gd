@@ -108,6 +108,24 @@ func _ready() -> void:
 		_place(last_run, 1.0, 1.0, 1.0, 1.0, Rect2(-340, -24, 332, 16))
 		add_child(last_run)
 
+	# The very first visitor gets one nudge toward the fire.
+	if not Game.hint_seen("begin"):
+		var nudge := UITheme.make_label("tap Wren — begin the vigil", 11, Palette.TORCH)
+		_place(nudge, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 66, 500, 16))
+		add_child(nudge)
+		var pulse := create_tween().set_loops()
+		pulse.tween_property(nudge, "modulate:a", 0.4, 0.7)
+		pulse.tween_property(nudge, "modulate:a", 1.0, 0.7)
+
+	# Settings by the fire (mirrors the pause menu's toggles).
+	var gear := UITheme.make_button("sound", 9)
+	_place(gear, 1.0, 1.0, 1.0, 1.0, Rect2(-92, -40, 84, 30))
+	gear.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_open_settings()
+	)
+	add_child(gear)
+
 	# The Hollow King's victory poses the final choice; otherwise, newly
 	# unlocked survivors tell their tale as they join the fire.
 	if Game.ending_pending():
@@ -427,6 +445,57 @@ func _show_ending_epilogue(ending_id: String) -> void:
 			_show_next_unlock_vignette()
 	_ending_overlay.gui_input.connect(close)
 	panel.gui_input.connect(close)
+
+# --- Settings by the fire ---
+
+var _settings_overlay: Control
+
+func _open_settings() -> void:
+	if _settings_overlay != null:
+		return
+	_settings_overlay = _overlay()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 10)
+	column.add_child(UITheme.make_label("BY THE FIRE", 24, Palette.PARCHMENT, true))
+	column.add_child(_settings_toggle("Sound", "sfx_volume"))
+	column.add_child(_settings_toggle("Music", "music_volume"))
+	var numbers := UITheme.make_button("")
+	var refresh_numbers := func() -> void:
+		numbers.text = "Damage numbers: %s" % ("on" if bool(Game.settings.get("damage_numbers", true)) else "off")
+	refresh_numbers.call()
+	numbers.pressed.connect(func() -> void:
+		Game.settings["damage_numbers"] = not bool(Game.settings.get("damage_numbers", true))
+		Game.write_save()
+		refresh_numbers.call()
+		Sfx.play("ui")
+	)
+	column.add_child(numbers)
+	var leave := UITheme.make_button("Back to the fire", 11)
+	leave.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_settings_overlay.queue_free()
+		_settings_overlay = null
+	)
+	column.add_child(leave)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_settings_overlay, panel)
+
+func _settings_toggle(label: String, key: String) -> Button:
+	var button := UITheme.make_button("")
+	var refresh := func() -> void:
+		var muted := float(Game.settings.get(key, 1.0)) <= 0.01
+		button.text = "%s: %s" % [label, "off" if muted else "on"]
+	refresh.call()
+	button.pressed.connect(func() -> void:
+		var muted := float(Game.settings.get(key, 1.0)) <= 0.01
+		Game.settings[key] = 1.0 if muted else 0.0
+		Game.write_save()
+		refresh.call()
+		Sfx.play("ui")
+	)
+	return button
 
 # --- The Ledger: Maud's grave-book of every weapon the vale remembers ---
 

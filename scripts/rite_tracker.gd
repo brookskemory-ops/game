@@ -171,7 +171,19 @@ func _on_elite_killed(type_name: String) -> void:
 
 func _announce(rite: Dictionary) -> void:
 	_hud.toast("A RITE IS ASKED:  %s" % String(rite.get("name", "")))
+	if not Game.hint_seen("rite"):
+		Game.mark_hint("rite")
+		_hud.toast("(optional — keep it, and its relic waits at the fire)")
 	Sfx.play("bell", 0.5)
+
+## For the results screen: how did the night's rites go?
+func summary() -> String:
+	if _rites.is_empty():
+		return ""
+	for state in _state:
+		if String(state.get("status", "")) == "kept":
+			return "the rite was kept"
+	return "the rite went unkept"
 
 func _keep(rite: Dictionary, state: Dictionary, _index: int) -> void:
 	state["status"] = "kept"

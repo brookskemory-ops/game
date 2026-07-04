@@ -6,7 +6,7 @@ signal run_started
 signal run_ended(victory: bool)
 signal gold_changed(total: int)
 
-const VERSION := "0.16.1 — the scales balance"
+const VERSION := "0.17.0 — first night"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -47,6 +47,7 @@ var save_data := {
 	"relics": {},
 	"relic_equipped": "",
 	"relics_equipped": [],
+	"seen_hints": {},
 }
 
 ## Stats from the most recent run, for camp/results screens.
@@ -82,6 +83,8 @@ func start_run() -> void:
 					selected_character = String(hero_id)
 					break
 	run_gold = 0
+	if not hint_seen("begin"):
+		mark_hint("begin")
 	get_tree().paused = false
 	Music.play_night()
 	run_started.emit()
@@ -298,6 +301,17 @@ func write_save() -> void:
 ## (docs/NIGHT_SHIFT.md WP2). Ignored everywhere else.
 func stage_cleared(id: String) -> bool:
 	return bool(save_data.get("stages", {}).get(id, false))
+
+# --- First-run hints (each shown once, then remembered forever) ---
+
+func hint_seen(id: String) -> bool:
+	return bool(save_data.get("seen_hints", {}).get(id, false))
+
+func mark_hint(id: String) -> void:
+	if not save_data.has("seen_hints"):
+		save_data["seen_hints"] = {}
+	save_data["seen_hints"][id] = true
+	write_save()
 
 # --- Relics (earned by rites; one may be carried into the night) ---
 
