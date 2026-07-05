@@ -26,6 +26,17 @@ sprite size). Frames come back 64×64 with transparent background.
   arcs instead of legs. Enemies that carry a weapon (knight/archer/bell) are the
   most prone to baking in attack VFX; strong negatives help but some just won't
   cooperate.
+- **Attack frames** (v2.0 fix): the naive swing actions ("swinging a sword")
+  bake in huge motion-blur **crescent/ring swoosh VFX**, turn the hero to face
+  away, or shrink/warp the design — reading as wonky and off-class. The fix:
+  **img-guidance 11, text-guidance 6**, a **concrete, pose-based, class-specific
+  action** (draw the bow / lift the shovel overhead / throw the vial / swing the
+  censer on its chain / raise the greatsword / thrust the blade / reach a hand
+  out) and a **strong anti-VFX negative**: `motion blur, glowing arc, energy
+  swoosh, weapon trail, white crescent, moon shape, facing away, back turned,
+  turning around`. Avoid the word "cast" — it summons a spell-circle disc; add
+  `orange circle, glowing orb, spell circle, colored background` to the negative
+  if one appears. All 7 heroes came out clean this way.
 - `--clean` despeckles stray pixels after generation.
 - Always **visual-QA every set** (build a montage, eyeball coherence). Cherry-pick
   the clean frames; if a character won't hold, **fail soft** — that type keeps the
