@@ -1,0 +1,13 @@
+{
+	"id": "sin_eater",
+	"name": "Thessaly, the Sin-Eater",
+	"sprite": "sin_eater",
+	"max_hp": 70,
+	"move_speed": 120,
+	"radius": 6,
+	"pickup_radius": 48,
+	"weapon": "saint_reliquary",
+	"signature": "communion",
+	"signature_desc": "Communion — each kill feeds a stacking, fading damage boon (up to +30%)",
+	"story_arc": "sin_eater_arc"
+}

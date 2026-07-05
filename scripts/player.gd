@@ -51,6 +51,10 @@ var _sig_malpractice := false
 var _sig_mortification := false
 var _sig_bulwark := false
 var _sig_deathless := false
+var _sig_communion := false
+var _communion := 0.0          # Sin-Eater: kill-fuelled, decaying damage stacks
+const COMMUNION_MAX := 20.0
+const COMMUNION_PER_STACK := 0.015  # +1.5% damage each, up to +30%
 var _invuln := 0.0
 var _last_kill_at := -10.0
 
@@ -94,6 +98,10 @@ func setup(ctx: Dictionary) -> void:
 			_sig_bulwark = true
 		"deathless":
 			_sig_deathless = true
+			if _enemies != null:
+				_enemies.enemy_killed.connect(_on_enemy_killed)
+		"communion":
+			_sig_communion = true
 			if _enemies != null:
 				_enemies.enemy_killed.connect(_on_enemy_killed)
 	_apply_camp_shop()
@@ -205,22 +213,28 @@ func _apply_camp_shop() -> void:
 ## Malpractice (Corvus): kills within a 3s streak each restore 1 HP.
 ## Deathless (the Hollow King): EVERY kill leeches life — his only healing.
 func _on_enemy_killed(_at: Vector2) -> void:
+	# Communion (Sin-Eater): each death feeds a stacking, decaying damage boon.
+	if _sig_communion:
+		_communion = minf(COMMUNION_MAX, _communion + 1.0)
 	if _sig_deathless:
 		# 1.5/kill (was 1.0): bot runs showed Deathless as by far the
 		# hardest opening — the leech is his only healing.
 		hp = minf(max_hp, hp + 1.5)
 		hp_changed.emit(hp, max_hp)
 		return
-	var now := float(Time.get_ticks_msec()) / 1000.0
-	if now - _last_kill_at <= 3.0:
-		heal(1.0)
-	_last_kill_at = now
+	if _sig_malpractice:
+		var now := float(Time.get_ticks_msec()) / 1000.0
+		if now - _last_kill_at <= 3.0:
+			heal(1.0)
+		_last_kill_at = now
 
 ## All weapon damage routes through this (Mortification scales with missing HP).
 func damage_multiplier() -> float:
 	var multiplier := float(mods["damage"])
 	if _sig_mortification and max_hp > 0.0:
 		multiplier *= 1.0 + clampf(1.0 - hp / max_hp, 0.0, 1.0)
+	if _sig_communion:
+		multiplier *= 1.0 + _communion * COMMUNION_PER_STACK
 	return multiplier
 
 func apply_passive(id: String, def: Dictionary) -> void:
@@ -261,6 +275,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if dead:
 		return
+	if _sig_communion and _communion > 0.0:
+		_communion = maxf(0.0, _communion - delta)  # ~1 stack/sec; kills refuel it
 	# WASD and arrow keys both move (see project.godot [input]); on touch the
 	# virtual joystick overrides whenever it has meaningful output.
 	var dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")

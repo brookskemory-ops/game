@@ -53,5 +53,14 @@
 			"He is still half-alive inside the bargain, hollowed out to hold it. The cursed blade drinks what it kills because HE must.",
 			"\"I bought this night,\" he says, and draws. \"The least I can do is stand it.\""
 		]
+	},
+	"sin_eater": {
+		"title": "The Sin-Eater",
+		"lines": [
+			"They called for her at every deathbed in Hollowmere, and paid her in bread and silence.",
+			"She ate the sins of the dying over their cooling hands, so their souls would go clean. She carried all of it, and said nothing.",
+			"\"Everyone else runs from the dead,\" she says, lifting the bowl. \"I have been swallowing them my whole life. What is one more night?\"",
+			"When the graves opened, the vale remembered whose fault it wasn't, and whose burden it always had been."
+		]
 	}
 }
