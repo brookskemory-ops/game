@@ -90,8 +90,12 @@ var save_data := {
 	"relic_equipped": "",
 	"relics_equipped": [],
 	"seen_hints": {},
+	"achievements": {},
 	"save_version": 1,
 }
+
+## Achievement ids earned by the last run, awaiting their toast at the camp.
+var newly_earned_achievements: Array = []
 
 ## Stats from the most recent run, for camp/results screens.
 var last_run := {
@@ -204,6 +208,12 @@ func end_run(victory: bool, stats := {}) -> void:
 	}
 	var lifetime: Dictionary = save_data["stats"]
 	lifetime["total_kills"] = int(lifetime.get("total_kills", 0)) + int(stats.get("kills", 0))
+	lifetime["elite_kills"] = int(lifetime.get("elite_kills", 0)) + int(stats.get("elite_kills", 0))
+	lifetime["evolutions_total"] = int(lifetime.get("evolutions_total", 0)) + int(stats.get("evolutions", 0))
+	# Distinct heroes played, for the "whole watch" medal.
+	var played: Dictionary = lifetime.get("heroes_played", {})
+	played[selected_character] = true
+	lifetime["heroes_played"] = played
 	# The Bestiary: union of everything seen, sum of everything killed.
 	var book: Dictionary = lifetime.get("bestiary", {})
 	for eid in stats.get("bestiary", {}):
@@ -230,6 +240,7 @@ func end_run(victory: bool, stats := {}) -> void:
 			}
 	_check_unlocks(stats)
 	_check_weapon_unlocks(stats, weapons_before)
+	_check_achievements(stats)
 	write_save()
 	get_tree().paused = false
 	run_ended.emit(victory)
@@ -514,6 +525,65 @@ func equip_relic(id: String) -> void:
 	save_data["relics_equipped"] = carried
 	write_save()
 
+# --- Achievements (data-driven; data/achievements.json) ---
+
+## The full list, or [] if the data is missing (fail-soft — the camp panel
+## simply shows nothing rather than crashing).
+func all_achievements() -> Array:
+	var data: Variant = load_json("res://data/achievements.json")
+	if data is Dictionary and data.get("achievements") is Array:
+		return data["achievements"]
+	return []
+
+func achievement_earned(id: String) -> bool:
+	return bool(save_data.get("achievements", {}).get(id, false))
+
+## Evaluate one achievement's condition against lifetime + this run's stats.
+func _achievement_met(a: Dictionary, run_stats: Dictionary) -> bool:
+	var lifetime: Dictionary = save_data.get("stats", {})
+	var need: Variant = a.get("value", 0)
+	match String(a.get("type", "")):
+		"nights_survived":
+			return int(lifetime.get("nights_survived", 0)) >= int(need)
+		"total_kills":
+			return int(lifetime.get("total_kills", 0)) >= int(need)
+		"elite_kills":
+			return int(lifetime.get("elite_kills", 0)) >= int(need)
+		"evolutions_total":
+			return int(lifetime.get("evolutions_total", 0)) >= int(need)
+		"deaths":
+			return int(lifetime.get("deaths", 0)) >= int(need)
+		"heroes_count":
+			return (lifetime.get("heroes_played", {}) as Dictionary).size() >= int(need)
+		"run_kills":
+			return int(run_stats.get("kills", 0)) >= int(need)
+		"no_hit_win":
+			return bool(run_stats.get("victory_flag", false)) and int(run_stats.get("hits", -1)) == 0
+		"stage_cleared":
+			return stage_cleared(String(need))
+		"ending":
+			return ending() == String(need)
+	return false
+
+## Award any newly-met achievements. Called after each run (with its stats) and
+## when an ending is set. Newly-earned ids queue for the camp toast.
+func _check_achievements(run_stats: Dictionary) -> void:
+	if not save_data.has("achievements"):
+		save_data["achievements"] = {}
+	# no_hit_win needs to know THIS run was a victory (lifetime can't tell us).
+	if run_stats.has("hits"):
+		run_stats["victory_flag"] = bool(last_run.get("victory", false))
+	var earned: Dictionary = save_data["achievements"]
+	for a in all_achievements():
+		if not (a is Dictionary):
+			continue
+		var id := String(a.get("id", ""))
+		if id.is_empty() or bool(earned.get(id, false)):
+			continue
+		if _achievement_met(a, run_stats):
+			earned[id] = true
+			newly_earned_achievements.append(id)
+
 # --- The ending (Block B): chosen once, at the camp, by the Hollow King ---
 
 func ending() -> String:
@@ -521,6 +591,7 @@ func ending() -> String:
 
 func set_ending(id: String) -> void:
 	save_data["ending"] = id
+	_check_achievements({})  # ending-gated medals can land now
 	write_save()
 
 ## The final choice is offered when the Hollow King himself has just

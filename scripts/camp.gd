@@ -107,6 +107,15 @@ func _ready() -> void:
 	)
 	add_child(ledger)
 
+	var medals := UITheme.make_button("M E D A L S", 12)
+	_place(medals, 0.5, 1.0, 0.5, 1.0,
+		Rect2(-62, -145, 124, 30) if _narrow else Rect2(72, -40, 124, 30))
+	medals.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_open_achievements()
+	)
+	add_child(medals)
+
 	# What the last night earned for the book (weapons and relics alike).
 	if not Game.newly_unlocked_weapons.is_empty() or not Game.newly_unlocked_relics.is_empty():
 		var names: Array = []
@@ -127,6 +136,22 @@ func _ready() -> void:
 			var pulse := create_tween().set_loops()
 			pulse.tween_property(grows, "modulate:a", 0.45, 0.8)
 			pulse.tween_property(grows, "modulate:a", 1.0, 0.8)
+
+	# Medals won last night — a quiet fanfare by the fire.
+	if not Game.newly_earned_achievements.is_empty():
+		var titles: Array = []
+		for aid in Game.newly_earned_achievements:
+			for a in Game.all_achievements():
+				if a is Dictionary and String(a.get("id", "")) == String(aid):
+					titles.append(String(a.get("name", aid)))
+		Game.newly_earned_achievements.clear()
+		if not titles.is_empty():
+			var won := UITheme.make_label("a medal earned:  %s" % ", ".join(titles), 11, Palette.TORCH)
+			_place(won, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 84, 500, 16))
+			add_child(won)
+			var mpulse := create_tween().set_loops()
+			mpulse.tween_property(won, "modulate:a", 0.45, 0.8)
+			mpulse.tween_property(won, "modulate:a", 1.0, 0.8)
 
 	_build_stage_row()
 
@@ -693,6 +718,90 @@ func _open_ledger() -> void:
 	panel.add_child(column)
 	_center(_ledger_overlay, panel)
 
+# --- Medals (achievements) ---
+var _achievements_overlay: Control
+
+func _open_achievements() -> void:
+	if _achievements_overlay != null:
+		return
+	_achievements_overlay = _overlay()
+	var all := Game.all_achievements()
+	var earned := 0
+	for a in all:
+		if a is Dictionary and Game.achievement_earned(String(a.get("id", ""))):
+			earned += 1
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 6)
+	column.add_child(UITheme.make_label("MEDALS OF THE WATCH", 24, Palette.PARCHMENT, true))
+	column.add_child(UITheme.make_label("— %d of %d earned —" % [earned, all.size()], 11, Palette.BONE))
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(UITheme.fit_width(self, 440.0),
+		UITheme.fit_height(self, 260.0))
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 6)
+	for a in all:
+		if a is Dictionary:
+			list.add_child(_make_achievement_row(a))
+	scroll.add_child(list)
+	column.add_child(scroll)
+	var leave := UITheme.make_button("Back to the fire", 11)
+	leave.pressed.connect(func() -> void:
+		Sfx.play("ui")
+		_achievements_overlay.queue_free()
+		_achievements_overlay = null
+	)
+	column.add_child(leave)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UITheme.panel_style())
+	panel.add_child(column)
+	_center(_achievements_overlay, panel)
+
+## One medal row: name + how to earn it, lit if won. Numeric goals show live
+## lifetime progress ("637 / 1000") so the grind reads as progress, not a wall.
+func _make_achievement_row(a: Dictionary) -> HBoxContainer:
+	var won := Game.achievement_earned(String(a.get("id", "")))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var mark := UITheme.make_label("✦" if won else "·", 18,
+		Palette.TORCH if won else Palette.STONE)
+	mark.custom_minimum_size = Vector2(20, 0)
+	row.add_child(mark)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var name_label := UITheme.make_label(String(a.get("name", "?")), 12,
+		Palette.TORCH if won else Palette.STONE)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	info.add_child(name_label)
+	var desc := UITheme.make_label(String(a.get("desc", "")), 9,
+		Palette.PARCHMENT if won else Palette.ASH)
+	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info.add_child(desc)
+	var prog := _achievement_progress(a)
+	if not won and not prog.is_empty():
+		var pl := UITheme.make_label(prog, 9, Palette.ASH)
+		pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		info.add_child(pl)
+	row.add_child(info)
+	return row
+
+## Live "current / goal" for the numeric lifetime medals; "" for one-shots.
+func _achievement_progress(a: Dictionary) -> String:
+	var lifetime: Dictionary = Game.save_data.get("stats", {})
+	var need := int(a.get("value", 0))
+	var have := -1
+	match String(a.get("type", "")):
+		"nights_survived": have = int(lifetime.get("nights_survived", 0))
+		"total_kills": have = int(lifetime.get("total_kills", 0))
+		"elite_kills": have = int(lifetime.get("elite_kills", 0))
+		"evolutions_total": have = int(lifetime.get("evolutions_total", 0))
+		"deaths": have = int(lifetime.get("deaths", 0))
+		"heroes_count": have = (lifetime.get("heroes_played", {}) as Dictionary).size()
+	if have < 0:
+		return ""
+	return "%d / %d" % [mini(have, need), need]
+
 func _make_ledger_row(def: Dictionary, unlocked: bool) -> HBoxContainer:
 	var name_text := String(def.get("name", "?")) if unlocked else "? ? ?"
 	var desc_text := String(def.get("draft_desc", "")) if unlocked \
@@ -787,6 +896,13 @@ func _make_bestiary_row(enemy_id: String, def: Dictionary, book: Dictionary) -> 
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_child(desc)
 	if seen:
+		# Once met, the codex records what it took to learn: flesh, bite, and
+		# how many you have finally put to rest.
+		var stats_line := "flesh %d  ·  bite %d  ·  pace %d" % [
+			int(def.get("hp", 0)), int(def.get("damage", 0)), int(def.get("speed", 0))]
+		var stats_label := UITheme.make_label(stats_line, 9, Palette.STONE)
+		stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		info.add_child(stats_label)
 		var count := int(book.get(enemy_id, 0))
 		var tally := "put to rest:  %d" % count if count > 0 else "seen, but never felled"
 		var tally_label := UITheme.make_label(tally, 9, Palette.ASH)

@@ -1,0 +1,110 @@
+{
+	"_doc": "Data-driven achievements. Each is one condition evaluated over lifetime save stats + the just-ended run's stats (game.gd:_check_achievements). type -> field: total_kills/elite_kills/nights_survived/deaths/evolutions_total/heroes_count read the lifetime tally; run_kills/run_level read the ended run; no_hit_win = victory taking zero hits; stage_cleared/ending match an id. Purely additive: unknown types never crash (fail-soft).",
+	"achievements": [
+		{
+			"id": "first_dawn",
+			"name": "First Dawn",
+			"desc": "Survive your first night.",
+			"type": "nights_survived",
+			"value": 1
+		},
+		{
+			"id": "the_long_vigil",
+			"name": "The Long Vigil",
+			"desc": "Survive ten nights across your watches.",
+			"type": "nights_survived",
+			"value": 10
+		},
+		{
+			"id": "gravedigger",
+			"name": "Gravedigger",
+			"desc": "Put down 1,000 of the dead.",
+			"type": "total_kills",
+			"value": 1000
+		},
+		{
+			"id": "the_reaper",
+			"name": "The Reaper",
+			"desc": "Put down 25,000 of the dead.",
+			"type": "total_kills",
+			"value": 25000
+		},
+		{
+			"id": "one_long_night",
+			"name": "One Long Night",
+			"desc": "Fell 800 in a single night.",
+			"type": "run_kills",
+			"value": 800
+		},
+		{
+			"id": "elite_hunter",
+			"name": "Elite Hunter",
+			"desc": "Cut down 100 elites and champions.",
+			"type": "elite_kills",
+			"value": 100
+		},
+		{
+			"id": "old_oaths",
+			"name": "Old Oaths Answered",
+			"desc": "Evolve a weapon at the reliquary.",
+			"type": "evolutions_total",
+			"value": 1
+		},
+		{
+			"id": "the_armory",
+			"name": "The Whole Armory",
+			"desc": "Evolve ten weapons across your nights.",
+			"type": "evolutions_total",
+			"value": 10
+		},
+		{
+			"id": "unscathed",
+			"name": "Unscathed",
+			"desc": "Win a night without taking a single hit.",
+			"type": "no_hit_win",
+			"value": 1
+		},
+		{
+			"id": "the_watch",
+			"name": "The Whole Watch",
+			"desc": "Play every hero of Hollowmere at least once.",
+			"type": "heroes_count",
+			"value": 7
+		},
+		{
+			"id": "the_ashen_field",
+			"name": "The Ashen Field",
+			"desc": "Clear the graveyard.",
+			"type": "stage_cleared",
+			"value": "stage1"
+		},
+		{
+			"id": "the_wailing_wood",
+			"name": "The Wailing Wood",
+			"desc": "Clear the forest.",
+			"type": "stage_cleared",
+			"value": "stage2"
+		},
+		{
+			"id": "the_hollow_court",
+			"name": "The Hollow Court",
+			"desc": "Break the Hollow King's court.",
+			"type": "stage_cleared",
+			"value": "stage3"
+		},
+		{
+			"id": "the_last_grave",
+			"name": "The Last Grave",
+			"desc": "Reach the true end beneath Castle Vane.",
+			"type": "ending",
+			"value": "unburied"
+		},
+		{
+			"id": "faithful_unto_death",
+			"name": "Faithful Unto Death",
+			"desc": "Fall in the dark a hundred times, and rise to watch again.",
+			"type": "deaths",
+			"value": 100
+		}
+	]
+}

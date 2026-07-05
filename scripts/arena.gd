@@ -17,6 +17,8 @@ const SCATTER_RANGE := 1500.0
 
 var stage := {}
 var time_elapsed := 0.0
+var _run_hits := 0        # times the hero took damage this night (no-hit medals)
+var _run_evolutions := 0  # weapons evolved this night (for achievements)
 var run_over := false
 var upgrades: UpgradeSystem
 var rites: RiteTracker
@@ -87,6 +89,7 @@ func _ready() -> void:
 	hud.setup(self, player, enemies)
 	upgrades = UpgradeSystem.new(player)
 	player.died.connect(_on_player_died)
+	player.hurt.connect(func(_amount: float) -> void: _run_hits += 1)
 	player.leveled_up.connect(_on_player_leveled)
 	enemies.boss_spawned.connect(_on_boss_spawned)
 	enemies.boss_died.connect(_on_boss_died)
@@ -318,6 +321,7 @@ func _on_chest_opened() -> void:
 		player.heal(player.max_hp)
 		hud.banner("THE RELIQUARY", "gold and mercy within")
 	else:
+		_run_evolutions += 1
 		hud.banner("OLD OATHS ANSWERED", "%s takes new form" % evolved)
 		Sfx.play("level")
 	player.get_node("Camera2D").add_trauma(0.3)
@@ -366,6 +370,8 @@ func _finish(victory: bool) -> void:
 		"stage": String(stage.get("id", "stage1")),
 		"rite": rites.summary() if rites != null else "",
 		"bestiary": enemies.bestiary,
+		"hits": _run_hits,
+		"evolutions": _run_evolutions,
 	}
 	hud.show_results(victory, stats)
 	# Freeze the night behind the overlay (HUD runs in PROCESS_MODE_ALWAYS).
