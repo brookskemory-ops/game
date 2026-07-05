@@ -1,0 +1,138 @@
+{
+	"id": "stage4",
+	"name": "The Hollow Beneath",
+	"theme": "crypt",
+	"run_length": 600,
+	"boss": "chapel_thing",
+	"mid_boss": "iron_revenant",
+	"mid_boss_t": 300,
+	"mid_boss_banner": "something older stirs in the dark",
+	"boss_banner": "the last grave opens",
+	"boss_trickle": "wight",
+	"boss_trickle_interval": 1.6,
+	"victory_unlock": "sin_eater",
+	"events": [
+		{
+			"t": 150,
+			"spawn": "wight",
+			"count": 4,
+			"announce": "The oldest dead do not sleep down here..."
+		},
+		{
+			"t": 300,
+			"spawn": "crypt_archer",
+			"count": 6,
+			"announce": "Bolts hiss from the dark niches!"
+		},
+		{
+			"t": 450,
+			"spawn": "chorister",
+			"count": 2,
+			"announce": "A hymn rises from below..."
+		}
+	],
+	"waves": [
+		{
+			"from": 0,
+			"to": 90,
+			"type": "shambler",
+			"interval": 1.1,
+			"count": 3
+		},
+		{
+			"from": 30,
+			"to": 160,
+			"type": "gnawer",
+			"interval": 2.2,
+			"count": 2
+		},
+		{
+			"from": 60,
+			"to": 220,
+			"type": "wight",
+			"interval": 2.6,
+			"count": 2
+		},
+		{
+			"from": 90,
+			"to": 300,
+			"type": "hanged_man",
+			"interval": 1.4,
+			"count": 3
+		},
+		{
+			"from": 150,
+			"to": 320,
+			"type": "shambler",
+			"interval": 0.7,
+			"count": 4
+		},
+		{
+			"from": 220,
+			"to": 420,
+			"type": "crypt_archer",
+			"interval": 3.0,
+			"count": 1
+		},
+		{
+			"from": 300,
+			"to": 600,
+			"type": "wight",
+			"interval": 1.8,
+			"count": 2
+		},
+		{
+			"from": 320,
+			"to": 600,
+			"type": "hanged_man",
+			"interval": 0.9,
+			"count": 3
+		},
+		{
+			"from": 420,
+			"to": 600,
+			"type": "chorister",
+			"interval": 6.0,
+			"count": 1
+		},
+		{
+			"from": 480,
+			"to": 600,
+			"type": "gnawer",
+			"interval": 0.5,
+			"count": 4
+		}
+	],
+	"ground": {
+		"base": "res://assets/sprites/generated/tiles/crypt_base.png",
+		"decals": [
+			[
+				"res://assets/sprites/generated/tiles/decal_crypt_bones.png",
+				0.9
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_crypt_runes.png",
+				0.92
+			],
+			[
+				"res://assets/sprites/generated/tiles/decal_bones.png",
+				0.9
+			]
+		]
+	},
+	"rites": [
+		{
+			"id": "seal_the_grave",
+			"name": "Seal the Grave",
+			"type": "stand_ground",
+			"t": 240,
+			"pos": [
+				-260,
+				0
+			],
+			"radius": 80,
+			"seconds": 18,
+			"relic": "briar_crown"
+		}
+	]
+}

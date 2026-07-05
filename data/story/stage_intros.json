@@ -19,5 +19,12 @@
 			"The road climbs at last to Castle Vane, where the bell hangs and the bargain was struck.",
 			"Whatever the king let into the chapel is still there, and it has been waiting a long time to be met. This is where the night is decided — one way, or the other."
 		]
+	},
+	"stage4": {
+		"title": "The Hollow Beneath",
+		"lines": [
+			"Under Castle Vane the stairs go down further than any mason cut them. The dead here are the oldest dead — the first to be wronged, the first to refuse the grave.",
+			"This is where it began: the wound the whole night bleeds from. Go down. Find the thing that will not stay buried, and bury it for good."
+		]
 	}
 }

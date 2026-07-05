@@ -49,6 +49,8 @@ func _ready() -> void:
 			$BackgroundLayer/Background.color = Color(0.055, 0.075, 0.06)
 		"castle":
 			$BackgroundLayer/Background.color = Color(0.075, 0.065, 0.085)
+		"crypt":
+			$BackgroundLayer/Background.color = Color(0.045, 0.05, 0.06)
 	_load_theme_props()
 	ground.setup(stage, $Player)
 	_wave_acc.resize(waves().size())
@@ -393,6 +395,13 @@ const THEME_PROPS := {
 		["res://assets/sprites/generated/props/prop_candelabra.png", 0.7],
 		["res://assets/sprites/generated/props/prop_brazier.png", 0.7],
 		["res://assets/sprites/generated/props/prop_broken_statue.png", 0.85],
+	],
+	"crypt": [
+		["res://assets/sprites/generated/props/prop_sarcophagus.png", 0.8],
+		["res://assets/sprites/generated/props/prop_bone_altar.png", 0.7],
+		["res://assets/sprites/generated/props/prop_skull_pillar.png", 0.8],
+		["res://assets/sprites/generated/props/prop_bonepile.png", 0.7],
+		["res://assets/sprites/generated/props/prop_broken_statue.png", 0.8],
 	],
 }
 

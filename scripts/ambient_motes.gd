@@ -19,6 +19,8 @@ func setup(player: Node2D, theme: String) -> void:
 			_color = Color(0.72, 0.95, 0.7)   # pale spores
 		"castle":
 			_color = Color(1.0, 0.62, 0.32)   # warm embers
+		"crypt":
+			_color = Color(0.6, 0.72, 0.85)   # cold pale grave-dust
 		_:
 			_color = Color(0.82, 0.93, 0.62)  # graveyard fireflies
 	var h := _win * 0.5

@@ -17,6 +17,13 @@
 		}
 	},
 	{
+		"id": "stage4",
+		"requires": {
+			"type": "stage",
+			"id": "stage3"
+		}
+	},
+	{
 		"id": "blood_toll",
 		"requires": {
 			"type": "stage",
