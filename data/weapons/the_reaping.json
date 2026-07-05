@@ -1,0 +1,18 @@
+{
+	"id": "the_reaping",
+	"name": "The Reaping",
+	"niche": "evolution of the Reaping Hook (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/reaping_hook.gd",
+	"evolved": true,
+	"draft_desc": "a whole harvest of blades, out and back",
+	"up_desc": "keener, and more of it",
+	"cooldown": 1.0,
+	"damage": 26,
+	"range": 170,
+	"hooks": 3,
+	"spread_deg": 26,
+	"radius": 20,
+	"speed": 380,
+	"family": "return",
+	"max_level": 8
+}

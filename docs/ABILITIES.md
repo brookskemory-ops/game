@@ -26,12 +26,13 @@ Niche = Delivery method × Targeting rule × Damage profile. No two weapons shar
 | 13 | **Fen-Fire** | — | Bouncing chain (instant) | Nearest, then next-nearest unhit | Medium, steps down per leap | More leaps, longer reach | Wants a crowd; one foe = one hit |
 | 14 | **Reaping Hook** | — | Returning throw | Facing/nearest, out and back | Medium, hits on both legs | More hooks, faster | Aimed once; the return is fixed |
 | 15 | **Gallows Toll** | — | Delayed strike from above | Densest cluster | High burst AoE, telegraphed | More weights, wider crush | Telegraph delay; the quick escape it |
+| 16 | **Devouring Grief** | Sin-Eater (start) | Sustained tether (channel) | Nearest, held | Continuous single-target drain + lifesteal | More drain, more leech, longer reach | One foe at a time; nothing for a crowd |
 
 **Coverage check** — every archetype is covered exactly once: straight projectile (1),
 melee arc (2), thrown zone (3), orbit (4), heavy cleave (5), summon (6), random chaos (7),
 line pierce (8), radial push (9), seeker (10), lash (11), aura (12), bouncing chain (13),
-returning throw (14), delayed strike from above (15). New slots live in `IDEAS.md`, and
-they must pass the same test.
+returning throw (14), delayed strike from above (15), sustained channel-drain (16). New
+slots live in `IDEAS.md`, and they must pass the same test.
 
 ## 2. The 10 passives
 
@@ -60,6 +61,9 @@ Each passive touches **exactly one stat** no other passive touches.
 | **Halo of Cinders** | Burning Censer + Penitence | Second, counter-rotating ring; orbs leave ember trails |
 | **Oathkeeper** | Greatsword + Whetstone | Cleave becomes a full-circle shockwave slam |
 | **Crownsorrow** | Cursed Blade + Hourglass | Thralls persist until death — and detonate when they fall |
+| **Corpsefire** | Fen-Fire + Hawk's Eye | The wisp never dims between leaps — more jumps, full damage each, longer reach |
+| **The Reaping** | Reaping Hook + Whetstone | A whole harvest of blades thrown out and drawn back at once |
+| **The Gallows** | Gallows Toll + Bad Humours | The whole gallows comes down — more weights, a wider, heavier crush |
 
 ## 4. Character starting kits (uniqueness ladder)
 

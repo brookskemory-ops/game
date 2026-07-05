@@ -1,0 +1,18 @@
+{
+	"id": "the_gallows",
+	"name": "The Gallows",
+	"niche": "evolution of the Gallows Toll (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/gallows_toll.gd",
+	"evolved": true,
+	"draft_desc": "the whole gallows comes down at once",
+	"up_desc": "heavier iron, wider ruin",
+	"cooldown": 1.3,
+	"damage": 60,
+	"range": 240,
+	"weights": 3,
+	"telegraph": 0.35,
+	"radius": 50,
+	"knockback": 100,
+	"family": "skyfall",
+	"max_level": 8
+}

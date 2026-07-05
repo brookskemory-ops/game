@@ -1,0 +1,14 @@
+{
+	"id": "devouring_grief",
+	"name": "Devouring Grief",
+	"niche": "sustained single-target drain beam + lifesteal (hero-locked, docs/ABILITIES.md #16)",
+	"script": "res://scripts/weapons/devouring_grief.gd",
+	"cooldown": 0.1,
+	"damage": 58,
+	"range": 150,
+	"leech": 2.5,
+	"family": "beam",
+	"up_desc": "the tether hungers",
+	"draft_desc": "a tether of grief that drains the dead and feeds you",
+	"max_level": 8
+}

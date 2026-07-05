@@ -17,5 +17,7 @@
 		"type": "level_in_night",
 		"value": 15
 	},
-	"unlock_hint": "reach level 15 in a single night"
+	"unlock_hint": "reach level 15 in a single night",
+	"evolution": "the_reaping",
+	"catalyst": "whetstone"
 }

@@ -1,0 +1,17 @@
+{
+	"id": "corpsefire",
+	"name": "Corpsefire",
+	"niche": "evolution of Fen-Fire (docs/ABILITIES.md #3)",
+	"script": "res://scripts/weapons/fen_fire.gd",
+	"evolved": true,
+	"draft_desc": "the wisp that never dims between the dead",
+	"up_desc": "colder, farther",
+	"cooldown": 0.9,
+	"damage": 20,
+	"range": 220,
+	"jumps": 6,
+	"jump_range": 140,
+	"falloff": 1.0,
+	"family": "arc",
+	"max_level": 8
+}

@@ -17,5 +17,7 @@
 		"type": "lifetime_kills",
 		"value": 800
 	},
-	"unlock_hint": "put down 800 of the dead across your nights"
+	"unlock_hint": "put down 800 of the dead across your nights",
+	"evolution": "the_gallows",
+	"catalyst": "bad_humours"
 }
