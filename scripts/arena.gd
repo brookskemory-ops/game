@@ -39,6 +39,7 @@ var _rerolls_tonight := 0
 var _current_options: Array = []
 
 func _ready() -> void:
+	GameCamera.clear_hitstop()  # never inherit a leftover freeze from a prior scene
 	var data: Variant = Game.load_json(Game.stage_path())
 	if data is Dictionary:
 		stage = data
@@ -261,12 +262,18 @@ func _on_boss_spawned(display_name: String) -> void:
 			sub = "%s rises from the churchyard" % display_name
 	hud.banner(title, sub)
 	Sfx.play("bell")
-	player.get_node("Camera2D").add_trauma(0.45)
+	var spawn_cam := player.get_node("Camera2D")
+	spawn_cam.add_trauma(0.45)
+	spawn_cam.hitstop(0.08, 0.0)
 
 ## The boss drops the reliquary; the run ends after it is claimed.
 func _on_boss_died(at: Vector2) -> void:
 	Music.set_boss(false)
 	Sfx.play("boss_death")
+	# The kill itself lands as a beat — a hard freeze and a heavy shake.
+	var death_cam := player.get_node("Camera2D")
+	death_cam.add_trauma(0.55)
+	death_cam.hitstop(0.14, 0.0)
 	# The mid-night boss is a milestone, not the finale: reward the kill and let
 	# the night roll on — no reliquary, no dawn.
 	if _mid_boss_active:
@@ -344,6 +351,7 @@ func _finish(victory: bool) -> void:
 	}
 	hud.show_results(victory, stats)
 	# Freeze the night behind the overlay (HUD runs in PROCESS_MODE_ALWAYS).
+	GameCamera.clear_hitstop()  # the death freeze must not persist into results
 	get_tree().paused = true
 
 # Generated prop art per theme: [texture path, draw scale, weight threshold].

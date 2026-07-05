@@ -52,14 +52,19 @@ func _physics_process(delta: float) -> void:
 			if float(s["telegraph"]) <= 0.0:
 				s["struck"] = true
 				var at: Vector2 = s["pos"]
+				var landed := false
 				for slot in enemies.query_circle(at, radius):
 					enemies.damage_slot(slot, damage())
 					var away: Vector2 = enemies.enemy_pos(slot) - at
 					enemies.push_slot(slot, away.normalized() * knockback)
+					landed = true
 				Sfx.play("swing", 0.9)
 				var camera := wielder.get_node_or_null("Camera2D")
 				if camera != null:
 					camera.add_trauma(0.12)
+					# The weight biting into the crowd hits hard.
+					if landed:
+						camera.hitstop(0.05, 0.05)
 		else:
 			s["flash"] = float(s["flash"]) - delta
 	_strikes = _strikes.filter(func(s): return not bool(s["struck"]) or float(s["flash"]) > 0.0)

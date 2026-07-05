@@ -363,6 +363,7 @@ func _revive() -> void:
 	Sfx.play("bell", 0.7)
 	if _camera != null:
 		_camera.add_trauma(0.5)
+		_camera.hitstop(0.10, 0.0)
 	if _sprite != null:
 		_sprite.visible = true
 
@@ -398,4 +399,5 @@ func _die() -> void:
 	hp_changed.emit(hp, max_hp)
 	if _camera != null:
 		_camera.add_trauma(0.7)
+		_camera.hitstop(0.16, 0.0)
 	died.emit()

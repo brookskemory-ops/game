@@ -165,7 +165,27 @@ func _process(delta: float) -> void:
 			Game.mark_hint("move")
 			_move_hint.queue_free()
 			_move_hint = null
+	_push_telemetry(delta)
 	queue_redraw()
+
+## Balance-QA hook: publish live numbers to window.__vigil (~5 Hz) when ?debug=1
+## is set. Automated probes read exact counts instead of scraping the screen.
+var _telemetry_accum := 0.0
+func _push_telemetry(delta: float) -> void:
+	if not Game.debug_telemetry():
+		return
+	_telemetry_accum += delta
+	if _telemetry_accum < 0.2:
+		return
+	_telemetry_accum = 0.0
+	var t: float = _arena.time_elapsed if _arena != null else 0.0
+	var alive: int = _enemies.alive_count() if _enemies != null else 0
+	var kills: int = _enemies.kills if _enemies != null else 0
+	var level: int = _player.level if _player != null else 0
+	var hp: float = _player.hp if _player != null else 0.0
+	var boss: bool = _enemies.boss_active() if _enemies != null else false
+	JavaScriptBridge.eval("window.__vigil={t:%.1f,alive:%d,kills:%d,level:%d,hp:%.0f,boss:%s};" \
+		% [t, alive, kills, level, hp, "true" if boss else "false"], true)
 
 func _draw() -> void:
 	if _results_shown:
@@ -334,6 +354,7 @@ func toast(text: String) -> void:
 func show_draft(options: Array, on_pick: Callable, reroll_cost := 0, on_reroll := Callable()) -> void:
 	if _results_shown:
 		return
+	GameCamera.clear_hitstop()  # a kill's freeze must not leak into the paused draft
 	get_tree().paused = true
 	_pause_button.visible = false
 	close_draft()  # rerolls replace the open panel

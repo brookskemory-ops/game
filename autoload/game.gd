@@ -7,7 +7,7 @@ signal run_ended(victory: bool)
 signal gold_changed(total: int)
 signal orientation_changed  # mobile canvas swapped landscape <-> portrait
 
-const VERSION := "1.4 — new instruments of the vigil"
+const VERSION := "1.5 — weight and measure"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).
@@ -443,6 +443,20 @@ func qa_web_override() -> bool:
 		return false
 	var search := String(JavaScriptBridge.eval("window.location.search", true))
 	return search.contains("stage=") or search.contains("hero=") or search.contains("weapon=")
+
+## True when `?debug=1` is on the URL (web only). Gates the HUD's live telemetry
+## push to `window.__vigil` so automated balance probes can read exact numbers
+## (enemies alive, kills, level, HP) instead of scraping pixels. Cached — never
+## present for real players.
+var _debug_telemetry := -1  # -1 unresolved, 0 off, 1 on
+func debug_telemetry() -> bool:
+	if _debug_telemetry < 0:
+		if OS.has_feature("web"):
+			var search := String(JavaScriptBridge.eval("window.location.search", true))
+			_debug_telemetry = 1 if search.contains("debug=1") else 0
+		else:
+			_debug_telemetry = 0
+	return _debug_telemetry == 1
 
 ## Which stage the arena loads. On web builds a `?stage=qa` URL parameter
 ## swaps in the 45-second QA stage so automated tests can play full runs

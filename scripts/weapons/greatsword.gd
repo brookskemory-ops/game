@@ -42,6 +42,7 @@ func _release() -> void:
 	var full_circle := float(def.get("arc_deg", 200)) >= 355.0
 	_swing_angle = _windup_dir.angle()
 	var knockback := float(def.get("knockback", 260))
+	var hits := 0
 	for slot in enemies.query_circle(wielder.global_position, reach):
 		var to_enemy: Vector2 = enemies.enemy_pos(slot) - wielder.global_position
 		if not full_circle and to_enemy.length() > 14.0 \
@@ -49,11 +50,16 @@ func _release() -> void:
 			continue
 		enemies.damage_slot(slot, damage())
 		enemies.push_slot(slot, to_enemy.normalized() * knockback)
+		hits += 1
 	_swing_time = SWING_FLASH
 	Sfx.play("swing", 1.0)
 	var camera := wielder.get_node_or_null("Camera2D")
 	if camera != null:
 		camera.add_trauma(0.15)
+		# A true cleave into the crowd lands with weight; light grazes don't
+		# stutter the game.
+		if hits >= 3:
+			camera.hitstop(0.045, 0.08)
 	queue_redraw()
 
 func _draw() -> void:
