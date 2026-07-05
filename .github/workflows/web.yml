@@ -53,6 +53,21 @@ jobs:
           done
           exit $fail
 
+      # Booting the arena only exercises the default loadout. This loads and
+      # instantiates EVERY weapon script so a draftable weapon that parses but
+      # fails to load at runtime (untyped-Variant inference, etc.) fails CI
+      # instead of shipping as a silently-dead weapon.
+      - name: Validate every weapon script loads
+        shell: bash
+        run: |
+          out=$(godot --headless --script res://tools/check_weapons.gd 2>&1 || true)
+          echo "$out"
+          if echo "$out" | grep -qE "check_weapons: OK"; then
+            exit 0
+          fi
+          echo "::error::One or more weapon scripts failed to load/instantiate"
+          exit 1
+
       # The containerized job runs with HOME=/github/home, so the image's
       # preinstalled templates are invisible — and we need the *nothreads*
       # web templates (runs on Pages/mobile browsers without COOP/COEP

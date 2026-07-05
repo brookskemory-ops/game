@@ -54,7 +54,7 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	for a in _arcs:
-		var alpha := 1.0 - a[2] / 0.18
+		var alpha := 1.0 - float(a[2]) / 0.18
 		_draw_bolt(to_local(a[0]), to_local(a[1]), alpha)
 
 ## A jagged bolt: midpoints jittered perpendicular to the line (re-jittered each
