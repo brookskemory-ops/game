@@ -38,5 +38,15 @@
 			"Travelers say a light burns in the castle's highest window, every night, all night. It has not gone out in living memory.",
 			"\"He bought the night,\" Wren says at the fire, to anyone new. \"Somebody's got to keep the receipt.\""
 		]
+	},
+	"unburied": {
+		"title": "The Last Grave",
+		"epitaph": "the first grave is filled. the night lets go.",
+		"lines": [
+			"Beneath the castle, beneath even the crypt, you find the first wound — a grave dug wrong and never mended, and the small, ancient grief that grew into a whole cursed vale.",
+			"You do not fight it, in the end. You finish it. You lay the first of the dead down properly, with the words no one ever said, and the wailing under Hollowmere goes quiet for the first time in living memory.",
+			"One by one, above you, the risen sit down in their fields and their streets and their graves, and stay.",
+			"The survivors keep the fire a while longer, out of habit. Then, one grey morning, they let it go out — and nothing comes. Nothing ever comes again."
+		]
 	}
 }

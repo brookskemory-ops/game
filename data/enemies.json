@@ -419,5 +419,69 @@
 			"proj_speed": 150,
 			"proj_damage": 9
 		}
+	},
+	"pale_prior": {
+		"name": "The Pale Prior",
+		"lore": "He kept the under-chapel long after the light left it, and reads the last rites to things that will not lie still.",
+		"sprite": "pale_prior",
+		"hp": 950,
+		"speed": 30,
+		"damage": 22,
+		"radius": 13,
+		"xp": 60,
+		"gold": 60,
+		"boss": true,
+		"mid_boss": true,
+		"gen_scale": 0.48,
+		"ranged": {
+			"range": 210,
+			"cooldown": 3.0,
+			"proj_speed": 130,
+			"proj_damage": 11,
+			"hold_distance": false
+		},
+		"summons": {
+			"type": "gravecrawler",
+			"count": 3,
+			"interval": 6.5
+		},
+		"enrage": {
+			"below": 0.35,
+			"speed_mul": 1.35,
+			"cooldown_mul": 0.55
+		}
+	},
+	"the_unburied": {
+		"name": "The Unburied",
+		"lore": "The first of Hollowmere's dead to be wronged, and the last to forgive it. Everything above is only its grief, wearing the shapes of the risen.",
+		"sprite": "the_unburied",
+		"hp": 4200,
+		"speed": 22,
+		"damage": 32,
+		"radius": 16,
+		"xp": 120,
+		"gold": 120,
+		"boss": true,
+		"gen_scale": 0.55,
+		"flip_x": true,
+		"ranged": {
+			"range": 260,
+			"cooldown": 3.6,
+			"proj_speed": 110,
+			"proj_damage": 13,
+			"volley": 6,
+			"spread_deg": 60,
+			"hold_distance": false
+		},
+		"summons": {
+			"type": "sepulcher_wraith",
+			"count": 2,
+			"interval": 5.5
+		},
+		"enrage": {
+			"below": 0.35,
+			"speed_mul": 1.4,
+			"cooldown_mul": 0.5
+		}
 	}
 }

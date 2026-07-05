@@ -529,6 +529,14 @@ func ending_pending() -> bool:
 		and String(last_run.get("stage", "")) == "stage3" \
 		and String(last_run.get("character", "")) == "hollow_king"
 
+## The true ending: shown once, the first time ANY hero puts down the Unburied
+## at the root of the night (Act IV). Independent of the Hollow King's bargain —
+## a deeper resolution beneath it.
+func true_ending_pending() -> bool:
+	return not hint_seen("true_ending") \
+		and bool(last_run.get("victory", false)) \
+		and String(last_run.get("stage", "")) == "stage4"
+
 func stage_path() -> String:
 	if OS.has_feature("web"):
 		var search := String(JavaScriptBridge.eval("window.location.search", true))

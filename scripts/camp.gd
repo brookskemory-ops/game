@@ -176,6 +176,11 @@ func _ready() -> void:
 	# tale as they join the fire.
 	if Game.ending_pending():
 		_show_ending_choice()
+	elif Game.true_ending_pending() and not Game.qa_web_override():
+		Game.mark_hint("true_ending")
+		var epi: Dictionary = _endings.get("unburied", {})
+		_show_story_card(String(epi.get("title", "The Last Grave")),
+			epi.get("lines", []), _show_next_unlock_vignette)
 	elif not Game.hint_seen("prologue") and not Game.qa_web_override():
 		Game.mark_hint("prologue")
 		var pro: Variant = Game.load_json("res://data/story/prologue.json")
