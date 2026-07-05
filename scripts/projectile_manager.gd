@@ -83,6 +83,19 @@ func _physics_process(delta: float) -> void:
 				break
 		if _alive[i] == 1:
 			_mm.set_instance_transform_2d(i, Transform2D(_vel[i].angle(), _pos[i]))
+	queue_redraw()
+
+## A glowing motion streak behind every projectile — one place, so all projectile
+## weapons (bow, ballista, axes) gain the trail. Cheap: a couple of lines per live
+## shot, drawn under the arrow sprite (the MultiMesh child renders on top).
+func _draw() -> void:
+	for i in CAP:
+		if _alive[i] == 0:
+			continue
+		var p: Vector2 = _pos[i]
+		var back: Vector2 = p - _vel[i].normalized() * 12.0
+		draw_line(back, p, Color(1.0, 0.85, 0.45, 0.22), 4.0)   # warm glow
+		draw_line(back, p, Color(1.0, 0.97, 0.82, 0.7), 1.5)    # hot core
 
 func _despawn(slot: int) -> void:
 	if _alive[slot] == 0:
