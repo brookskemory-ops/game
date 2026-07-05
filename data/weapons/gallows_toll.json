@@ -1,0 +1,21 @@
+{
+	"id": "gallows_toll",
+	"name": "Gallows Toll",
+	"niche": "telegraphed strike from above, instant crush (docs/ABILITIES.md #15)",
+	"script": "res://scripts/weapons/gallows_toll.gd",
+	"cooldown": 1.6,
+	"damage": 40,
+	"range": 220,
+	"weights": 1,
+	"telegraph": 0.5,
+	"radius": 34,
+	"knockback": 80,
+	"family": "skyfall",
+	"up_desc": "more weights fall, wider crush",
+	"draft_desc": "iron dropped from the gallows onto the gathered dead",
+	"unlock": {
+		"type": "lifetime_kills",
+		"value": 800
+	},
+	"unlock_hint": "put down 800 of the dead across your nights"
+}

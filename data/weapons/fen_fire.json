@@ -1,0 +1,20 @@
+{
+	"id": "fen_fire",
+	"name": "Fen-Fire",
+	"niche": "bouncing chain between enemies (docs/ABILITIES.md #13)",
+	"script": "res://scripts/weapons/fen_fire.gd",
+	"cooldown": 1.1,
+	"damage": 14,
+	"range": 200,
+	"jumps": 3,
+	"jump_range": 95,
+	"falloff": 0.8,
+	"family": "arc",
+	"up_desc": "the wisp leaps farther and colder",
+	"draft_desc": "a mere-wisp that leaps from one dead thing to the next",
+	"unlock": {
+		"type": "lifetime_kills",
+		"value": 300
+	},
+	"unlock_hint": "put down 300 of the dead across your nights"
+}

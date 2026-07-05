@@ -1,0 +1,21 @@
+{
+	"id": "reaping_hook",
+	"name": "Reaping Hook",
+	"niche": "returning projectile, cuts going and coming (docs/ABILITIES.md #14)",
+	"script": "res://scripts/weapons/reaping_hook.gd",
+	"cooldown": 1.3,
+	"damage": 16,
+	"range": 150,
+	"speed": 300,
+	"hooks": 1,
+	"spread_deg": 18,
+	"radius": 14,
+	"family": "return",
+	"up_desc": "another blade on the cord, keener",
+	"draft_desc": "a sexton's curved blade, thrown to cut out and back",
+	"unlock": {
+		"type": "level_in_night",
+		"value": 15
+	},
+	"unlock_hint": "reach level 15 in a single night"
+}

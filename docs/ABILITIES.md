@@ -23,11 +23,15 @@ Niche = Delivery method × Targeting rule × Damage profile. No two weapons shar
 | 10 | **Falcon Companion** | Wren's arc | Seeker (flies itself) | Farthest / elite first | Medium repeated strikes | Faster hunts, bleed on elite | One target at a time |
 | 11 | **Pilgrim's Chain** | — | Thin long lash | Alternating left/right | Fast medium line hits | Longer reach, faster lash | Only ever horizontal |
 | 12 | **Reliquary of the Unquiet Saint** | — | Aura (steady field) | Self, uniform circle | Very low constant ticks + slow | Wider field, stronger slow | Never spikes; pure attrition |
+| 13 | **Fen-Fire** | — | Bouncing chain (instant) | Nearest, then next-nearest unhit | Medium, steps down per leap | More leaps, longer reach | Wants a crowd; one foe = one hit |
+| 14 | **Reaping Hook** | — | Returning throw | Facing/nearest, out and back | Medium, hits on both legs | More hooks, faster | Aimed once; the return is fixed |
+| 15 | **Gallows Toll** | — | Delayed strike from above | Densest cluster | High burst AoE, telegraphed | More weights, wider crush | Telegraph delay; the quick escape it |
 
 **Coverage check** — every archetype is covered exactly once: straight projectile (1),
 melee arc (2), thrown zone (3), orbit (4), heavy cleave (5), summon (6), random chaos (7),
-line pierce (8), radial push (9), seeker (10), lash (11), aura (12). Slots for the DLC/v1.1
-list live in `IDEAS.md`, and they must pass the same test.
+line pierce (8), radial push (9), seeker (10), lash (11), aura (12), bouncing chain (13),
+returning throw (14), delayed strike from above (15). New slots live in `IDEAS.md`, and
+they must pass the same test.
 
 ## 2. The 10 passives
 
