@@ -60,12 +60,12 @@ jobs:
       - name: Validate every weapon script loads
         shell: bash
         run: |
-          out=$(godot --headless --script res://tools/check_weapons.gd 2>&1 || true)
+          out=$(timeout 90 godot --headless --quit-after 20 --script res://tools/check_weapons.gd 2>&1 || true)
           echo "$out"
           if echo "$out" | grep -qE "check_weapons: OK"; then
             exit 0
           fi
-          echo "::error::One or more weapon scripts failed to load/instantiate"
+          echo "::error::One or more weapon scripts failed to load/instantiate (or the check timed out)"
           exit 1
 
       # The containerized job runs with HOME=/github/home, so the image's
