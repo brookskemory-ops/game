@@ -14,93 +14,107 @@
 	"events": [
 		{
 			"t": 150,
-			"spawn": "wight",
-			"count": 4,
-			"announce": "The oldest dead do not sleep down here..."
+			"spawn": "sepulcher_wraith",
+			"count": 3,
+			"announce": "The air goes cold — they are already among you."
 		},
 		{
 			"t": 300,
-			"spawn": "crypt_archer",
-			"count": 6,
-			"announce": "Bolts hiss from the dark niches!"
+			"spawn": "bonecaller",
+			"count": 2,
+			"announce": "Something below begins to chant..."
 		},
 		{
 			"t": 450,
-			"spawn": "chorister",
-			"count": 2,
-			"announce": "A hymn rises from below..."
+			"spawn": "ossuary_horror",
+			"count": 1,
+			"announce": "The bone-heap stands up."
 		}
 	],
 	"waves": [
 		{
 			"from": 0,
-			"to": 90,
-			"type": "shambler",
-			"interval": 1.1,
+			"to": 80,
+			"type": "gravecrawler",
+			"interval": 1.0,
 			"count": 3
 		},
 		{
 			"from": 30,
 			"to": 160,
-			"type": "gnawer",
-			"interval": 2.2,
+			"type": "shambler",
+			"interval": 1.6,
 			"count": 2
 		},
 		{
 			"from": 60,
-			"to": 220,
-			"type": "wight",
-			"interval": 2.6,
-			"count": 2
+			"to": 240,
+			"type": "grave_leech",
+			"interval": 4.0,
+			"count": 1
 		},
 		{
 			"from": 90,
 			"to": 300,
-			"type": "hanged_man",
-			"interval": 1.4,
-			"count": 3
-		},
-		{
-			"from": 150,
-			"to": 320,
-			"type": "shambler",
-			"interval": 0.7,
+			"type": "gravecrawler",
+			"interval": 0.6,
 			"count": 4
 		},
 		{
-			"from": 220,
-			"to": 420,
-			"type": "crypt_archer",
-			"interval": 3.0,
+			"from": 120,
+			"to": 280,
+			"type": "sepulcher_wraith",
+			"interval": 5.0,
 			"count": 1
+		},
+		{
+			"from": 180,
+			"to": 360,
+			"type": "bonecaller",
+			"interval": 6.0,
+			"count": 1
+		},
+		{
+			"from": 220,
+			"to": 600,
+			"type": "wight",
+			"interval": 2.4,
+			"count": 2
 		},
 		{
 			"from": 300,
 			"to": 600,
-			"type": "wight",
-			"interval": 1.8,
-			"count": 2
+			"type": "sepulcher_wraith",
+			"interval": 3.5,
+			"count": 1
 		},
 		{
 			"from": 320,
 			"to": 600,
-			"type": "hanged_man",
-			"interval": 0.9,
-			"count": 3
+			"type": "gravecrawler",
+			"interval": 0.4,
+			"count": 5
 		},
 		{
-			"from": 420,
+			"from": 360,
 			"to": 600,
-			"type": "chorister",
-			"interval": 6.0,
+			"type": "grave_leech",
+			"interval": 3.0,
+			"count": 1
+		},
+		{
+			"from": 430,
+			"to": 600,
+			"type": "ossuary_horror",
+			"interval": 9.0,
 			"count": 1
 		},
 		{
 			"from": 480,
 			"to": 600,
-			"type": "gnawer",
-			"interval": 0.5,
-			"count": 4
+			"type": "bonecaller",
+			"interval": 4.0,
+			"count": 1
 		}
 	],
 	"ground": {

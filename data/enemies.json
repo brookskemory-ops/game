@@ -340,5 +340,84 @@
 			"type": "gnawer",
 			"count": 2
 		}
+	},
+	"gravecrawler": {
+		"name": "Gravecrawler",
+		"lore": "What crawls up when the coffins rot through. Fast, low, and always hungry for the living warmth above.",
+		"sprite": "gravecrawler",
+		"hp": 14,
+		"speed": 118,
+		"damage": 6,
+		"radius": 5,
+		"xp": 1,
+		"gold_chance": 0.02,
+		"gen_scale": 0.26
+	},
+	"ossuary_horror": {
+		"name": "Ossuary Horror",
+		"lore": "A hundred graves' worth of bone, fused and risen as one. Slow, and does not care how many blows it takes.",
+		"sprite": "ossuary_horror",
+		"hp": 260,
+		"speed": 22,
+		"damage": 24,
+		"radius": 12,
+		"xp": 7,
+		"armor": 3,
+		"gold_chance": 0.12,
+		"gen_scale": 0.36,
+		"death_boom": {
+			"radius": 44,
+			"damage": 22
+		}
+	},
+	"sepulcher_wraith": {
+		"name": "Sepulcher Wraith",
+		"lore": "It does not walk so much as arrive. Look away, and it is already closer.",
+		"sprite": "sepulcher_wraith",
+		"hp": 42,
+		"speed": 40,
+		"damage": 12,
+		"radius": 7,
+		"xp": 3,
+		"gold_chance": 0.05,
+		"gen_scale": 0.3,
+		"blink": {
+			"interval": 3.2,
+			"dist": 95,
+			"min_dist": 60
+		}
+	},
+	"grave_leech": {
+		"name": "Grave-Leech",
+		"lore": "It feeds on the touch and mends from it. Trade blows and it only grows fat — burst it, or leave it.",
+		"sprite": "grave_leech",
+		"hp": 64,
+		"speed": 34,
+		"damage": 10,
+		"radius": 7,
+		"xp": 3,
+		"gold_chance": 0.05,
+		"gen_scale": 0.3,
+		"leech": {
+			"heal": 7.0
+		}
+	},
+	"bonecaller": {
+		"name": "Bonecaller",
+		"lore": "It hangs back and speaks to the dead in their own tongue. Silence it before the choir it calls arrives.",
+		"sprite": "bonecaller",
+		"hp": 46,
+		"speed": 34,
+		"damage": 8,
+		"radius": 7,
+		"xp": 4,
+		"gold_chance": 0.07,
+		"gen_scale": 0.3,
+		"ranged": {
+			"range": 175,
+			"cooldown": 2.6,
+			"proj_speed": 150,
+			"proj_damage": 9
+		}
 	}
 }

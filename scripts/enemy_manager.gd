@@ -331,6 +331,16 @@ func _advance_walk_frames(delta: float) -> void:
 			if _shot_cd[i] <= 0.0:
 				_shot_cd[i] = float(choir.get("interval", 2.0))
 				_sing_hymn(i, choir)
+		# Blink (Sepulcher Wraith): every few seconds it flickers a chunk of the
+		# way toward the player — sudden pressure you can't simply outrun.
+		var blink: Dictionary = def.get("blink", {})
+		if not blink.is_empty():
+			_shot_cd[i] -= delta
+			if _shot_cd[i] <= 0.0 and dist > float(blink.get("min_dist", 55)):
+				_shot_cd[i] = float(blink.get("interval", 3.0))
+				_puffs.append([_pos[i], 0.0])
+				_pos[i] += (ppos - _pos[i]).normalized() * float(blink.get("dist", 90))
+				_puffs.append([_pos[i], 0.0])
 		# Knockback impulse (from shovel swings etc.), decays fast.
 		if _push[i] != Vector2.ZERO:
 			_pos[i] += _push[i] * delta
@@ -352,6 +362,12 @@ func _advance_walk_frames(delta: float) -> void:
 		var cry := float(def.get("_hit_ry", 6.0)) + player_radius
 		if (cdx * cdx) / (crx * crx) + (cdy * cdy) / (cry * cry) < 1.0:
 			contact_dps += float(def.get("damage", 5)) * _damage_mul
+			# Leech (Grave-Leech): it feeds on the touch, healing itself — you
+			# must burst it down, not trade with it.
+			var leech: Dictionary = def.get("leech", {})
+			if not leech.is_empty():
+				var lmax := float(def.get("hp", 10)) * _hp_mul
+				_hp[i] = minf(lmax, _hp[i] + float(leech.get("heal", 6.0)) * delta)
 			# Thorns tick roughly twice a second, probabilistically (cheap).
 			if thorns > 0.0 and randf() < delta * 2.0:
 				damage_slot(i, thorns)
