@@ -282,5 +282,63 @@
 			"count": 2,
 			"interval": 6.0
 		}
+	},
+	"carrion_crow": {
+		"name": "Carrion Crow",
+		"lore": "They feasted on the field-dead and forgot how to stop. A black tide on tattered wings.",
+		"sprite": "carrion_crow",
+		"hp": 11,
+		"speed": 132,
+		"damage": 6,
+		"radius": 5,
+		"xp": 1,
+		"gold_chance": 0.02,
+		"gen_scale": 0.24,
+		"flip_x": true
+	},
+	"barrow_brute": {
+		"name": "Barrow Brute",
+		"lore": "What they buried under the biggest stone, and the biggest stone was not enough.",
+		"sprite": "barrow_brute",
+		"hp": 230,
+		"speed": 24,
+		"damage": 22,
+		"radius": 11,
+		"xp": 6,
+		"armor": 2,
+		"gold_chance": 0.11,
+		"gen_scale": 0.34
+	},
+	"bloat": {
+		"name": "Bloat",
+		"lore": "Swollen with the gas of its own rot. Put it down at arm's length, or share in the burst.",
+		"sprite": "bloat",
+		"hp": 42,
+		"speed": 30,
+		"damage": 6,
+		"radius": 9,
+		"xp": 3,
+		"gold_chance": 0.05,
+		"gen_scale": 0.31,
+		"death_boom": {
+			"radius": 42,
+			"damage": 20
+		}
+	},
+	"sundered_wisp": {
+		"name": "Sundered Wisp",
+		"lore": "One grief that will not be one thing. Cut it and it is two, each still hungry.",
+		"sprite": "sundered_wisp",
+		"hp": 34,
+		"speed": 62,
+		"damage": 8,
+		"radius": 6,
+		"xp": 2,
+		"gold_chance": 0.03,
+		"gen_scale": 0.26,
+		"death_split": {
+			"type": "gnawer",
+			"count": 2
+		}
 	}
 }

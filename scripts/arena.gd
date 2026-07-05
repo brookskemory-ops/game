@@ -228,12 +228,24 @@ func _physics_process(delta: float) -> void:
 		if wave_time < float(wave.get("from", 0)) or wave_time >= float(wave.get("to", 0)):
 			continue
 		_wave_acc[w] += delta
-		var interval := maxf(0.05, float(wave.get("interval", 1.0)) / _spawn_mul)
+		var interval := maxf(0.05, float(wave.get("interval", 1.0)) / (_spawn_mul * _deepen_mul(wave_time)))
 		while _wave_acc[w] >= interval:
 			_wave_acc[w] -= interval
 			for c in int(wave.get("count", 1)):
 				enemies.spawn(String(wave.get("type", "shambler")),
 					_spawn_point(float(wave.get("distance", SPAWN_DISTANCE))))
+
+## v1.6 "the night deepens": after the mid-boss, spawn rate ramps smoothly
+## toward the finale (up to +55%), so the back half of a night is felt as
+## heavier. Endless has its own tier system, so leave it alone there.
+func _deepen_mul(wtime: float) -> float:
+	if _endless:
+		return 1.0
+	var mid := float(stage.get("mid_boss_t", 300))
+	var rl := run_length()
+	if wtime <= mid or rl <= mid:
+		return 1.0
+	return lerpf(1.0, 1.55, clampf((wtime - mid) / (rl - mid), 0.0, 1.0))
 
 func _spawn_point(distance := SPAWN_DISTANCE) -> Vector2:
 	# Just past the edge of a landscape phone view, in a random direction

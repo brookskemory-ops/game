@@ -494,12 +494,28 @@ func _kill(slot: int) -> void:
 	_type_mm[_type[slot]].set_instance_color(slot, Color.WHITE)
 	_drop_pickups(slot, def)
 	_puffs.append([_pos[slot], 0.0])
+	_death_effects(_pos[slot], def)
 	Sfx.play("kill", 0.8)
 	enemy_killed.emit(_pos[slot])
 	queue_redraw()
 	if slot == _boss_slot:
 		_boss_slot = -1
 		boss_died.emit(_pos[slot])
+
+## On-death mechanics (v1.6): the bloat bursts, the sundered wisp splits.
+func _death_effects(at: Vector2, def: Dictionary) -> void:
+	var boom: Dictionary = def.get("death_boom", {})
+	if not boom.is_empty():
+		# A short-fuse gas burst: hurts the player if caught in it. A second
+		# puff sells the pop.
+		_puffs.append([at, -0.25])
+		if _player != null and _player.global_position.distance_to(at) < float(boom.get("radius", 40)):
+			_player.take_hit(float(boom.get("damage", 12)) * _damage_mul)
+	var split: Dictionary = def.get("death_split", {})
+	if not split.is_empty():
+		var stype := String(split.get("type", "gnawer"))
+		for i in int(split.get("count", 2)):
+			spawn(stype, at + Vector2.from_angle(randf() * TAU) * 9.0)
 
 ## XP gems always; gold from elites/bosses (and a rare trickle from normals).
 func _drop_pickups(slot: int, def: Dictionary) -> void:

@@ -114,6 +114,34 @@
 			"type": "courtier",
 			"interval": 0.35,
 			"count": 4
+		},
+		{
+			"from": 300,
+			"to": 600,
+			"type": "carrion_crow",
+			"interval": 0.55,
+			"count": 4
+		},
+		{
+			"from": 340,
+			"to": 600,
+			"type": "bloat",
+			"interval": 4.5,
+			"count": 1
+		},
+		{
+			"from": 400,
+			"to": 600,
+			"type": "sundered_wisp",
+			"interval": 3.5,
+			"count": 2
+		},
+		{
+			"from": 430,
+			"to": 600,
+			"type": "barrow_brute",
+			"interval": 7.0,
+			"count": 1
 		}
 	],
 	"ground": {
