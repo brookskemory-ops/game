@@ -26,17 +26,20 @@ sprite size). Frames come back 64×64 with transparent background.
   arcs instead of legs. Enemies that carry a weapon (knight/archer/bell) are the
   most prone to baking in attack VFX; strong negatives help but some just won't
   cooperate.
-- **Attack frames** (v2.0 fix): the naive swing actions ("swinging a sword")
-  bake in huge motion-blur **crescent/ring swoosh VFX**, turn the hero to face
-  away, or shrink/warp the design — reading as wonky and off-class. The fix:
-  **img-guidance 11, text-guidance 6**, a **concrete, pose-based, class-specific
-  action** (draw the bow / lift the shovel overhead / throw the vial / swing the
-  censer on its chain / raise the greatsword / thrust the blade / reach a hand
-  out) and a **strong anti-VFX negative**: `motion blur, glowing arc, energy
-  swoosh, weapon trail, white crescent, moon shape, facing away, back turned,
-  turning around`. Avoid the word "cast" — it summons a spell-circle disc; add
-  `orange circle, glowing orb, spell circle, colored background` to the negative
-  if one appears. All 7 heroes came out clean this way.
+- **Attack frames — DON'T (learned the hard way, v2.0).** We tried to give each
+  hero a class attack (draw the bow, lift the shovel, swing the censer…) via
+  `animate-with-text`. It cannot do a clean *and* animated attack at this 64px
+  detail. There are only two outcomes and no middle:
+  - **High image-guidance (11+)** → the frames stay glued to the standing
+    reference: clean, but *no motion* (the hero just stands there).
+  - **Lower image-guidance (7–9) / higher text** → the action registers, but the
+    model bakes in a huge **white swoosh / ring / halo** behind the hero, or
+    **corrupts the face** (magenta speckle) and warps the pose. Negatives
+    (`glowing ring, halo, energy swoosh, white crescent, motion blur, …`) do
+    **not** remove the swoosh.
+  So hero attack frames were **removed** — heroes read as alive from the walk
+  cycle, and each weapon's own procedural VFX carries the attack. If you ever
+  revisit, do it with hand-authored frames, not this endpoint.
 - `--clean` despeckles stray pixels after generation.
 - Always **visual-QA every set** (build a montage, eyeball coherence). Cherry-pick
   the clean frames; if a character won't hold, **fail soft** — that type keeps the

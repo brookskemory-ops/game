@@ -70,11 +70,6 @@ var _side_tex: Texture2D
 var _walk_frames: Array = []  # Pixel Lab side walk cycle; empty -> procedural gait
 var _anim_t := 0.0
 const WALK_FPS := 9.0
-var _attack_frames: Array = []  # brief on-fire swing; empty -> stays on walk/idle
-var _attack_t := 0.0     # >0 while a swing plays; counts down
-var _attack_dur := 0.0   # total length of the current swing
-var _attack_cool := 0.0  # rate-limit so rapid/orbit weapons don't flail
-const ATTACK_MIN_GAP := 0.35
 var _gait_t := 0.0
 var _sprite_base_scale := 1.0
 var _lightfoot_timer := 0.0
@@ -157,25 +152,9 @@ func setup(ctx: Dictionary) -> void:
 			_walk_frames.append(load(wp))
 	if not _walk_frames.is_empty():
 		_sprite.texture = _walk_frames[0]
-	# Attack swing frames (Pixel Lab). Played briefly on weapon fire over the
-	# walk/idle pose; fail-soft — with none, the hero just keeps walking.
-	for i in 4:
-		var ap := "res://assets/sprites/generated/side/%s_attack_%d.png" % [hero_id, i]
-		if ResourceLoader.exists(ap):
-			_attack_frames.append(load(ap))
 	_sprite_base_scale = _sprite.scale.x
 	add_child(_sprite)
 	equip(_qa_weapon_override(String(stats.get("weapon", "hunting_bow"))))
-
-## A weapon fired — play a brief attack-pose swing. Rate-limited so rapid or
-## orbiting weapons don't lock the hero into constant flailing, and weightier
-## weapons hold the pose a touch longer. Fail-soft: no frames -> no-op.
-func notify_attacked(weight := 1.0) -> void:
-	if weight <= 0.0 or _attack_frames.is_empty() or _attack_cool > 0.0:
-		return
-	_attack_dur = clampf(0.16 * weight, 0.14, 0.34)
-	_attack_t = _attack_dur
-	_attack_cool = maxf(ATTACK_MIN_GAP, _attack_dur + 0.05)
 
 ## Web QA: ?weapon=<id> forces the starting weapon so every weapon's attack
 ## can be driven and screenshotted deterministically (mirrors ?hero=/?stage=).
@@ -323,24 +302,11 @@ func _physics_process(delta: float) -> void:
 	var moving := velocity.length_squared() > 1.0
 	if moving:
 		facing = velocity.normalized()
-	_attack_cool = maxf(0.0, _attack_cool - delta)
 	if _sprite != null:
 		if absf(velocity.x) > 1.0:
 			_sprite.flip_h = velocity.x < 0.0
 		_sprite.modulate = _sprite.modulate.lerp(Color.WHITE, delta * 8.0)
-		if _attack_t > 0.0 and not _attack_frames.is_empty():
-			# A brief swing: play the attack frames once across _attack_dur,
-			# overriding walk/idle. Keeps the gentle gait bob while moving.
-			_attack_t -= delta
-			var prog := 1.0 - clampf(_attack_t / maxf(0.0001, _attack_dur), 0.0, 1.0)
-			var fi := clampi(int(prog * _attack_frames.size()), 0, _attack_frames.size() - 1)
-			_sprite.texture = _attack_frames[fi]
-			if moving:
-				_gait_t += delta * move_speed * 0.085
-				_sprite.position.y = -absf(sin(_gait_t)) * 0.8
-			else:
-				_sprite.position.y = lerpf(_sprite.position.y, 0.0, minf(1.0, delta * 10.0))
-		elif not _walk_frames.is_empty():
+		if not _walk_frames.is_empty():
 			# Frame-based side walk cycle: one consistent design, flipped for
 			# direction. Idle rests on frame 0; a gentle bob, no design-warping
 			# rotation/squash.
