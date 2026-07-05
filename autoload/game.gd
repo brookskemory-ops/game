@@ -184,7 +184,9 @@ func start_run() -> void:
 	if not hint_seen("begin"):
 		mark_hint("begin")
 	get_tree().paused = false
-	Music.play_night()
+	var stage_def: Variant = load_json(stage_path())
+	var theme := String(stage_def.get("theme", "")) if stage_def is Dictionary else ""
+	Music.play_night(theme)
 	run_started.emit()
 	get_tree().change_scene_to_file("res://scenes/arena.tscn")
 

@@ -17,22 +17,47 @@ const FADE_SPEED := 1.6
 
 var _players := {}
 var _targets := {"camp": 0.0, "night": 0.0, "danger": 0.0, "boss": 0.0}
+var _default_stream := {}   # id -> the base looping stream
+var _variant := {}          # "<layer>_<theme>" -> looping stream (optional)
+
+func _prep(path: String) -> AudioStreamWAV:
+	if not ResourceLoader.exists(path):
+		return null
+	var s: AudioStreamWAV = load(path)
+	s.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	s.loop_begin = 0
+	s.loop_end = s.data.size() / 2  # 16-bit mono: bytes -> frames
+	return s
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	for id in TRACKS:
-		if not ResourceLoader.exists(String(TRACKS[id])):
+		var stream := _prep(String(TRACKS[id]))
+		if stream == null:
 			continue
-		var stream: AudioStreamWAV = load(String(TRACKS[id]))
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		stream.loop_begin = 0
-		stream.loop_end = stream.data.size() / 2  # 16-bit mono: bytes -> frames
+		_default_stream[id] = stream
 		var player := AudioStreamPlayer.new()
 		player.stream = stream
 		player.volume_db = -60.0
 		add_child(player)
 		player.play()
 		_players[id] = player
+	# Optional per-theme beds (Act IV): night_crypt, boss_crypt, ...
+	for key in ["night_crypt", "boss_crypt"]:
+		var vs := _prep("res://assets/music/%s.wav" % key)
+		if vs != null:
+			_variant[key] = vs
+
+## Swap a layer's stream to a themed variant (or back to the default). Restarts
+## that layer's loop — fine, it fades in from silence anyway.
+func _use_variant(layer: String, theme: String) -> void:
+	if not _players.has(layer):
+		return
+	var want: AudioStreamWAV = _variant.get("%s_%s" % [layer, theme], _default_stream.get(layer))
+	var player: AudioStreamPlayer = _players[layer]
+	if player.stream != want and want != null:
+		player.stream = want
+		player.play()
 
 func _process(delta: float) -> void:
 	if _players.is_empty():
@@ -49,9 +74,12 @@ func _process(delta: float) -> void:
 func play_camp() -> void:
 	_targets = {"camp": 1.0, "night": 0.0, "danger": 0.0, "boss": 0.0}
 
-## The vigil: a run begins. Danger and boss layers blend in on top.
-func play_night() -> void:
+## The vigil: a run begins. Danger and boss layers blend in on top. The stage
+## theme picks the night/boss bed (Act IV's crypt gets its own colder loop).
+func play_night(theme := "") -> void:
 	_targets = {"camp": 0.0, "night": 1.0, "danger": 0.0, "boss": 0.0}
+	_use_variant("night", theme)
+	_use_variant("boss", theme)
 
 ## 0..1 — how hard the horde is pressing (arena feeds alive_count).
 func set_danger(fraction: float) -> void:

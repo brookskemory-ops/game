@@ -195,6 +195,23 @@ def main():
             + 0.3 * heartbeat(dur, bpm=60, gain=0.5))
     write("boss", _norm(boss, 0.88))
 
+    # --- Act IV (crypt): colder and deeper, with water dripping in the dark.
+    # music.gd swaps the night/boss beds to these on the "crypt" theme. ---
+    dur = 32.0
+    night_crypt = (0.5 * pad(dur, [A2, C3, D3], lfo_cycles=2)          # colder minor
+                   + 0.5 * drone(dur, [A1, A1 * 1.5], detune=0.5, lfo_cycles=3, depth=0.35)
+                   + 0.3 * heartbeat(dur, bpm=38, gain=0.42)
+                   # sparse high plinks = water dripping in a stone dark
+                   + 0.28 * plucks(dur, [A3 * 2, E3 * 2, C3 * 3], period=2.7, decay=7.0, gain=0.4)
+                   + 0.12 * noise_wash(dur, gain=0.09, lfo_cycles=2))
+    write("night_crypt", _norm(night_crypt, 0.78))
+
+    dur = 16.0
+    boss_crypt = (0.6 * drone(dur, [A1, D3, F3], detune=0.8, lfo_cycles=2, depth=0.35)
+                  + 0.45 * bell(dur, period=5.0, base=220.0, gain=0.55)  # deeper, slower toll
+                  + 0.35 * heartbeat(dur, bpm=54, gain=0.55))
+    write("boss_crypt", _norm(boss_crypt, 0.88))
+
 
 if __name__ == "__main__":
     main()
