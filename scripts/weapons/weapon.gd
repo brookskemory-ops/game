@@ -30,6 +30,18 @@ func _physics_process(delta: float) -> void:
 	_cooldown_left -= delta
 	if _cooldown_left <= 0.0 and _try_fire():
 		_cooldown_left = cooldown()
+		if wielder != null:
+			wielder.notify_attacked(_attack_weight())
+
+## How heavy this weapon reads as a swing (drives the hero's brief attack pose;
+## 0 = a continuously-emitting weapon that shouldn't trigger a discrete swing).
+func _attack_weight() -> float:
+	match String(def.get("family", "")):
+		"melee", "cleave": return 1.8
+		"skyfall": return 1.5
+		"return": return 1.2
+		"aura", "orbit", "beam": return 0.0
+		_: return 1.0
 
 ## Override per weapon. Return true only if the weapon actually fired
 ## (so weapons hold their shot when no target is in range).
