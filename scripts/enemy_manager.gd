@@ -60,7 +60,13 @@ func escalate(hp_factor: float) -> void:
 # Type registry, from data/enemies.json.
 var _type_defs: Array = []      # Dictionary per type id
 var _type_mm: Array = []        # MultiMesh per type id
+var _type_mmi: Array = []       # MultiMeshInstance2D per type id (for frame swap)
+var _type_frames: Array = []    # Array[Texture2D] walk frames per type (empty = static)
 var _name_to_type := {}         # String -> int
+# Shared walk-cycle clock: all instances of a type animate in lockstep (one
+# shared texture per type — cheap, O(types)/frame). Base sprite stays frame 0.
+var _anim_t := 0.0
+const ENEMY_WALK_FPS := 6.0
 
 # Flat per-enemy state. One slot per enemy, shared across types.
 var _alive := PackedByteArray()
@@ -166,10 +172,27 @@ func _register_type(type_name: String, def: Dictionary) -> void:
 	mmi.multimesh = mm
 	mmi.texture = tex
 	add_child(mmi)
+	# Side walk cycle (Pixel Lab): <sprite>_walk_0..N.png, same flip pipeline as
+	# the base sprite so it lines up with the velocity-flip logic. Frame 0 is the
+	# base tex; missing frames just leave the type static (fail-soft — the horde
+	# can be a mix of animated and still types).
+	var frames: Array = [tex]
+	for i in 4:
+		var fp := "res://assets/sprites/generated/%s_walk_%d.png" % [sprite_id, i]
+		if not ResourceLoader.exists(fp):
+			continue
+		var ftex: Texture2D = PixelSprites.flipped_for_multimesh(load(fp))
+		if bool(def.get("flip_x", false)):
+			var fimg := ftex.get_image()
+			fimg.flip_x()
+			ftex = ImageTexture.create_from_image(fimg)
+		frames.append(ftex)
 	def["_id"] = type_name  # so kill/spawn signals can name the type
 	_name_to_type[type_name] = _type_defs.size()
 	_type_defs.append(def)
 	_type_mm.append(mm)
+	_type_mmi.append(mmi)
+	_type_frames.append(frames if frames.size() > 1 else [])
 
 func spawn(type_name: String, at: Vector2) -> void:
 	if not _name_to_type.has(type_name):
@@ -233,7 +256,18 @@ func _physics_process(delta: float) -> void:
 	if _player == null:
 		return
 	_time += delta
+	_advance_walk_frames(delta)
 	_update_boss_mechanics(delta)
+
+## Shared walk-cycle clock: swap each animated type's MultiMesh texture to the
+## current frame. Cheap — one texture assignment per animated type per frame.
+func _advance_walk_frames(delta: float) -> void:
+	_anim_t += delta * ENEMY_WALK_FPS
+	var frame := int(_anim_t)
+	for t in _type_frames.size():
+		var frames: Array = _type_frames[t]
+		if frames.size() > 1:
+			_type_mmi[t].texture = frames[frame % frames.size()]
 	var ppos: Vector2 = _player.global_position
 	_grid.clear()
 	var contact_dps := 0.0
