@@ -75,6 +75,10 @@ func _ready() -> void:
 		var fog := FogLayer.new()
 		add_child(fog)
 		fog.setup(player)
+	# Ambient life: drifting motes themed to the stage (fireflies/spores/embers).
+	var motes := AmbientMotes.new()
+	add_child(motes)
+	motes.setup(player, String(stage.get("theme", "graveyard")))
 	projectiles.setup(enemies)
 	hazards.setup(enemies)
 	gems.setup(player, player.pickup_radius)
@@ -373,16 +377,22 @@ const THEME_PROPS := {
 		["res://assets/sprites/generated/props/prop_tombstone.png", 0.7],
 		["res://assets/sprites/generated/props/prop_cross.png", 0.7],
 		["res://assets/sprites/generated/props/prop_shrub.png", 0.8],
+		["res://assets/sprites/generated/props/prop_bonepile.png", 0.7],
+		["res://assets/sprites/generated/props/prop_hanging_corpse.png", 0.85],
 	],
 	"forest": [
 		["res://assets/sprites/generated/props/prop_tree.png", 1.0],
 		["res://assets/sprites/generated/props/prop_stump.png", 0.7],
 		["res://assets/sprites/generated/props/prop_boulder.png", 0.8],
+		["res://assets/sprites/generated/props/prop_gnarl_root.png", 0.8],
+		["res://assets/sprites/generated/props/prop_toadstool.png", 0.6],
 	],
 	"castle": [
 		["res://assets/sprites/generated/props/prop_pillar.png", 0.8],
 		["res://assets/sprites/generated/props/prop_rubble.png", 0.8],
 		["res://assets/sprites/generated/props/prop_candelabra.png", 0.7],
+		["res://assets/sprites/generated/props/prop_brazier.png", 0.7],
+		["res://assets/sprites/generated/props/prop_broken_statue.png", 0.85],
 	],
 }
 
