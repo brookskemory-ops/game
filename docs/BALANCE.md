@@ -60,3 +60,14 @@ not top-tier.
 
 On-screen count builds fast — ~56 alive by 26s, ~90 by 32s on hard. The opening
 is **not** thin; no thickening needed (an earlier hypothesis the data killed).
+
+## The Deepening (v2.0 ascension curve)
+
+Post-true-ending replay knob, 0..10, folded into the enemy-mods pipeline on top
+of night + difficulty. Per level: enemy **hp ×(1 + 0.18·n)**, **damage ×(1 +
+0.08·n)**, **speed ×(1 + 0.03·n)**; rewards **gold ×(1 + 0.15·n)**, **xp ×(1 +
+0.10·n)**. At the cap (10): foes ~2.8× flesh, 1.8× bite, 1.3× pace for ~2.5×
+gold / 2× xp — punishing but not a wall, and the reward curve keeps the run's
+own power scaling roughly apace. Per-hero mastery grants a small flat edge
+(+2% damage, +2 max HP per night won, capped at 5 tiers) so a well-walked hero
+opens the deeper Deepenings with a real, earned head start.
