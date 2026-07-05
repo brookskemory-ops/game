@@ -237,3 +237,34 @@ story-tied objectives, more maps, and an endless mode.
 - **v1.0-rc "The Vigil Holds"**: save_version + a single migration hook, README rewritten
   as a landing page, and the full QA battery (suite + all-night boots + perf + layout)
   run against the final build. The release gate from here is the user's own playtests.
+
+---
+
+## Block D — "The Last Grave" (v1.6 → v2.0)
+
+The biggest single expansion since launch — a fourth act, a seventh hero, weapon
+evolutions for the v1.4 trio, two new meta layers, controller support, and the hero
+attack swings held back in v1.6. Eleven work blocks, each shipped green.
+
+- **Act IV "The Hollow Beneath"** (stage4, theme `crypt`): the abyss under Castle Vane
+  where the curse began. Five animated crypt mobs (two new mechanics — a **blink**
+  wraith that closes distance, a **leech** that heals off contact), a mid-boss (the Pale
+  Prior) and the **true final boss** (the Unburied), a colder crypt music bed, and the
+  **true ending** ("The Last Grave") beyond the Hollow King's bargain.
+- **Thessaly, the Sin-Eater** (7th hero): a sustained tether weapon, **Devouring Grief**
+  (channel-drain + lifesteal — a genuinely open niche), and *Communion*, a decaying
+  kill-fuelled damage stack. Unlocked by the true end.
+- **Weapon evolutions** for Fen-Fire → **Corpsefire**, Reaping Hook → **The Reaping**,
+  Gallows Toll → **The Gallows** — closing the parity gap (they were the only draftable
+  weapons without an evolution).
+- **Meta: Medals + Codex** — 15 data-driven achievements over lifetime/run stats, a
+  fireside MEDALS panel with live progress, a toast on unlock, and combat stats added to
+  the browsable bestiary.
+- **Meta: The Deepening + Mastery** — a stackable post-ending ascension (0..10, harder
+  dead / richer spoils, folded into the enemy-mods pipeline) and a per-hero mastery track
+  (a small permanent edge per night won), both persisted and surfaced at the camp.
+- **Controller support** — left stick + D-pad movement, pad-gated menu focus navigation
+  across camp / draft / pause / results, title-advance on any button, device-aware copy.
+  Keyboard / mouse / touch untouched. (Clears the long-standing v1.2 task.)
+- **Hero attack swings** — the six original heroes' Pixel Lab attack frames now play as a
+  brief, rate-limited swing on fire, tuned by weapon heft, under the weapons' own VFX.

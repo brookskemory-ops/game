@@ -7,7 +7,7 @@ signal run_ended(victory: bool)
 signal gold_changed(total: int)
 signal orientation_changed  # mobile canvas swapped landscape <-> portrait
 
-const VERSION := "1.6 — the deepening night"
+const VERSION := "2.0 — the last grave"
 const SAVE_PATH := "user://save.json"
 
 ## Player-facing settings (persisted inside the save file).

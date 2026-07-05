@@ -78,6 +78,7 @@ pool while playing them** (so their identity can't be replicated by another hero
 | Ansel | Burning Censer | *Mortification* — +1% damage per 1% missing HP |
 | Roland | Greatsword | *Bulwark* — flat damage reduction, −10% speed |
 | Hollow King | Cursed Blade | *Deathless* — no natural healing; leech on kill |
+| Sin-Eater | Devouring Grief | *Communion* — kills fuel a decaying damage stack (to +30%) |
 
 Signature passives follow the same one-stat rule against the general passive pool
 (Light Foot is conditional speed vs Fleet Boots' flat speed — different niche; Bulwark is
