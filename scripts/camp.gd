@@ -437,6 +437,11 @@ func _make_hero_column(hero_id: String) -> VBoxContainer:
 		var sig := UITheme.make_label(String(def.get("signature_desc", "")).get_slice(" — ", 0), 8, Palette.ASH)
 		sig.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		inner.add_child(sig)
+		# Hero mastery: filled marks for tiers earned (a permanent small edge).
+		var mtier := mini(Game.hero_mastery(hero_id), Game.MASTERY_MAX)
+		if mtier > 0:
+			var marks := "✦".repeat(mtier) + "·".repeat(Game.MASTERY_MAX - mtier)
+			inner.add_child(UITheme.make_label("mastery " + marks, 8, Palette.TORCH))
 	else:
 		inner.add_child(UITheme.make_label("? ? ?", 12, Palette.STONE))
 		var hint := UITheme.make_label(String(def.get("unlock_hint", "")), 8, Palette.ASH)
@@ -597,6 +602,41 @@ func _open_settings() -> void:
 		Sfx.play("ui")
 	)
 	column.add_child(diff)
+	# The Deepening (ascension): unlocked at the true end. Each level makes the
+	# dead harder but more generous — stacked on top of the difficulty above.
+	if Game.ascension_unlocked():
+		var deep := HBoxContainer.new()
+		deep.add_theme_constant_override("separation", 6)
+		var minus := UITheme.make_button("−", 14)
+		minus.custom_minimum_size = Vector2(42, 0)
+		var deep_label := UITheme.make_label("", 12, Palette.TORCH)
+		deep_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		deep_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var plus := UITheme.make_button("+", 14)
+		plus.custom_minimum_size = Vector2(42, 0)
+		var refresh_deep := func() -> void:
+			var n := Game.ascension_level()
+			if n <= 0:
+				deep_label.text = "The Deepening: none"
+			else:
+				var m: Dictionary = Game.ascension_mods()
+				deep_label.text = "The Deepening %d  ·  foes ×%.1f, spoils ×%.1f" % [
+					n, float(m["hp_mul"]), float(m["gold_mul"])]
+		refresh_deep.call()
+		minus.pressed.connect(func() -> void:
+			Game.set_ascension(Game.ascension_level() - 1)
+			refresh_deep.call()
+			Sfx.play("ui")
+		)
+		plus.pressed.connect(func() -> void:
+			Game.set_ascension(Game.ascension_level() + 1)
+			refresh_deep.call()
+			Sfx.play("ui")
+		)
+		deep.add_child(minus)
+		deep.add_child(deep_label)
+		deep.add_child(plus)
+		column.add_child(deep)
 	column.add_child(_settings_toggle("Sound", "sfx_volume"))
 	column.add_child(_settings_toggle("Music", "music_volume"))
 	var numbers := UITheme.make_button("")

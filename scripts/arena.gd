@@ -63,12 +63,15 @@ func _ready() -> void:
 	# multiply the shared knobs so, e.g., a Hard blood-toll night is both.
 	var night_mods: Dictionary = stage.get("mods", {})
 	var diff: Dictionary = Game.difficulty_def()
+	# The Deepening (v2.0 ascension) stacks on top of night + difficulty: the
+	# dead grow harder but pay out more. Level 0 is the identity.
+	var asc: Dictionary = Game.ascension_mods()
 	var mods := {
-		"hp_mul": float(night_mods.get("hp_mul", 1.0)) * float(diff.get("enemy_hp", 1.0)),
-		"speed_mul": float(night_mods.get("speed_mul", 1.0)) * float(diff.get("enemy_speed", 1.0)),
-		"gold_mul": float(night_mods.get("gold_mul", 1.0)) * float(diff.get("gold", 1.0)),
-		"xp_mul": float(night_mods.get("xp_mul", 1.0)) * float(diff.get("xp", 1.0)),
-		"damage_mul": float(diff.get("enemy_damage", 1.0)),
+		"hp_mul": float(night_mods.get("hp_mul", 1.0)) * float(diff.get("enemy_hp", 1.0)) * float(asc["hp_mul"]),
+		"speed_mul": float(night_mods.get("speed_mul", 1.0)) * float(diff.get("enemy_speed", 1.0)) * float(asc["speed_mul"]),
+		"gold_mul": float(night_mods.get("gold_mul", 1.0)) * float(diff.get("gold", 1.0)) * float(asc["gold_mul"]),
+		"xp_mul": float(night_mods.get("xp_mul", 1.0)) * float(diff.get("xp", 1.0)) * float(asc["xp_mul"]),
+		"damage_mul": float(diff.get("enemy_damage", 1.0)) * float(asc["damage_mul"]),
 		"fog": night_mods.get("fog", false),
 	}
 	enemies.set_mods(mods)

@@ -225,6 +225,13 @@ func end_run(victory: bool, stats := {}) -> void:
 		var stage_id := String(stats.get("stage", ""))
 		if not stage_id.is_empty():
 			save_data["stages"][stage_id] = true
+		# Per-hero mastery: another night held with this hero.
+		var mastery: Dictionary = save_data.get("mastery", {})
+		mastery[selected_character] = int(mastery.get(selected_character, 0)) + 1
+		save_data["mastery"] = mastery
+		# Deepening prestige: the deepest Deepening ever cleared.
+		if ascension_level() > int(save_data.get("ascension_best", 0)):
+			save_data["ascension_best"] = ascension_level()
 	else:
 		lifetime["deaths"] = int(lifetime.get("deaths", 0)) + 1
 	var best: Dictionary = save_data.get("best_run", {})
@@ -583,6 +590,44 @@ func _check_achievements(run_stats: Dictionary) -> void:
 		if _achievement_met(a, run_stats):
 			earned[id] = true
 			newly_earned_achievements.append(id)
+
+# --- Ascension: "The Deepening" (unlocked by the true end) + hero mastery ---
+
+const ASCENSION_MAX := 10
+const MASTERY_MAX := 5  # tiers that grant a bonus; wins beyond still tally
+
+## The Deepening is offered once the night has been taken to its root (Act IV).
+func ascension_unlocked() -> bool:
+	return stage_cleared("stage4") or ending() == "unburied"
+
+func ascension_level() -> int:
+	return clampi(int(save_data.get("ascension", 0)), 0, ASCENSION_MAX)
+
+func set_ascension(n: int) -> void:
+	save_data["ascension"] = clampi(n, 0, ASCENSION_MAX)
+	write_save()
+
+## Deepening multipliers, folded into the arena's enemy mods. Each level makes
+## the dead harder but more generous. Level 0 is the identity (no change).
+func ascension_mods() -> Dictionary:
+	var n := float(ascension_level())
+	return {
+		"hp_mul": 1.0 + 0.18 * n,
+		"damage_mul": 1.0 + 0.08 * n,
+		"speed_mul": 1.0 + 0.03 * n,
+		"gold_mul": 1.0 + 0.15 * n,
+		"xp_mul": 1.0 + 0.10 * n,
+	}
+
+## Raw nights won with a hero (uncapped — the mastery panel shows the tally).
+func hero_mastery(hero_id: String) -> int:
+	return int(save_data.get("mastery", {}).get(hero_id, 0))
+
+## +2% damage and +2 max HP per mastery tier (capped at MASTERY_MAX), applied
+## once at hero setup. A small, permanent edge for a well-walked hero.
+func hero_mastery_bonus(hero_id: String) -> Dictionary:
+	var m := float(mini(hero_mastery(hero_id), MASTERY_MAX))
+	return {"damage_mul": 1.0 + 0.02 * m, "max_hp": 2.0 * m}
 
 # --- The ending (Block B): chosen once, at the camp, by the Hollow King ---
 

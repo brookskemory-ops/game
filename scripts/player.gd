@@ -136,6 +136,13 @@ func setup(ctx: Dictionary) -> void:
 	else:
 		_sprite.texture = PixelSprites.get_tex(String(stats.get("sprite", "wren")))
 	_front_tex = _sprite.texture
+	# Hero mastery (v2.0): a small permanent edge for a well-walked hero.
+	var mastery: Dictionary = Game.hero_mastery_bonus(hero_id)
+	var bonus_hp := float(mastery.get("max_hp", 0.0))
+	base_max_hp += bonus_hp
+	max_hp += bonus_hp
+	hp = max_hp
+	mods["damage"] *= float(mastery.get("damage_mul", 1.0))
 	# Directional art: strict side profile used while moving horizontally.
 	var side_path := "res://assets/sprites/generated/side/%s.png" % hero_id
 	if ResourceLoader.exists(side_path):
