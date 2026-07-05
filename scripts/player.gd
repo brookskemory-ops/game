@@ -63,6 +63,9 @@ var _sprite: Sprite2D
 var _camera: GameCamera
 var _front_tex: Texture2D
 var _side_tex: Texture2D
+var _walk_frames: Array = []  # Pixel Lab side walk cycle; empty -> procedural gait
+var _anim_t := 0.0
+const WALK_FPS := 9.0
 var _gait_t := 0.0
 var _sprite_base_scale := 1.0
 var _lightfoot_timer := 0.0
@@ -124,6 +127,16 @@ func setup(ctx: Dictionary) -> void:
 	var side_path := "res://assets/sprites/generated/side/%s.png" % hero_id
 	if ResourceLoader.exists(side_path):
 		_side_tex = load(side_path)
+	# Side-view walk cycle (Pixel Lab). When present it fully replaces the
+	# front/side texture swap — the hero always reads as one consistent
+	# side-facing design (flip for direction), which is what "the design
+	# changes when they move" was about.
+	for i in 4:
+		var wp := "res://assets/sprites/generated/side/%s_walk_%d.png" % [hero_id, i]
+		if ResourceLoader.exists(wp):
+			_walk_frames.append(load(wp))
+	if not _walk_frames.is_empty():
+		_sprite.texture = _walk_frames[0]
 	_sprite_base_scale = _sprite.scale.x
 	add_child(_sprite)
 	equip(_qa_weapon_override(String(stats.get("weapon", "hunting_bow"))))
@@ -270,21 +283,29 @@ func _physics_process(delta: float) -> void:
 		if absf(velocity.x) > 1.0:
 			_sprite.flip_h = velocity.x < 0.0
 		_sprite.modulate = _sprite.modulate.lerp(Color.WHITE, delta * 8.0)
-		# Directional still: side profile when horizontal movement dominates.
-		if _side_tex != null:
-			_sprite.texture = _side_tex if (moving and absf(velocity.x) >= absf(velocity.y)) else _front_tex
-		# Procedural gait (genre-standard): footstep bob, sway, and a small
-		# squash on each footfall. Settles smoothly when standing.
-		if moving:
-			_gait_t += delta * move_speed * 0.085
-			var step := sin(_gait_t)
-			_sprite.rotation = step * 0.07
-			_sprite.position.y = -absf(step) * 1.4
-			_sprite.scale.y = _sprite_base_scale * (1.0 - 0.04 * absf(step))
+		if not _walk_frames.is_empty():
+			# Frame-based side walk cycle: one consistent design, flipped for
+			# direction. Idle rests on frame 0; a gentle bob, no design-warping
+			# rotation/squash.
+			if moving:
+				_anim_t += delta * WALK_FPS
+				_sprite.texture = _walk_frames[int(_anim_t) % _walk_frames.size()]
+				_gait_t += delta * move_speed * 0.085
+				_sprite.position.y = -absf(sin(_gait_t)) * 0.8
+			else:
+				_anim_t = 0.0
+				_sprite.texture = _walk_frames[0]
+				_sprite.position.y = lerpf(_sprite.position.y, 0.0, minf(1.0, delta * 10.0))
 		else:
-			_sprite.rotation = lerpf(_sprite.rotation, 0.0, minf(1.0, delta * 10.0))
-			_sprite.position.y = lerpf(_sprite.position.y, 0.0, minf(1.0, delta * 10.0))
-			_sprite.scale.y = lerpf(_sprite.scale.y, _sprite_base_scale, minf(1.0, delta * 10.0))
+			# Fallback (no walk frames): keep a clean side/front still + gentle
+			# bob — but no jarring squash.
+			if _side_tex != null:
+				_sprite.texture = _side_tex if (moving and absf(velocity.x) >= absf(velocity.y)) else _front_tex
+			if moving:
+				_gait_t += delta * move_speed * 0.085
+				_sprite.position.y = -absf(sin(_gait_t)) * 1.2
+			else:
+				_sprite.position.y = lerpf(_sprite.position.y, 0.0, minf(1.0, delta * 10.0))
 	if _hurt_accum > 0.0:
 		_hurt_accum = maxf(0.0, _hurt_accum - delta * 6.0)
 	if _invuln > 0.0:
