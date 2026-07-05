@@ -486,6 +486,10 @@ func stage_cleared(id: String) -> bool:
 
 # --- First-run hints (each shown once, then remembered forever) ---
 
+## True when a joypad is present — UI copy swaps to controller prompts.
+func using_controller() -> bool:
+	return not Input.get_connected_joypads().is_empty()
+
 func hint_seen(id: String) -> bool:
 	return bool(save_data.get("seen_hints", {}).get(id, false))
 

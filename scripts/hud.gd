@@ -630,6 +630,7 @@ func _center_in_overlay(overlay: Control, content: Control) -> void:
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	center.add_child(content)
 	overlay.add_child(center)
+	UITheme.enable_focus(content)  # controller nav (no-op without a pad)
 
 func _snapshot_stats() -> Dictionary:
 	var time_elapsed := 0.0

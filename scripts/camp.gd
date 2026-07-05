@@ -180,6 +180,8 @@ func _ready() -> void:
 	if not Game.hint_seen("begin"):
 		var nudge_text := "tap Wren — begin the vigil" if Game.is_mobile \
 			else "click a survivor — begin the vigil"
+		if Game.using_controller():
+			nudge_text = "◀ ▶ choose a survivor,  Ⓐ to begin the vigil"
 		var nudge := UITheme.make_label(nudge_text, 11, Palette.TORCH)
 		_place(nudge, 0.5, 0.0, 0.5, 0.0, Rect2(-250, 66, 500, 16))
 		add_child(nudge)
@@ -195,6 +197,10 @@ func _ready() -> void:
 		_open_settings()
 	)
 	add_child(gear)
+
+	# Controller: let a joypad pick a hero and start (no-op without a pad).
+	# Any story card opened just below re-grabs focus over this (also deferred).
+	UITheme.enable_focus(self)
 
 	# The Hollow King's victory poses the final choice; otherwise the very
 	# first visitor gets the prologue, and newly unlocked survivors tell their
@@ -1060,6 +1066,7 @@ func _center(overlay: Control, content: Control) -> void:
 	_place(center, 0.0, 0.0, 1.0, 1.0, Rect2(0, 0, 0, 0))
 	center.add_child(content)
 	overlay.add_child(center)
+	UITheme.enable_focus(content)  # controller nav (no-op without a pad)
 
 func _is_press(event: InputEvent) -> bool:
 	if event is InputEventScreenTouch and event.pressed:

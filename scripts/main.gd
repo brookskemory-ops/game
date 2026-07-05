@@ -33,6 +33,8 @@ func _ready() -> void:
 	add_child(subtitle)
 
 	var begin_text := "TAP TO BEGIN" if Game.is_mobile else "CLICK OR PRESS ANY KEY"
+	if Game.using_controller():
+		begin_text = "PRESS ANY BUTTON"
 	_prompt = UITheme.make_label(begin_text, 13, Palette.BONE)
 	_place(_prompt, 0.5, 1.0, 0.5, 1.0, Rect2(-150, -64, 300, 22))
 	add_child(_prompt)
@@ -183,6 +185,8 @@ func _input(event: InputEvent) -> void:
 		at = event.position
 	elif event is InputEventKey and event.pressed and not event.echo:
 		pressed = true
+	elif event is InputEventJoypadButton and event.pressed:
+		pressed = true  # any controller button begins (A/Start/etc.)
 	# _input runs before button handlers: a tap on the fullscreen button
 	# must not double as tap-to-begin.
 	if pressed and _full_btn != null and _full_btn.get_global_rect().has_point(at):

@@ -104,3 +104,24 @@ static func make_button(text: String, size := 15) -> Button:
 	button.add_theme_stylebox_override("pressed", pressed)
 	button.add_theme_stylebox_override("focus", hover.duplicate())
 	return button
+
+## Controller support (v2.0): make every enabled Button under `root` focusable
+## and drop initial focus on the first, so a joypad's ui_up/down/left/right/
+## accept can drive the menu — Godot resolves neighbours geometrically. Gated
+## on a pad actually being present, so mouse/touch/keyboard UX is untouched
+## (no stray focus rings after a click). The focus box is styled like hover.
+static func enable_focus(root: Node) -> void:
+	if Input.get_connected_joypads().is_empty():
+		return
+	var buttons: Array = []
+	_collect_focusable(root, buttons)
+	for b in buttons:
+		(b as Button).focus_mode = Control.FOCUS_ALL
+	if not buttons.is_empty():
+		(buttons[0] as Button).call_deferred("grab_focus")
+
+static func _collect_focusable(n: Node, out: Array) -> void:
+	for child in n.get_children():
+		if child is Button and not (child as Button).disabled and (child as Button).visible:
+			out.append(child)
+		_collect_focusable(child, out)
